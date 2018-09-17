@@ -1,10 +1,9 @@
 const unified = require('unified');
 const parse = require('remark-parse');
 const render = require('../../src/index');
+const Renderer = require('../../renderers/hyperscript-renderer');
 
 const h = require('hyperscript');
-const Renderer = require('../../src/renderers/hyperscript/renderer');
-
 const renderer = new Renderer({
     h: h,
     rootClassName: 'markdown-body'

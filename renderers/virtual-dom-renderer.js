@@ -1,13 +1,16 @@
 /**
- * Renderer
+ * virtual-dom Renderer
  */
 
-var Renderer = require('../../renderer');
+function Renderer(options) {
+    this.options = options || {};
+    this.h = options.h;
+}
 
 Renderer.prototype.root = function(h, node, index, children) {
     return h('div', {
         key: index,
-        'class': [this.options.rootClassName || 'markdown-body']
+        className: this.options.rootClassName || 'markdown-body'
     }, children);
 };
 
@@ -20,8 +23,8 @@ Renderer.prototype.inlineCode = function(h, node, index, children) {
 Renderer.prototype.math = function(h, node, index, children) {
     return h('p', {
         key: index,
-        domProps:{
-            "innerHTML": node.renderedValue
+        dangerouslySetInnerHTML: {
+            __html: node.renderedValue
         }
     });
 };
@@ -29,17 +32,8 @@ Renderer.prototype.math = function(h, node, index, children) {
 Renderer.prototype.inlineMath = function(h, node, index, children) {
     return h('span', {
         key: index,
-        domProps:{
-            "innerHTML": node.renderedValue
-        }
-    });
-};
-
-Renderer.prototype.html = function(h, node, index, children) {
-    return h('div', {
-        key: index,
-        domProps:{
-            "innerHTML": node.value
+        dangerouslySetInnerHTML: {
+            __html: node.renderedValue
         }
     });
 };
@@ -47,11 +41,9 @@ Renderer.prototype.html = function(h, node, index, children) {
 Renderer.prototype.code = function(h, node, index, children) {
     return h('pre', {
         key: index
-    }, [
-        h('code', {
-            'class': [node.lang?'language-'+node.lang:'']
-        }, node.value)
-    ]);
+    }, h('code', {
+        className: node.lang?'language-'+node.lang:''
+    }, node.value));
 };
 
 Renderer.prototype.blockquote = function(h, node, index, children) {
@@ -60,7 +52,14 @@ Renderer.prototype.blockquote = function(h, node, index, children) {
     }, children);
 };
 
-
+Renderer.prototype.html = function(h, node, index, children) {
+    return h('div', {
+        key: index,
+        dangerouslySetInnerHTML: {
+            __html: node.value
+        }
+    });
+};
 
 Renderer.prototype.heading = function(h, node, index, children) {
     return h('h'+node.depth, {
@@ -89,11 +88,9 @@ Renderer.prototype.listItem = function(h, node, index, children) {
 Renderer.prototype.checkbox = function(h, node, index, children) {
     return h('input', {
         key: index,
-        attrs: {
-            type: 'checkbox',
-            checked: node.checked,
-            disabled: true
-        }
+        type: 'checkbox',
+        checked: node.checked,
+        readOnly: true
     });
 };
 
@@ -107,7 +104,7 @@ Renderer.prototype.table = function(h, node, index, children) {
     return h('table', {
             key: index
         },
-        [h('tbody',{key:0}, children)]
+        h('tbody',{key:0}, children)
     );
 };
 
@@ -151,22 +148,16 @@ Renderer.prototype.delete = function(h, node, index, children) {
 Renderer.prototype.link = function(h, node, index, children) {
     return h('a', {
         key: index,
-        attrs:{
-            target: '_blank',
-            href: node.url,
-            title: node.title
-        }
+        href: node.url,
+        title: node.title
     }, children);
 };
 
 Renderer.prototype.linkReference = function(h, node, index, children) {
     return h('a', {
         key: index,
-        attrs:{
-            target: '_blank',
-            href: node.url,
-            title: node.title
-        }
+        href: node.url,
+        title: node.title
     }, children);
 };
 
@@ -174,34 +165,27 @@ Renderer.prototype.definition = function(h, node, index, children) {
     return h('div', {
             key: index,
             style: {
-                // height: 0,
-                // visibility: 'hidden'
-                'word-break': 'break-all'
+                height: 0,
+                visibility: 'hidden'
             }
-        },[
-            h('a', {
-                key: 0,
-                attrs: {
-                    target: '_blank',
-                    href: node.url,
-                    'data-identifier': node.identifier
-                }
-            }, [
-                '['+node.identifier+']: ',
-                node.url
-            ])
-        ]
+        },
+        h('a', {
+            key: 0,
+            href: node.url,
+            'data-identifier': node.identifier
+        }, [
+            '['+node.identifier+']: ',
+            node.url
+        ])
     );
 };
 
 Renderer.prototype.image = function(h, node, index, children) {
     return h('img', {
         key: index,
-        attrs: {
-            src: node.url,
-            alt: node.alt,
-            title: node.title
-        }
+        src: node.url,
+        alt: node.alt,
+        title: node.title
     });
 };
 

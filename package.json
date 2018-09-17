@@ -4,7 +4,7 @@
   "description": "Compile markdown to Virtual DOM with remark.",
   "scripts": {
     "dist": "webpack -c webpack.config.js",
-    "dev": "webpack -w",
+    "dev": "webpack -w --config ./examples/webpack.config.js --example hyperscript",
     "test": "mocha test/**/*.js"
   },
   "repository": {
@@ -21,7 +21,8 @@
   "main": "src/index.js",
   "files": [
     "src",
-    "dist/*.js"
+    "dist/*.js",
+    "renderers/*.js"
   ],
   "author": "yucopowo@gmail.com",
   "license": "MIT",

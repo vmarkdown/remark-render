@@ -1,8 +1,11 @@
 /**
- * Renderer
+ * hyperscript Renderer
  */
 
-var Renderer = require('../../renderer');
+function Renderer(options) {
+    this.options = options || {};
+    this.h = options.h;
+}
 
 Renderer.prototype.root = function(h, node, index, children) {
     var rootClassName = this.options.rootClassName || 'markdown-body';
@@ -13,13 +16,13 @@ Renderer.prototype.root = function(h, node, index, children) {
 
 Renderer.prototype.text = function(h, node, index, children) {
     return h('span', {
-        
+
     }, node.value);
 };
 
 Renderer.prototype.inlineCode = function(h, node, index, children) {
     return h('code', {
-        
+
     }, node.value);
 };
 
@@ -66,7 +69,7 @@ Renderer.prototype.listItem = function(h, node, index, children) {
 
 Renderer.prototype.checkbox = function(h, node, index, children) {
     return h('input', {
-        
+
         type: 'checkbox',
         checked: node.checked,
         readOnly: true
@@ -95,7 +98,7 @@ Renderer.prototype.tableRow = function(h, node, index, children) {
 
 Renderer.prototype.tableCell = function(h, node, index, children) {
     return h('td', {
-        
+
         align: node.align
     }, children);
 };
@@ -133,7 +136,7 @@ Renderer.prototype.link = function(h, node, index, children) {
 
 Renderer.prototype.linkReference = function(h, node, index, children) {
     return h('a', {
-        
+
         href: node.url,
         title: node.title
     }, children);

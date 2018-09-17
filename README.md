@@ -33,7 +33,8 @@ var parse = require('remark-parse')
 var render = require('remark-render')
   
 var h = require('hyperscript');
-var renderer = new render.HyperScript({
+var Renderer = require('remark-render/renderers/hyperscript-renderer');
+var renderer = new Renderer({
     h: h,
     rootClassName: 'markdown-body'
 });
@@ -62,7 +63,8 @@ var render = require('remark-render')
   
 var React = require('react');
 var h = React.createElement;
-var renderer = new render.React({
+var Renderer = require('remark-render/renderers/react-renderer');
+var renderer = new Renderer({
     h: h,
     rootClassName: 'markdown-body'
 });
@@ -103,7 +105,8 @@ var parse = require('remark-parse')
 var render = require('remark-render')
   
 var React = require('react');
-var renderer = new render.Vue({
+var Renderer = require('remark-render/renderers/vue/renderer');
+var renderer = new Renderer({
     rootClassName: 'markdown-body'
 });
  
@@ -119,7 +122,7 @@ const app = new Vue({
         md: md
     },
     render(h) {
-        renderer.h(h);
+        renderer.h = h;
         var file = processor.processSync(this.md);
         return file.contents;
     }
@@ -135,8 +138,7 @@ var parse = require('remark-parse')
 var render = require('remark-render')
   
 var h = require('hyperscript');
-var Renderer = render.HyperScriptRenderer;
-
+var Renderer = require('remark-render/renderers/hyperscript-renderer');
 Renderer.prototype.text = function(h, node, index, children) {
     return h('span', {
         style: {
@@ -149,6 +151,14 @@ var renderer = new Renderer({
     h: h,
     rootClassName: 'markdown-body'
 });
+
+renderer.text = function(h, node, index, children) {
+    return h('span', {
+        style: {
+            fontSize: 20
+        }
+    }, node.value);
+};
 
 unified()
   .use(parse)

@@ -1,8 +1,11 @@
 /**
- * Renderer
+ * preact Renderer
  */
 
-var Renderer = require('../../renderer');
+function Renderer(options) {
+    this.options = options || {};
+    this.h = options.h;
+}
 
 Renderer.prototype.root = function(h, node, index, children) {
     return h('div', {

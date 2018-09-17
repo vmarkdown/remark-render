@@ -28,12 +28,11 @@ Parser.prototype.parseNode = function(node, index) {
         throw new Error('renderer no method:'+ node.type);
     }
 
-    var h = this.renderer.h();
+    var h = this.renderer.h || this.renderer.options.h;
     if(!h){
         throw new Error('h not found.');
     }
 
-    // var children = (node.children && node.children.length>0)?this.parse(node.children):[];
     var children = this.parseNodes(node.children);
     return this.renderer[node.type].apply(this.renderer, [h, node, index, children]);
 };
