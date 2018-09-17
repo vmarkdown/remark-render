@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+
+    <link rel="stylesheet" href="//cdn.bootcss.com/github-markdown-css/2.10.0/github-markdown.min.css">
+    <link rel="stylesheet" href="//cdn.bootcss.com/KaTeX/0.10.0-alpha/katex.min.css">
+
+
+    <script src="//cdn.bootcss.com/vue/2.5.16/vue.js"></script>
+
+    <script src="../../dist/vremark.js"></script>
+    <script src="../../dist/vremark-plugin-katex.js"></script>
+
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+            height: 100%;
+        }
+
+        #preview{
+            width: 600px;
+            margin: 0 auto;
+
+            border: 1px darkgray solid;
+            margin-top: 40px;
+            padding: 40px 60px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="preview">
+    <div id="app"></div>
+</div>
+
+<script src="../../dist/example-vue-main.js"></script>
+
+</body>
+</html>

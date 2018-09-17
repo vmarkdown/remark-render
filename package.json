@@ -1,0 +1,34 @@
+{
+  "name": "remark-render",
+  "version": "0.0.1",
+  "description": "Compile markdown to Virtual DOM with remark.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/**/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vmarkdown/remark-render.git"
+  },
+  "keywords": [
+    "markdown",
+    "remark",
+    "vdom",
+    "vue",
+    "react"
+  ],
+  "author": "yucopowo@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vmarkdown/remark-render/issues"
+  },
+  "homepage": "https://github.com/vmarkdown/remark-render#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "hyperscript": "^2.0.2",
+    "mocha": "^5.2.0",
+    "react": "^16.5.1",
+    "remark-parse": "^5.0.0",
+    "unified": "^7.0.0"
+  }
+}
