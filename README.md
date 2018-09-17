@@ -75,23 +75,10 @@ var processor = unified()
         renderer: renderer
     });
  
-class Preview extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            md: '# h1  \n## h2'
-        };
-    }
-    
-    render() {
-        var file = processor.processSync(this.state.md);
-        return file.contents;
-    }
-}
+var file = processor.processSync('# h1');
 
 ReactDOM.render(
-    h(Preview),
+    file.contents,
     document.getElementById('preview')
 );
  
@@ -105,7 +92,7 @@ var parse = require('remark-parse')
 var render = require('remark-render')
   
 var React = require('react');
-var Renderer = require('remark-render/renderers/vue/renderer');
+var Renderer = require('remark-render/renderers/vue-renderer');
 var renderer = new Renderer({
     rootClassName: 'markdown-body'
 });
@@ -118,12 +105,9 @@ var processor = unified()
  
 const app = new Vue({
     el: '#app',
-    data: {
-        md: md
-    },
     render(h) {
         renderer.h = h;
-        var file = processor.processSync(this.md);
+        var file = processor.processSync('# h1');
         return file.contents;
     }
 }); 
@@ -139,24 +123,15 @@ var render = require('remark-render')
   
 var h = require('hyperscript');
 var Renderer = require('remark-render/renderers/hyperscript-renderer');
-Renderer.prototype.text = function(h, node, index, children) {
-    return h('span', {
-        style: {
-            fontSize: 20
-        }
-    }, node.value);
-};
 
 var renderer = new Renderer({
     h: h,
     rootClassName: 'markdown-body'
 });
 
-renderer.text = function(h, node, index, children) {
+renderer.text = function(node, children, index) {
     return h('span', {
-        style: {
-            fontSize: 20
-        }
+        style: {'font-size': '60px'}
     }, node.value);
 };
 
@@ -170,7 +145,6 @@ unified()
     var preview = document.getElementById('preview');
     preview.appendChild(vdom);
   })
- 
 ```
 
 

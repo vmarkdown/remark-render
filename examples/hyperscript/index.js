@@ -9,6 +9,12 @@ const renderer = new Renderer({
     rootClassName: 'markdown-body'
 });
 
+renderer.heading = function(node, children) {
+    return h('h'+node.depth, {
+        style: {'font-size': '60px'}
+    }, children);
+};
+
 let processor = unified()
     .use(parse, {})
     .use(render, {
@@ -16,10 +22,8 @@ let processor = unified()
     });
 
 const file = processor.processSync(require('../md/syntax.md'));
-const vdom = file.contents;
+const dom = file.contents;
 
 const preview = document.getElementById('preview');
-
-preview.appendChild(vdom);
-
+preview.appendChild(dom);
 

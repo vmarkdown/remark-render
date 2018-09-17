@@ -1,10 +1,3 @@
-var isArray = (function isArray() {
-    if (Array.isArray) return Array.isArray;
-    return function(arg) {
-        return Object.prototype.toString.call(arg) === '[object Array]';
-    };
-})();
-
 function Parser(options) {
     this.options = options;
     this.renderer = options.renderer;
@@ -16,7 +9,7 @@ Parser.prototype.parseNodes = function(nodes) {
     var vnodes = [];
     for(var i=0;i<nodes.length;i++){
         var node = nodes[i];
-        vnodes.push(this.parse(node, i));
+        vnodes.push(this.parseNode(node, i));
     }
     return vnodes;
 };
@@ -24,24 +17,19 @@ Parser.prototype.parseNodes = function(nodes) {
 Parser.prototype.parseNode = function(node, index) {
     if(!node) return null;
 
-    if(!this.renderer[node.type]){
-        throw new Error('renderer no method:'+ node.type);
-    }
-
-    var h = this.renderer.h || this.renderer.options.h;
-    if(!h){
-        throw new Error('h not found.');
-    }
-
     var children = this.parseNodes(node.children);
-    return this.renderer[node.type].apply(this.renderer, [h, node, index, children]);
+    return this.renderer[node.type].apply(this.renderer, [node, children, index]);
 };
 
-Parser.prototype.parse = function(node, index) {
-    if( isArray(node) ){
-        return this.parseNodes(node);
+Parser.prototype.parse = function(node) {
+    try {
+        return this.parseNode(node,  0);
     }
-    return this.parseNode(node, index || 0);
+    catch (e) {
+        console.error(e);
+    }
+    var h = this.renderer.h || this.renderer.options.h;
+    return h?h('div', {}, 'error'):null;
 };
 
 module.exports = Parser;
