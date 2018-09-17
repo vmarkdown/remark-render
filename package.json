@@ -2,7 +2,6 @@
   "name": "remark-render",
   "version": "0.0.1",
   "description": "Compile markdown to Virtual DOM with remark.",
-  "main": "index.js",
   "scripts": {
     "test": "mocha test/**/*.js"
   },
@@ -16,6 +15,11 @@
     "vdom",
     "vue",
     "react"
+  ],
+  "main": "src/index.js",
+  "files": [
+    "src",
+    "dist/*.js"
   ],
   "author": "yucopowo@gmail.com",
   "license": "MIT",
