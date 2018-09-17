@@ -27,15 +27,9 @@ Renderer.prototype.text = function(h, node, index) {};
 
 Renderer.prototype.inlineCode = function(h, node, index, children) {};
 
-Renderer.prototype.math = function(h, node, index, children) {};
-
-Renderer.prototype.inlineMath = function(h, node, index, children) {};
-
 Renderer.prototype.code = function(h, node, index, children) {};
 
 Renderer.prototype.blockquote = function(h, node, index, children) {};
-
-Renderer.prototype.html = function(h, node, index, children) {};
 
 Renderer.prototype.heading = function(h, node, index, children) {};
 
@@ -71,5 +65,12 @@ Renderer.prototype.definition = function(h, node, index, children) {};
 
 Renderer.prototype.image = function(h, node, index, children) {};
 
+Renderer.prototype.imageReference = function(h, node, index, children) {};
+
+Renderer.prototype.math = function(h, node, index, children) {};
+
+Renderer.prototype.inlineMath = function(h, node, index, children) {};
+
+Renderer.prototype.html = function(h, node, index, children) {};
 
 module.exports = Renderer;
