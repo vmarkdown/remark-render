@@ -1,2 +1,142 @@
 # remark-render
-Compile markdown to Virtual DOM with remark.
+
+Compiles markdown to [Virtual DOM][vdom].  Built on [**remark**][remark], an
+extensively tested and pluggable markdown processor.
+
+*   [x] Supports raw HTML
+*   [x] Supports footnotes, todo lists
+*   [x] Support VNode [keys][vnode-key]
+*   [x] hyperscript virtual-dom Vue React snabbdom Renderers
+*   [x] Custom Renderer 
+
+## Installation
+
+[npm][]:
+
+```bash
+npm install remark-render
+```
+
+## Usage
+
+Say we have the following file, `example.js`:
+
+```html
+<div id="preview"></div>
+```
+
+### HyperScript
+
+```javascript 
+var unified = require('unified')
+var parse = require('remark-parse')
+var render = require('remark-render')
+  
+var h = require('hyperscript');
+var renderer = new render.HyperScript({
+    h: h,
+    rootClassName: 'markdown-body'
+});
+
+unified()
+  .use(parse)
+  .use(render, {
+     renderer: renderer
+  })
+  .process('# h1  \n## h2', function(err, file) {
+    if (err) throw err
+    console.dir(file.contents, {depth: null})
+    var preview = document.getElementById('preview');
+    preview.appendChild(vdom);
+  })
+ 
+```
+
+
+### React
+
+```javascript 
+var unified = require('unified')
+var parse = require('remark-parse')
+var render = require('remark-render')
+  
+var React = require('react');
+var h = React.createElement;
+var renderer = new render.React({
+    h: h,
+    rootClassName: 'markdown-body'
+});
+ 
+var processor = unified()
+    .use(parse)
+    .use(render, {
+        renderer: renderer
+    });
+ 
+class Preview extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            md: '# h1  \n## h2'
+        };
+    }
+    
+    render() {
+        var file = processor.processSync(this.state.md);
+        return file.contents;
+    }
+}
+
+ReactDOM.render(
+    h(Preview),
+    document.getElementById('preview')
+);
+ 
+```
+
+### Vue
+
+```javascript 
+var unified = require('unified')
+var parse = require('remark-parse')
+var render = require('remark-render')
+  
+var React = require('react');
+var renderer = new render.Vue({
+    rootClassName: 'markdown-body'
+});
+ 
+var processor = unified()
+    .use(parse)
+    .use(render, {
+        renderer: renderer
+    });
+ 
+const app = new Vue({
+    el: '#app',
+    data: {
+        md: md
+    },
+    render(h) {
+        renderer.h(h);
+        var file = processor.processSync(this.md);
+        return file.contents;
+    }
+}); 
+```
+
+
+## License
+
+[MIT][license] © [yucopowo][author]
+
+<!-- Definitions -->
+
+[license]: LICENSE
+
+[author]: https://github.com/yucopowo
+
+[npm]: https://docs.npmjs.com/cli/install
+
+[vdom]: https://github.com/Matt-Esch/virtual-dom

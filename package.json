@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Compile markdown to Virtual DOM with remark.",
   "scripts": {
+    "dist": "webpack -c webpack.config.js",
     "dev": "webpack -w",
     "test": "mocha test/**/*.js"
   },

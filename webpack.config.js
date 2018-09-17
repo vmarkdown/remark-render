@@ -1,8 +1,14 @@
 const path = require('path');
-const merge = require('webpack-merge');
 
-const config = {
+module.exports = {
     mode: 'none',
+    entry:{
+        'remark-render': './src/remark-render.js',
+        'remark-hyperscript-render': './src/renderers/hyperscript/renderer.js',
+        'remark-react-render': './src/renderers/react/renderer.js',
+        'remark-virtual-dom-render': './src/renderers/virtual-dom/renderer.js',
+        'remark-vue-render': './src/renderers/vue/renderer.js'
+    },
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].js',
@@ -11,29 +17,11 @@ const config = {
         // libraryExport: 'default'
     },
     module: {
-        rules: [
-            {
-                test: /\.md$/,
-                use: 'text-loader'
-            }
-        ]
     },
     externals: {
-        'vremark-plugin-katex': 'vremarkPluginKatex'
     },
     plugins: [
 
     ]
 };
-
-module.exports = [
-        merge(config, {
-        entry:{
-            'example-hyperscript-main': './examples/hyperscript/index.js'
-        },
-        externals: {
-
-        }
-    })
-];
 

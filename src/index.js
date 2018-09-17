@@ -1,19 +1,11 @@
-var Parser = require('./parser');
+var plugin = require('./remark-render');
 
-module.exports = function plugin(options) {
-    var renderer = options.renderer;
-
-    if(!renderer) {
-        throw new Error('renderer not found. Did you specify the correct plugin option?');
-    }
-
-    var parser = new Parser({
-        renderer: renderer
-    });
-
-    this.Compiler = function compiler(node) {
-        return parser.parse(node);
-    }
+plugin.renderers = {
+    HyperScript: require('./renderers/hyperscript/renderer.js'),
+    React: require('./renderers/react/renderer.js'),
+    VirtualDom: require('./renderers/virtual-dom/renderer.js'),
+    Vue: require('./renderers/vue/renderer.js')
 };
 
+module.exports = plugin;
 
