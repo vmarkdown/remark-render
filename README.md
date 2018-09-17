@@ -7,7 +7,7 @@ extensively tested and pluggable markdown processor.
 *   [x] Supports footnotes, todo lists
 *   [x] Support VNode [keys][vnode-key]
 *   [x] hyperscript virtual-dom Vue React snabbdom Renderers
-*   [x] Custom Renderer 
+*   [x] Custom Renderer / Extend Renderer
 
 ## Installation
 
@@ -127,6 +127,45 @@ const app = new Vue({
 ```
 
 
+### Writing a custom rule/Extend a rule 
+
+```javascript 
+var unified = require('unified')
+var parse = require('remark-parse')
+var render = require('remark-render')
+  
+var h = require('hyperscript');
+var Renderer = render.HyperScriptRenderer;
+
+Renderer.prototype.text = function(h, node, index, children) {
+    return h('span', {
+        style: {
+            fontSize: 20
+        }
+    }, node.value);
+};
+
+var renderer = new Renderer({
+    h: h,
+    rootClassName: 'markdown-body'
+});
+
+unified()
+  .use(parse)
+  .use(render, {
+     renderer: renderer
+  })
+  .process('# h1  \n## h2', function(err, file) {
+    if (err) throw err
+    var preview = document.getElementById('preview');
+    preview.appendChild(vdom);
+  })
+ 
+```
+
+
+
+
 ## License
 
 [MIT][license] © [yucopowo][author]
@@ -139,4 +178,8 @@ const app = new Vue({
 
 [npm]: https://docs.npmjs.com/cli/install
 
+[remark]: https://github.com/remarkjs/remark
+
 [vdom]: https://github.com/Matt-Esch/virtual-dom
+
+[vnode-key]: https://github.com/Matt-Esch/virtual-dom/tree/master/virtual-hyperscript#key
