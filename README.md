@@ -37,8 +37,6 @@ unified()
   .process('# h1  \n## h2', function(err, file) {
     if (err) throw err
     console.dir(file.contents, {depth: null})
-    var preview = document.getElementById('preview');
-    preview.appendChild(vdom);
   })
  
 ```
