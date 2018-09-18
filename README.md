@@ -21,11 +21,43 @@ npm install remark-render
 
 Say we have the following file, `example.js`:
 
+
+```javascript 
+var unified = require('unified')
+var parse = require('remark-parse')
+var render = require('remark-render')
+  
+var h = require('hyperscript');
+unified()
+  .use(parse)
+  .use(render, {
+     mode: 'hyperscript', // supoort hyperscript react vue preact snabbdom virtual-dom
+     h: h, // create element function
+     rootClassName: 'markdown-body' // vdom root element class name
+  })
+  .process('# h1  \n## h2', function(err, file) {
+    if (err) throw err
+    console.dir(file.contents, {depth: null})
+    var preview = document.getElementById('preview');
+    preview.appendChild(vdom);
+  })
+ 
+```
+
+
+## `Preset`
+
+Presets provide a potentially sharable way to render.  They can
+contain multiple modes and optionally settings as well.
+
+#### Example
+
+
 ```html
 <div id="preview"></div>
 ```
 
-### HyperScript
+###### HyperScript
 
 ```javascript 
 var unified = require('unified')
@@ -50,7 +82,7 @@ unified()
 ```
 
 
-### React
+###### React
 
 ```javascript 
 var unified = require('unified')
@@ -80,7 +112,7 @@ ReactDOM.render(
  
 ```
 
-### Vue
+###### Vue
 
 ```javascript 
 var unified = require('unified')
@@ -105,7 +137,7 @@ const app = new Vue({
 ```
 
 
-### Writing a custom rule/Extend a rule 
+###### Writing a custom rule/Extend a rule 
 
 ```javascript 
 var unified = require('unified')
