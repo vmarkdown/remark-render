@@ -172,6 +172,7 @@ Renderer.prototype.code = function(node, children, index) { var h = this.h;
 Renderer.prototype.math = function(node, children, index) { var h = this.h;
     return h('p', {
         key: index,
+        className: node.className,
         dangerouslySetInnerHTML: {
             __html: node.value
         }
@@ -181,6 +182,7 @@ Renderer.prototype.math = function(node, children, index) { var h = this.h;
 Renderer.prototype.inlineMath = function(node, children, index) { var h = this.h;
     return h('span', {
         key: index,
+        className: node.className,
         dangerouslySetInnerHTML: {
             __html: node.value
         }
@@ -190,16 +192,7 @@ Renderer.prototype.inlineMath = function(node, children, index) { var h = this.h
 Renderer.prototype.html = function(node, children, index) { var h = this.h;
     return h('div', {
         key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.value
-        }
-    });
-};
-
-Renderer.prototype.flow = function(node, children, index) { var h = this.h;
-    return h('div', {
-        key: index,
-        className: node.className || '',
+        className: node.className,
         dangerouslySetInnerHTML: {
             __html: node.value
         }

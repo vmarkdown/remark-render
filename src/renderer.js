@@ -66,6 +66,4 @@ Renderer.prototype.html = function(node, children, index) {};
 
 Renderer.prototype.code = function(node, children, index) {};
 
-Renderer.prototype.flow = function(node, children, index) {};
-
 module.exports = Renderer;

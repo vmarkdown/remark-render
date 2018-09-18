@@ -9,6 +9,8 @@ module.exports = function plugin(options) {
 
     var self = this;
 
+    self.data('renderer', parser.renderer);
+
     this.Compiler = function compiler(node) {
         // console.log(self.data('h'))
         var h = self.data('h');
