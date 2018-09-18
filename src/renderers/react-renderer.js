@@ -1,6 +1,21 @@
 /**
  * react Renderer
  */
+// const extend = require('extend');
+
+function props(node, index, defaultProps) {
+
+    defaultProps = defaultProps?defaultProps:{};
+
+    (index > -1) && (defaultProps.key = index);
+
+    if( node.data ){
+        defaultProps.id = node.data.id;
+        defaultProps.className = node.data.className;
+    }
+
+    return defaultProps;
+}
 
 function Renderer(options) {
     this.options = options || {};
@@ -21,9 +36,7 @@ Renderer.prototype.blockquote = function(node, children, index) { var h = this.h
 };
 
 Renderer.prototype.heading = function(node, children, index) { var h = this.h; 
-    return h('h'+node.depth, {
-        key: index
-    }, children);
+    return h('h'+node.depth, props(node, index), children);
 };
 
 Renderer.prototype.thematicBreak = function(node, children, index) { var h = this.h; 
