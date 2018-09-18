@@ -1,6 +1,6 @@
 {
   "name": "remark-render",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Compile markdown to Virtual DOM with remark.",
   "scripts": {
     "dist": "webpack -c webpack.config.js",
