@@ -4,9 +4,8 @@ Compiles markdown to [Virtual DOM][vdom].  Built on [**remark**][remark], an
 extensively tested and pluggable markdown processor.
 
 *   [x] Supports raw HTML
-*   [x] Supports footnotes, todo lists
 *   [x] Support VNode [keys][vnode-key]
-*   [x] hyperscript virtual-dom Vue React snabbdom Renderers
+*   [x] Multiple modes and Optionally settings (hyperscript virtual-dom Vue React snabbdom)
 *   [x] Custom Renderer / Extend Renderer
 
 ## Installation
