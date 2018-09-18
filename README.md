@@ -33,16 +33,12 @@ var parse = require('remark-parse')
 var render = require('remark-render')
   
 var h = require('hyperscript');
-var Renderer = require('remark-render/renderers/hyperscript-renderer');
-var renderer = new Renderer({
-    h: h,
-    rootClassName: 'markdown-body'
-});
-
 unified()
   .use(parse)
   .use(render, {
-     renderer: renderer
+     mode: 'hyperscript',
+     h: h,
+     rootClassName: 'markdown-body'
   })
   .process('# h1  \n## h2', function(err, file) {
     if (err) throw err
@@ -63,7 +59,6 @@ var render = require('remark-render')
   
 var React = require('react');
 var h = React.createElement;
-var Renderer = require('remark-render/renderers/react-renderer');
 var renderer = new Renderer({
     h: h,
     rootClassName: 'markdown-body'
@@ -72,7 +67,8 @@ var renderer = new Renderer({
 var processor = unified()
     .use(parse)
     .use(render, {
-        renderer: renderer
+        mode: 'react',
+        h: h
     });
  
 var file = processor.processSync('# h1');
@@ -91,23 +87,18 @@ var unified = require('unified')
 var parse = require('remark-parse')
 var render = require('remark-render')
   
-var React = require('react');
-var Renderer = require('remark-render/renderers/vue-renderer');
-var renderer = new Renderer({
-    rootClassName: 'markdown-body'
-});
+var Vue = require('vue');
  
 var processor = unified()
     .use(parse)
     .use(render, {
-        renderer: renderer
+        mode: 'vue'
     });
  
 const app = new Vue({
     el: '#app',
     render(h) {
-        renderer.h = h;
-        var file = processor.processSync('# h1');
+        var file = processor.data('h', h).processSync('# h1');
         return file.contents;
     }
 }); 
@@ -122,12 +113,7 @@ var parse = require('remark-parse')
 var render = require('remark-render')
   
 var h = require('hyperscript');
-var Renderer = require('remark-render/renderers/hyperscript-renderer');
-
-var renderer = new Renderer({
-    h: h,
-    rootClassName: 'markdown-body'
-});
+var Renderer = require('remark-render/src/renderers/hyperscript-renderer');
 
 renderer.text = function(node, children, index) {
     return h('span', {
@@ -138,7 +124,8 @@ renderer.text = function(node, children, index) {
 unified()
   .use(parse)
   .use(render, {
-     renderer: renderer
+     h: h,
+     Renderer: Renderer
   })
   .process('# h1  \n## h2', function(err, file) {
     if (err) throw err

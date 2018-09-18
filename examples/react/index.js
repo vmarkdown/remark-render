@@ -1,18 +1,15 @@
 const unified = require('unified');
 const parse = require('remark-parse');
 const render = require('../../src/index');
-const Renderer = require('../../renderers/react-renderer');
 
 const h = React.createElement;
-const renderer = new Renderer({
-    h: h,
-    rootClassName: 'markdown-body'
-});
 
 let processor = unified()
     .use(parse, {})
     .use(render, {
-        renderer: renderer
+        mode: 'react',
+        h: h,
+        rootClassName: 'markdown-body'
     });
 
 const file = processor.processSync(require('../md/syntax.md'));

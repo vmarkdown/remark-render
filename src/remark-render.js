@@ -1,17 +1,13 @@
 var Parser = require('./parser');
 
 module.exports = function plugin(options) {
-    var renderer = options.renderer;
+    var parser = new Parser(options);
 
-    if(!renderer) {
-        throw new Error('renderer not found. Did you specify the correct plugin option?');
-    }
-
-    var parser = new Parser({
-        renderer: renderer
-    });
+    var self = this;
 
     this.Compiler = function compiler(node) {
-        return parser.parse(node);
+        // console.log(self.data('h'))
+        var h = self.data('h');
+        return parser.parse(node, h);
     }
 };

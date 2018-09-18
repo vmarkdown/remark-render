@@ -98,24 +98,21 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const unified = __webpack_require__(3);
-const parse = __webpack_require__(18);
-const render = __webpack_require__(90);
-const Renderer = __webpack_require__(1);
+const unified = __webpack_require__(1);
+const parse = __webpack_require__(16);
+const render = __webpack_require__(88);
 
 const h = React.createElement;
-const renderer = new Renderer({
-    h: h,
-    rootClassName: 'markdown-body'
-});
 
 let processor = unified()
     .use(parse, {})
     .use(render, {
-        renderer: renderer
+        mode: 'react',
+        h: h,
+        rootClassName: 'markdown-body'
     });
 
-const file = processor.processSync(__webpack_require__(2));
+const file = processor.processSync(__webpack_require__(92));
 const vdom = file.contents;
 
 ReactDOM.render(
@@ -139,228 +136,18 @@ ReactDOM.render(
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
-
-/**
- * react Renderer
- */
-
-function Renderer(options) {
-    this.options = options || {};
-    this.h = options.h;
-}
-
-Renderer.prototype.root = function(node, children, index) { var h = this.h; 
-    return h('div', {
-        key: index,
-        className: this.options.rootClassName || 'markdown-body'
-    }, children);
-};
-
-Renderer.prototype.inlineCode = function(node, children, index) { var h = this.h; 
-    return h('code', {
-        key: index,
-    }, node.value);
-};
-
-Renderer.prototype.math = function(node, children, index) { var h = this.h; 
-    return h('p', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.renderedValue
-        }
-    });
-};
-
-Renderer.prototype.inlineMath = function(node, children, index) { var h = this.h; 
-    return h('span', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.renderedValue
-        }
-    });
-};
-
-Renderer.prototype.code = function(node, children, index) { var h = this.h; 
-    return h('pre', {
-        key: index
-    }, h('code', {
-        className: node.lang?'language-'+node.lang:''
-    }, node.value));
-};
-
-Renderer.prototype.blockquote = function(node, children, index) { var h = this.h; 
-    return h('blockquote', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.html = function(node, children, index) { var h = this.h; 
-    return h('div', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.value
-        }
-    });
-};
-
-Renderer.prototype.heading = function(node, children, index) { var h = this.h; 
-    return h('h'+node.depth, {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.thematicBreak = function(node, children, index) { var h = this.h; 
-    return h('hr', {
-        key: index
-    });
-};
-
-Renderer.prototype.list = function(node, children, index) { var h = this.h; 
-    return h(node.ordered?'ol':'ul', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.listItem = function(node, children, index) { var h = this.h; 
-    return h('li', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.checkbox = function(node, children, index) { var h = this.h; 
-    return h('input', {
-        key: index,
-        type: 'checkbox',
-        checked: node.checked,
-        readOnly: true
-    });
-};
-
-Renderer.prototype.paragraph = function(node, children, index) { var h = this.h; 
-    return h('p', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.table = function(node, children, index) { var h = this.h; 
-    return h('table', {
-            key: index
-        },
-        h('tbody',{key:0}, children)
-    );
-};
-
-Renderer.prototype.tableRow = function(node, children, index) { var h = this.h; 
-    return h('tr', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.tableCell = function(node, children, index) { var h = this.h; 
-    return h('td', {
-        key: index,
-        align: node.align
-    }, children);
-};
-
-Renderer.prototype.strong = function(node, children, index) { var h = this.h; 
-    return h('strong', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.emphasis = function(node, children, index) { var h = this.h; 
-    return h('em', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.break = function(node, children, index) { var h = this.h; 
-    return h('br', {
-        key: index
-    });
-};
-
-Renderer.prototype.delete = function(node, children, index) { var h = this.h; 
-    return h('del', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.link = function(node, children, index) { var h = this.h; 
-    return h('a', {
-        key: index,
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.linkReference = function(node, children, index) { var h = this.h; 
-    return h('a', {
-        key: index,
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.definition = function(node, children, index) { var h = this.h; 
-    return h('div', {
-            key: index,
-            style: {
-                height: 0,
-                visibility: 'hidden'
-            }
-        },
-        h('a', {
-            key: 0,
-            href: node.url,
-            'data-identifier': node.identifier
-        }, [
-            '['+node.identifier+']: ',
-            node.url
-        ])
-    );
-};
-
-Renderer.prototype.image = function(node, children, index) { var h = this.h; 
-    return h('img', {
-        key: index,
-        src: node.url,
-        alt: node.alt,
-        title: node.title
-    });
-};
-
-Renderer.prototype.text = function(node, children, index) { var h = this.h; 
-    return h('span', {
-        key: index
-    }, node.value);
-};
-
-module.exports = Renderer;
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-module.exports = "**NOTE:** This is Simplelified  Chinese Edition Document of Markdown Syntax. If you are seeking for English Edition Document. Please refer to [Markdown: Syntax][eng-doc].\n\n[eng-doc]:http://daringfireball.net/projects/markdown/syntax\n\n**声明：** 这份文档派生(fork)于[繁体中文版](http://markdown.tw/)，在此基础上进行了繁体转简体工作，并进行了适当的润色。此文档用 Markdown 语法编写，你可以到这里[查看它的源文件][src1]。「繁体中文版的原始文件可以[查看这里][src] 。」--By @[riku][t]\n\n**注：** 本项目托管于 [GitHub][]上，请通过\"派生\"和\"合并请求\"来帮忙改进本项目。\n\n  [src1]: http://gitcafe.com/riku/Markdown-Syntax-CN/blob/master/syntax.md\n  [src]: https://github.com/othree/markdown-syntax-zhtw/blob/master/syntax.md\n  [t]: http://twitter.com/riku\n  [g]: http://gitcafe.com/riku/Markdown-Syntax-CN\n  [Github]: https://github.com/riku/Markdown-Syntax-CN\n  [GitCafe]: http://gitcafe.com/riku/Markdown-Syntax-CN/\n\nMarkdown 语法说明 (简体中文版) / ([点击查看快速入门](./basic.html))\n================\n\n*   [概述](#overview)\n    *   [宗旨](#philosophy)\n    *   [兼容 HTML](#html)\n    *   [特殊字符自动转换](#autoescape)\n*   [区块元素](#block)\n    *   [段落和换行](#p)\n    *   [标题](#header)\n    *   [区块引用](#blockquote)\n    *   [列表](#list)\n    *   [代码区块](#precode)\n    *   [分隔线](#hr)\n*   [区段元素](#span)\n    *   [链接](#link)\n    *   [强调](#em)\n    *   [代码](#code)\n    *   [图片](#img)\n*   [其它](#misc)\n    *   [反斜杠](#backslash)\n    *   [自动链接](#autolink)\n*   [感谢](#acknowledgement)\n*\t[Markdown 免费编辑器](#editor)\n\n* * *\n\n<h2 id=\"overview\">概述</h2>\n\n<h3 id=\"philosophy\">宗旨</h3>\n\nMarkdown 的目标是实现「易读易写」。\n\n可读性，无论如何，都是最重要的。一份使用 Markdown 格式撰写的文件应该可以直接以纯文本发布，并且看起来不会像是由许多标签或是格式指令所构成。Markdown 语法受到一些既有 text-to-HTML 格式的影响，包括 [Setext] [1]、[atx] [2]、[Textile] [3]、[reStructuredText] [4]、[Grutatext] [5] 和 [EtText] [6]，而最大灵感来源其实是纯文本电子邮件的格式。\n\n  [1]: http://docutils.sourceforge.net/mirror/setext.html\n  [2]: http://www.aaronsw.com/2002/atx/\n  [3]: http://textism.com/tools/textile/\n  [4]: http://docutils.sourceforge.net/rst.html\n  [5]: http://www.triptico.com/software/grutatxt.html\n  [6]: http://ettext.taint.org/doc/\n\n总之， Markdown 的语法全由一些符号所组成，这些符号经过精挑细选，其作用一目了然。比如：在文字两旁加上星号，看起来就像\\*强调\\*。Markdown 的列表看起来，嗯，就是列表。Markdown 的区块引用看起来就真的像是引用一段文字，就像你曾在电子邮件中见过的那样。\n\n<h3 id=\"html\">兼容 HTML</h3>\n\nMarkdown 语法的目标是：成为一种适用于网络的*书写*语言。\n\nMarkdown 不是想要取代 HTML，甚至也没有要和它相近，它的语法种类很少，只对应 HTML 标记的一小部分。Markdown 的构想*不是*要使得 HTML 文档更容易书写。在我看来， HTML 已经很容易写了。Markdown 的理念是，能让文档更容易读、写和随意改。HTML 是一种*发布*的格式，Markdown 是一种*书写*的格式。就这样，Markdown 的格式语法只涵盖纯文本可以涵盖的范围。\n\n不在 Markdown 涵盖范围之内的标签，都可以直接在文档里面用 HTML 撰写。不需要额外标注这是 HTML 或是 Markdown；只要直接加标签就可以了。\n\n要制约的只有一些 HTML 区块元素――比如 `<div>`、`<table>`、`<pre>`、`<p>` 等标签，必须在前后加上空行与其它内容区隔开，还要求它们的开始标签与结尾标签不能用制表符或空格来缩进。Markdown 的生成器有足够智能，不会在 HTML 区块标签外加上不必要的 `<p>` 标签。\n\n例子如下，在 Markdown 文件里加上一段 HTML 表格：\n\n    这是一个普通段落。\n\n    <table>\n        <tr>\n            <td>Foo</td>\n        </tr>\n    </table>\n\n    这是另一个普通段落。\n\n请注意，在 HTML 区块标签间的 Markdown 格式语法将不会被处理。比如，你在 HTML 区块内使用 Markdown 样式的`*强调*`会没有效果。\n\nHTML 的区段（行内）标签如 `<span>`、`<cite>`、`<del>` 可以在 Markdown 的段落、列表或是标题里随意使用。依照个人习惯，甚至可以不用 Markdown 格式，而直接采用 HTML 标签来格式化。举例说明：如果比较喜欢 HTML 的 `<a>` 或 `<img>` 标签，可以直接使用这些标签，而不用 Markdown 提供的链接或是图像标签语法。\n\n和处在 HTML 区块标签间不同，Markdown 语法在 HTML 区段标签间是有效的。\n\n<h3 id=\"autoescape\">特殊字符自动转换</h3>\n\n在 HTML 文件中，有两个字符需要特殊处理： `<` 和 `&` 。 `<` 符号用于起始标签，`&` 符号则用于标记 HTML 实体，如果你只是想要显示这些字符的原型，你必须要使用实体的形式，像是 `&lt;` 和 `&amp;`。\n\n`&` 字符尤其让网络文档编写者受折磨，如果你要打「`AT&T`」 ，你必须要写成「`AT&amp;T`」。而网址中的 `&` 字符也要转换。比如你要链接到：\n\n    http://images.google.com/images?num=30&q=larry+bird\n\n你必须要把网址转换写为：\n\n    http://images.google.com/images?num=30&amp;q=larry+bird\n\n才能放到链接标签的 `href` 属性里。不用说也知道这很容易忽略，这也可能是 HTML 标准检验所检查到的错误中，数量最多的。\n\nMarkdown 让你可以自然地书写字符，需要转换的由它来处理好了。如果你使用的 `&` 字符是 HTML 字符实体的一部分，它会保留原状，否则它会被转换成 `&amp`;。\n\n所以你如果要在文档中插入一个版权符号 `©`，你可以这样写：\n\n    &copy;\n\nMarkdown 会保留它不动。而若你写：\n\n    AT&T\n\nMarkdown 就会将它转为：\n\n    AT&amp;T\n\n类似的状况也会发生在 `<` 符号上，因为 Markdown 允许 [兼容 HTML](#html) ，如果你是把 `<` 符号作为 HTML 标签的定界符使用，那 Markdown 也不会对它做任何转换，但是如果你写：\n\n    4 < 5\n\nMarkdown 将会把它转换为：\n\n    4 &lt; 5\n\n不过需要注意的是，code 范围内，不论是行内还是区块， `<` 和 `&` 两个符号都*一定*会被转换成 HTML 实体，这项特性让你可以很容易地用 Markdown 写 HTML code （和 HTML 相对而言， HTML 语法中，你要把所有的 `<` 和 `&` 都转换为 HTML 实体，才能在 HTML 文件里面写出 HTML code。）\n\n* * *\n\n<h2 id=\"block\">区块元素</h2>\n\n\n<h3 id=\"p\">段落和换行</h3>\n\n一个 Markdown 段落是由一个或多个连续的文本行组成，它的前后要有一个以上的空行（空行的定义是显示上看起来像是空的，便会被视为空行。比方说，若某一行只包含空格和制表符，则该行也会被视为空行）。普通段落不该用空格或制表符来缩进。\n\n「由一个或多个连续的文本行组成」这句话其实暗示了 Markdown 允许段落内的强迫换行（插入换行符），这个特性和其他大部分的 text-to-HTML 格式不一样（包括 Movable Type 的「Convert Line Breaks」选项），其它的格式会把每个换行符都转成 `<br />` 标签。\n\n如果你*确实*想要依赖 Markdown 来插入 `<br />` 标签的话，在插入处先按入两个以上的空格然后回车。\n\n的确，需要多费点事（多加空格）来产生 `<br />` ，但是简单地「每个换行都转换为 `<br />`」的方法在 Markdown 中并不适合， Markdown 中 email 式的 [区块引用][bq] 和多段落的 [列表][l] 在使用换行来排版的时候，不但更好用，还更方便阅读。\n\n  [bq]: #blockquote\n  [l]:  #list\n\n<h3 id=\"header\">标题</h3>\n\nMarkdown 支持两种标题的语法，类 [Setext] [1] 和类 [atx] [2] 形式。\n\n类 Setext 形式是用底线的形式，利用 `=` （最高阶标题）和 `-` （第二阶标题），例如：\n\n    This is an H1\n    =============\n\n    This is an H2\n    -------------\n\n任何数量的 `=` 和 `-` 都可以有效果。\n\n类 Atx 形式则是在行首插入 1 到 6 个 `#` ，对应到标题 1 到 6 阶，例如：\n\n    # 这是 H1\n\n    ## 这是 H2\n\n    ###### 这是 H6\n\n你可以选择性地「闭合」类 atx 样式的标题，这纯粹只是美观用的，若是觉得这样看起来比较舒适，你就可以在行尾加上 `#`，而行尾的 `#` 数量也不用和开头一样（行首的井字符数量决定标题的阶数）：\n\n    # 这是 H1 #\n\n    ## 这是 H2 ##\n\n    ### 这是 H3 ######\n\n\n<h3 id=\"blockquote\">区块引用 Blockquotes</h3>\n\nMarkdown 标记区块引用是使用类似 email 中用 `>` 的引用方式。如果你还熟悉在 email 信件中的引言部分，你就知道怎么在 Markdown 文件中建立一个区块引用，那会看起来像是你自己先断好行，然后在每行的最前面加上 `>` ：\n\n    > This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet,\n    > consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.\n    > Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.\n    > \n    > Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse\n    > id sem consectetuer libero luctus adipiscing.\n\nMarkdown 也允许你偷懒只在整个段落的第一行最前面加上 `>` ：\n\n    > This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet,\n    consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.\n    Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.\n\n    > Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse\n    id sem consectetuer libero luctus adipiscing.\n\n区块引用可以嵌套（例如：引用内的引用），只要根据层次加上不同数量的 `>` ：\n\n    > This is the first level of quoting.\n    >\n    > > This is nested blockquote.\n    >\n    > Back to the first level.\n\n引用的区块内也可以使用其他的 Markdown 语法，包括标题、列表、代码区块等：\n\n\t> ## 这是一个标题。\n\t> \n\t> 1.   这是第一行列表项。\n\t> 2.   这是第二行列表项。\n\t> \n\t> 给出一些例子代码：\n\t> \n\t>     return shell_exec(\"echo $input | $markdown_script\");\n\n任何像样的文本编辑器都能轻松地建立 email 型的引用。例如在 BBEdit 中，你可以选取文字后然后从选单中选择*增加引用阶层*。\n\n<h3 id=\"list\">列表</h3>\n\nMarkdown 支持有序列表和无序列表。\n\n无序列表使用星号、加号或是减号作为列表标记：\n\n    *   Red\n    *   Green\n    *   Blue\n\n等同于：\n\n    +   Red\n    +   Green\n    +   Blue\n\n也等同于：\n\n    -   Red\n    -   Green\n    -   Blue\n\n有序列表则使用数字接着一个英文句点：\n\n    1.  Bird\n    2.  McHale\n    3.  Parish\n\n很重要的一点是，你在列表标记上使用的数字并不会影响输出的 HTML 结果，上面的列表所产生的 HTML 标记为：\n\n    <ol>\n    <li>Bird</li>\n    <li>McHale</li>\n    <li>Parish</li>\n    </ol>\n\n如果你的列表标记写成：\n\n    1.  Bird\n    1.  McHale\n    1.  Parish\n\n或甚至是：\n\n    3. Bird\n    1. McHale\n    8. Parish\n\n你都会得到完全相同的 HTML 输出。重点在于，你可以让 Markdown 文件的列表数字和输出的结果相同，或是你懒一点，你可以完全不用在意数字的正确性。\n\n如果你使用懒惰的写法，建议第一个项目最好还是从 1. 开始，因为 Markdown 未来可能会支持有序列表的 start 属性。\n\n列表项目标记通常是放在最左边，但是其实也可以缩进，最多 3 个空格，项目标记后面则一定要接着至少一个空格或制表符。\n\n要让列表看起来更漂亮，你可以把内容用固定的缩进整理好：\n\n    *   Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\n        Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi,\n        viverra nec, fringilla in, laoreet vitae, risus.\n    *   Donec sit amet nisl. Aliquam semper ipsum sit amet velit.\n        Suspendisse id sem consectetuer libero luctus adipiscing.\n\n但是如果你懒，那也行：\n\n    *   Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\n    Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi,\n    viverra nec, fringilla in, laoreet vitae, risus.\n    *   Donec sit amet nisl. Aliquam semper ipsum sit amet velit.\n    Suspendisse id sem consectetuer libero luctus adipiscing.\n\n如果列表项目间用空行分开，在输出 HTML 时 Markdown 就会将项目内容用 `<p>` \n标签包起来，举例来说：\n\n    *   Bird\n    *   Magic\n\n会被转换为：\n\n    <ul>\n    <li>Bird</li>\n    <li>Magic</li>\n    </ul>\n\n但是这个：\n\n    *   Bird\n\n    *   Magic\n\n会被转换为：\n\n    <ul>\n    <li><p>Bird</p></li>\n    <li><p>Magic</p></li>\n    </ul>\n\n列表项目可以包含多个段落，每个项目下的段落都必须缩进 4 个空格或是 1 个制表符：\n\n    1.  This is a list item with two paragraphs. Lorem ipsum dolor\n        sit amet, consectetuer adipiscing elit. Aliquam hendrerit\n        mi posuere lectus.\n\n        Vestibulum enim wisi, viverra nec, fringilla in, laoreet\n        vitae, risus. Donec sit amet nisl. Aliquam semper ipsum\n        sit amet velit.\n\n    2.  Suspendisse id sem consectetuer libero luctus adipiscing.\n\n如果你每行都有缩进，看起来会看好很多，当然，再次地，如果你很懒惰，Markdown 也允许：\n\n    *   This is a list item with two paragraphs.\n\n        This is the second paragraph in the list item. You're\n    only required to indent the first line. Lorem ipsum dolor\n    sit amet, consectetuer adipiscing elit.\n\n    *   Another item in the same list.\n\n如果要在列表项目内放进引用，那 `>` 就需要缩进：\n\n    *   A list item with a blockquote:\n\n        > This is a blockquote\n        > inside a list item.\n\n如果要放代码区块的话，该区块就需要缩进*两次*，也就是 8 个空格或是 2 个制表符：\n\n    *   一列表项包含一个列表区块：\n\n            <代码写在这>\n\n\n当然，项目列表很可能会不小心产生，像是下面这样的写法：\n\n    1986. What a great season.\n\n换句话说，也就是在行首出现*数字-句点-空白*，要避免这样的状况，你可以在句点前面加上反斜杠。\n\n    1986\\. What a great season.\n\n<h3 id=\"precode\">代码区块</h3>\n\n和程序相关的写作或是标签语言原始码通常会有已经排版好的代码区块，通常这些区块我们并不希望它以一般段落文件的方式去排版，而是照原来的样子显示，Markdown 会用 `<pre>` 和 `<code>` 标签来把代码区块包起来。\n\n要在 Markdown 中建立代码区块很简单，只要简单地缩进 4 个空格或是 1 个制表符就可以，例如，下面的输入：\n\n    这是一个普通段落：\n\n        这是一个代码区块。\n\nMarkdown 会转换成：\n\n    <p>这是一个普通段落：</p>\n\n    <pre><code>这是一个代码区块。\n    </code></pre>\n\n这个每行一阶的缩进（4 个空格或是 1 个制表符），都会被移除，例如：\n\n    Here is an example of AppleScript:\n\n        tell application \"Foo\"\n            beep\n        end tell\n\n会被转换为：\n\n    <p>Here is an example of AppleScript:</p>\n\n    <pre><code>tell application \"Foo\"\n        beep\n    end tell\n    </code></pre>\n\n一个代码区块会一直持续到没有缩进的那一行（或是文件结尾）。\n\n在代码区块里面， `&` 、 `<` 和 `>` 会自动转成 HTML 实体，这样的方式让你非常容易使用 Markdown 插入范例用的 HTML 原始码，只需要复制贴上，再加上缩进就可以了，剩下的 Markdown 都会帮你处理，例如：\n\n        <div class=\"footer\">\n            &copy; 2004 Foo Corporation\n        </div>\n\n会被转换为：\n\n    <pre><code>&lt;div class=\"footer\"&gt;\n        &amp;copy; 2004 Foo Corporation\n    &lt;/div&gt;\n    </code></pre>\n\n代码区块中，一般的 Markdown 语法不会被转换，像是星号便只是星号，这表示你可以很容易地以 Markdown 语法撰写 Markdown 语法相关的文件。\n\n<h3 id=\"hr\">分隔线</h3>\n\n你可以在一行中用三个以上的星号、减号、底线来建立一个分隔线，行内不能有其他东西。你也可以在星号或是减号中间插入空格。下面每种写法都可以建立分隔线：\n\n    * * *\n\n    ***\n\n    *****\n\n    - - -\n\n    ---------------------------------------\n\n\n* * *\n\n<h2 id=\"span\">区段元素</h2>\n\n<h3 id=\"link\">链接</h3>\n\nMarkdown 支持两种形式的链接语法： *行内式*和*参考式*两种形式。\n\n不管是哪一种，链接文字都是用 [方括号] 来标记。\n\n要建立一个*行内式*的链接，只要在方块括号后面紧接着圆括号并插入网址链接即可，如果你还想要加上链接的 title 文字，只要在网址后面，用双引号把 title 文字包起来即可，例如：\n\n    This is [an example](http://example.com/ \"Title\") inline link.\n\n    [This link](http://example.net/) has no title attribute.\n\n会产生：\n\n    <p>This is <a href=\"http://example.com/\" title=\"Title\">\n    an example</a> inline link.</p>\n\n    <p><a href=\"http://example.net/\">This link</a> has no\n    title attribute.</p>\n\n如果你是要链接到同样主机的资源，你可以使用相对路径：\n\n    See my [About](/about/) page for details.   \n\n*参考式*的链接是在链接文字的括号后面再接上另一个方括号，而在第二个方括号里面要填入用以辨识链接的标记：\n\n    This is [an example][id] reference-style link.\n\n你也可以选择性地在两个方括号中间加上一个空格：\n\n    This is [an example] [id] reference-style link.\n\n接着，在文件的任意处，你可以把这个标记的链接内容定义出来：\n\n    [id]: http://example.com/  \"Optional Title Here\"\n\n链接内容定义的形式为：\n\n*   方括号（前面可以选择性地加上至多三个空格来缩进），里面输入链接文字\n*   接着一个冒号\n*   接着一个以上的空格或制表符\n*   接着链接的网址\n*   选择性地接着 title 内容，可以用单引号、双引号或是括弧包着\n\n下面这三种链接的定义都是相同：\n\n\t[foo]: http://example.com/  \"Optional Title Here\"\n\t[foo]: http://example.com/  'Optional Title Here'\n\t[foo]: http://example.com/  (Optional Title Here)\n\n**请注意：**有一个已知的问题是 Markdown.pl 1.0.1 会忽略单引号包起来的链接 title。\n\n链接网址也可以用尖括号包起来：\n\n    [id]: <http://example.com/>  \"Optional Title Here\"\n\n你也可以把 title 属性放到下一行，也可以加一些缩进，若网址太长的话，这样会比较好看：\n\n    [id]: http://example.com/longish/path/to/resource/here\n        \"Optional Title Here\"\n\n网址定义只有在产生链接的时候用到，并不会直接出现在文件之中。\n\n链接辨别标签可以有字母、数字、空白和标点符号，但是并*不*区分大小写，因此下面两个链接是一样的：\n\n\t[link text][a]\n\t[link text][A]\n\n*隐式链接标记*功能让你可以省略指定链接标记，这种情形下，链接标记会视为等同于链接文字，要用隐式链接标记只要在链接文字后面加上一个空的方括号，如果你要让 \"Google\" 链接到 google.com，你可以简化成：\n\n\t[Google][]\n\n然后定义链接内容：\n\n\t[Google]: http://google.com/\n\n由于链接文字可能包含空白，所以这种简化型的标记内也许包含多个单词：\n\n\tVisit [Daring Fireball][] for more information.\n\n然后接着定义链接：\n\n\t[Daring Fireball]: http://daringfireball.net/\n\n链接的定义可以放在文件中的任何一个地方，我比较偏好直接放在链接出现段落的后面，你也可以把它放在文件最后面，就像是注解一样。\n\n下面是一个参考式链接的范例：\n\n    I get 10 times more traffic from [Google] [1] than from\n    [Yahoo] [2] or [MSN] [3].\n\n      [1]: http://google.com/        \"Google\"\n      [2]: http://search.yahoo.com/  \"Yahoo Search\"\n      [3]: http://search.msn.com/    \"MSN Search\"\n\n如果改成用链接名称的方式写：\n\n    I get 10 times more traffic from [Google][] than from\n    [Yahoo][] or [MSN][].\n\n      [google]: http://google.com/        \"Google\"\n      [yahoo]:  http://search.yahoo.com/  \"Yahoo Search\"\n      [msn]:    http://search.msn.com/    \"MSN Search\"\n\n上面两种写法都会产生下面的 HTML。\n\n    <p>I get 10 times more traffic from <a href=\"http://google.com/\"\n    title=\"Google\">Google</a> than from\n    <a href=\"http://search.yahoo.com/\" title=\"Yahoo Search\">Yahoo</a>\n    or <a href=\"http://search.msn.com/\" title=\"MSN Search\">MSN</a>.</p>\n\n下面是用行内式写的同样一段内容的 Markdown 文件，提供作为比较之用：\n\n    I get 10 times more traffic from [Google](http://google.com/ \"Google\")\n    than from [Yahoo](http://search.yahoo.com/ \"Yahoo Search\") or\n    [MSN](http://search.msn.com/ \"MSN Search\").\n\n参考式的链接其实重点不在于它比较好写，而是它比较好读，比较一下上面的范例，使用参考式的文章本身只有 81 个字符，但是用行内形式的却会增加到 176 个字元，如果是用纯 HTML 格式来写，会有 234 个字元，在 HTML 格式中，标签比文本还要多。\n\n使用 Markdown 的参考式链接，可以让文件更像是浏览器最后产生的结果，让你可以把一些标记相关的元数据移到段落文字之外，你就可以增加链接而不让文章的阅读感觉被打断。\n\n<h3 id=\"em\">强调</h3>\n\nMarkdown 使用星号（`*`）和底线（`_`）作为标记强调字词的符号，被 `*` 或 `_` 包围的字词会被转成用 `<em>` 标签包围，用两个 `*` 或 `_` 包起来的话，则会被转成 `<strong>`，例如：\n\n    *single asterisks*\n\n    _single underscores_\n\n    **double asterisks**\n\n    __double underscores__\n\n会转成：\n\n    <em>single asterisks</em>\n\n    <em>single underscores</em>\n\n    <strong>double asterisks</strong>\n\n    <strong>double underscores</strong>\n\n你可以随便用你喜欢的样式，唯一的限制是，你用什么符号开启标签，就要用什么符号结束。\n\n强调也可以直接插在文字中间：\n\n    un*frigging*believable\n\n但是**如果你的 `*` 和 `_` 两边都有空白的话，它们就只会被当成普通的符号**。\n\n如果要在文字前后直接插入普通的星号或底线，你可以用反斜线：\n\n    \\*this text is surrounded by literal asterisks\\*\n\n<h3 id=\"code\">代码</h3>\n\n如果要标记一小段行内代码，你可以用反引号把它包起来（`` ` ``），例如：\n\n    Use the `printf()` function.\n\n会产生：\n\n    <p>Use the <code>printf()</code> function.</p>\n\n如果要在代码区段内插入反引号，你可以用多个反引号来开启和结束代码区段：\n\n    ``There is a literal backtick (`) here.``\n\n这段语法会产生：\n\n    <p><code>There is a literal backtick (`) here.</code></p>\n\n代码区段的起始和结束端都可以放入一个空白，起始端后面一个，结束端前面一个，这样你就可以在区段的一开始就插入反引号：\n\n\tA single backtick in a code span: `` ` ``\n\t\n\tA backtick-delimited string in a code span: `` `foo` ``\n\n会产生：\n\n\t<p>A single backtick in a code span: <code>`</code></p>\n\t\n\t<p>A backtick-delimited string in a code span: <code>`foo`</code></p>\n\n在代码区段内，`&` 和尖括号**都**会被自动地转成 HTML 实体，这使得插入 HTML 原始码变得很容易，Markdown 会把下面这段：\n\n    Please don't use any `<blink>` tags.\n\n转为：\n\n    <p>Please don't use any <code>&lt;blink&gt;</code> tags.</p>\n\n你也可以这样写：\n\n    `&#8212;` is the decimal-encoded equivalent of `&mdash;`.\n\n以产生：\n\n    <p><code>&amp;#8212;</code> is the decimal-encoded\n    equivalent of <code>&amp;mdash;</code>.</p>\n\n\n\n<h3 id=\"img\">图片</h3>\n\n很明显地，要在纯文字应用中设计一个「自然」的语法来插入图片是有一定难度的。\n\nMarkdown 使用一种和链接很相似的语法来标记图片，同样也允许两种样式： *行内式*和*参考式*。\n\n行内式的图片语法看起来像是：\n\n    ![Alt text](/path/to/img.jpg)\n\n    ![Alt text](/path/to/img.jpg \"Optional title\")\n\n详细叙述如下：\n\n*   一个惊叹号 `!`\n*   接着一个方括号，里面放上图片的替代文字\n*   接着一个普通括号，里面放上图片的网址，最后还可以用引号包住并加上\n    选择性的 'title' 文字。\n\n参考式的图片语法则长得像这样：\n\n    ![Alt text][id]\n\n「id」是图片参考的名称，图片参考的定义方式则和连结参考一样：\n\n    [id]: url/to/image  \"Optional title attribute\"\n\n到目前为止， Markdown 还没有办法指定图片的宽高，如果你需要的话，你可以使用普通的 `<img>` 标签。\n\n* * *\n\n<h2 id=\"misc\">其它</h2>\n\n<h3 id=\"autolink\">自动链接</h3>\n\nMarkdown 支持以比较简短的自动链接形式来处理网址和电子邮件信箱，只要是用尖括号包起来， Markdown 就会自动把它转成链接。一般网址的链接文字就和链接地址一样，例如：\n\n    <http://example.com/>\n\nMarkdown 会转为：\n\n    <a href=\"http://example.com/\">http://example.com/</a>\n\n邮址的自动链接也很类似，只是 Markdown 会先做一个编码转换的过程，把文字字符转成 16 进位码的 HTML 实体，这样的格式可以糊弄一些不好的邮址收集机器人，例如：\n\n    <address@example.com>\n\nMarkdown 会转成：\n\n    <a href=\"&#x6D;&#x61;i&#x6C;&#x74;&#x6F;:&#x61;&#x64;&#x64;&#x72;&#x65;\n    &#115;&#115;&#64;&#101;&#120;&#x61;&#109;&#x70;&#x6C;e&#x2E;&#99;&#111;\n    &#109;\">&#x61;&#x64;&#x64;&#x72;&#x65;&#115;&#115;&#64;&#101;&#120;&#x61;\n    &#109;&#x70;&#x6C;e&#x2E;&#99;&#111;&#109;</a>\n\n在浏览器里面，这段字串（其实是 `<a href=\"mailto:address@example.com\">address@example.com</a>`）会变成一个可以点击的「address@example.com」链接。\n\n（这种作法虽然可以糊弄不少的机器人，但并不能全部挡下来，不过总比什么都不做好些。不管怎样，公开你的信箱终究会引来广告信件的。）\n\n<h3 id=\"backslash\">反斜杠</h3>\n\nMarkdown 可以利用反斜杠来插入一些在语法中有其它意义的符号，例如：如果你想要用星号加在文字旁边的方式来做出强调效果（但不用 `<em>` 标签），你可以在星号的前面加上反斜杠：\n\n    \\*literal asterisks\\*\n\nMarkdown 支持以下这些符号前面加上反斜杠来帮助插入普通的符号：\n\n    \\   反斜线\n    `   反引号\n    *   星号\n    _   底线\n    {}  花括号\n    []  方括号\n    ()  括弧\n    #   井字号\n    +   加号\n    -   减号\n    .   英文句点\n    !   惊叹号\n\n<h2 id=\"acknowledgement\">感谢</h2>\n\n感谢 [leafy7382][] 协助翻译，[hlb][]、[Randylien][] 帮忙润稿，[ethantw][] 的[汉字标准格式・CSS Reset][]， [WM][] 回报文字错误。\n\n[leafy7382]:https://twitter.com/#!/leafy7382\n[hlb]:http://iamhlb.com/\n[Randylien]:http://twitter.com/randylien\n[ethantw]:https://twitter.com/#!/ethantw\n[汉字标准格式・CSS Reset]:http://ethantw.net/projects/han/\n[WM]:http://kidwm.net/\n\n感谢 [fenprace][]，[addv][]。\n\n[fenprace]:https://github.com/fenprace\n[addv]:https://github.com/addv\n\n"
-
-/***/ }),
-/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 /* Dependencies. */
-var extend = __webpack_require__(4)
-var bail = __webpack_require__(5)
-var vfile = __webpack_require__(6)
-var trough = __webpack_require__(14)
-var string = __webpack_require__(16)
-var plain = __webpack_require__(17)
+var extend = __webpack_require__(2)
+var bail = __webpack_require__(3)
+var vfile = __webpack_require__(4)
+var trough = __webpack_require__(12)
+var string = __webpack_require__(14)
+var plain = __webpack_require__(15)
 
 /* Expose a frozen processor. */
 module.exports = unified().freeze()
@@ -821,7 +608,7 @@ function assertDone(name, asyncName, complete) {
 
 
 /***/ }),
-/* 4 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -945,7 +732,7 @@ module.exports = function extend() {
 
 
 /***/ }),
-/* 5 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -961,14 +748,14 @@ function bail(err) {
 
 
 /***/ }),
-/* 6 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VMessage = __webpack_require__(7)
-var VFile = __webpack_require__(9)
+var VMessage = __webpack_require__(5)
+var VFile = __webpack_require__(7)
 
 module.exports = VFile
 
@@ -1021,13 +808,13 @@ function info() {
 
 
 /***/ }),
-/* 7 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var stringify = __webpack_require__(8)
+var stringify = __webpack_require__(6)
 
 module.exports = VMessage
 
@@ -1122,7 +909,7 @@ function parseOrigin(origin) {
 
 
 /***/ }),
-/* 8 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1179,15 +966,15 @@ function index(value) {
 
 
 /***/ }),
-/* 9 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process) {
 
-var path = __webpack_require__(11)
-var replace = __webpack_require__(12)
-var buffer = __webpack_require__(13)
+var path = __webpack_require__(9)
+var replace = __webpack_require__(10)
+var buffer = __webpack_require__(11)
 
 module.exports = VFile
 
@@ -1350,10 +1137,10 @@ function assertPath(path, name) {
   }
 }
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(10)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(8)))
 
 /***/ }),
-/* 10 */
+/* 8 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -1543,7 +1330,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 11 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -1771,16 +1558,16 @@ var substr = 'ab'.substr(-1) === 'b'
     }
 ;
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(10)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(8)))
 
 /***/ }),
-/* 12 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var path = __webpack_require__(11);
+var path = __webpack_require__(9);
 
 function replaceExt(npath, ext) {
   if (typeof npath !== 'string') {
@@ -1799,7 +1586,7 @@ module.exports = replaceExt;
 
 
 /***/ }),
-/* 13 */
+/* 11 */
 /***/ (function(module, exports) {
 
 /*!
@@ -1816,13 +1603,13 @@ module.exports = function isBuffer (obj) {
 
 
 /***/ }),
-/* 14 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var wrap = __webpack_require__(15)
+var wrap = __webpack_require__(13)
 
 module.exports = trough
 
@@ -1898,7 +1685,7 @@ function trough() {
 
 
 /***/ }),
-/* 15 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1970,7 +1757,7 @@ function wrap(fn, callback) {
 
 
 /***/ }),
-/* 16 */
+/* 14 */
 /***/ (function(module, exports) {
 
 var toString = Object.prototype.toString
@@ -1983,7 +1770,7 @@ function isString(obj) {
 
 
 /***/ }),
-/* 17 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1997,15 +1784,15 @@ module.exports = function (x) {
 
 
 /***/ }),
-/* 18 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var unherit = __webpack_require__(19);
-var xtend = __webpack_require__(20);
-var Parser = __webpack_require__(22);
+var unherit = __webpack_require__(17);
+var xtend = __webpack_require__(18);
+var Parser = __webpack_require__(20);
 
 module.exports = parse;
 parse.Parser = Parser;
@@ -2018,14 +1805,14 @@ function parse(options) {
 
 
 /***/ }),
-/* 19 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var xtend = __webpack_require__(20)
-var inherits = __webpack_require__(21)
+var xtend = __webpack_require__(18)
+var inherits = __webpack_require__(19)
 
 module.exports = unherit
 
@@ -2070,7 +1857,7 @@ function unherit(Super) {
 
 
 /***/ }),
-/* 20 */
+/* 18 */
 /***/ (function(module, exports) {
 
 module.exports = extend
@@ -2095,7 +1882,7 @@ function extend() {
 
 
 /***/ }),
-/* 21 */
+/* 19 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -2124,18 +1911,18 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 22 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var xtend = __webpack_require__(20);
-var toggle = __webpack_require__(23);
-var vfileLocation = __webpack_require__(24);
-var unescape = __webpack_require__(25);
-var decode = __webpack_require__(26);
-var tokenizer = __webpack_require__(35);
+var xtend = __webpack_require__(18);
+var toggle = __webpack_require__(21);
+var vfileLocation = __webpack_require__(22);
+var unescape = __webpack_require__(23);
+var decode = __webpack_require__(24);
+var tokenizer = __webpack_require__(33);
 
 module.exports = Parser;
 
@@ -2158,11 +1945,11 @@ function Parser(doc, file) {
 var proto = Parser.prototype;
 
 /* Expose core. */
-proto.setOptions = __webpack_require__(36);
-proto.parse = __webpack_require__(40);
+proto.setOptions = __webpack_require__(34);
+proto.parse = __webpack_require__(38);
 
 /* Expose `defaults`. */
-proto.options = __webpack_require__(38);
+proto.options = __webpack_require__(36);
 
 /* Enter and exit helpers. */
 proto.exitStart = toggle('atStart', true);
@@ -2230,34 +2017,34 @@ proto.interruptBlockquote = [
 
 /* Handlers. */
 proto.blockTokenizers = {
-  newline: __webpack_require__(45),
-  indentedCode: __webpack_require__(47),
-  fencedCode: __webpack_require__(50),
-  blockquote: __webpack_require__(51),
-  atxHeading: __webpack_require__(54),
-  thematicBreak: __webpack_require__(55),
-  list: __webpack_require__(56),
-  setextHeading: __webpack_require__(59),
-  html: __webpack_require__(60),
-  footnote: __webpack_require__(62),
-  definition: __webpack_require__(65),
-  table: __webpack_require__(66),
-  paragraph: __webpack_require__(67)
+  newline: __webpack_require__(43),
+  indentedCode: __webpack_require__(45),
+  fencedCode: __webpack_require__(48),
+  blockquote: __webpack_require__(49),
+  atxHeading: __webpack_require__(52),
+  thematicBreak: __webpack_require__(53),
+  list: __webpack_require__(54),
+  setextHeading: __webpack_require__(57),
+  html: __webpack_require__(58),
+  footnote: __webpack_require__(60),
+  definition: __webpack_require__(63),
+  table: __webpack_require__(64),
+  paragraph: __webpack_require__(65)
 };
 
 proto.inlineTokenizers = {
-  escape: __webpack_require__(68),
-  autoLink: __webpack_require__(70),
-  url: __webpack_require__(72),
-  html: __webpack_require__(74),
-  link: __webpack_require__(75),
-  reference: __webpack_require__(77),
-  strong: __webpack_require__(78),
-  emphasis: __webpack_require__(80),
-  deletion: __webpack_require__(83),
-  code: __webpack_require__(85),
-  break: __webpack_require__(87),
-  text: __webpack_require__(89)
+  escape: __webpack_require__(66),
+  autoLink: __webpack_require__(68),
+  url: __webpack_require__(70),
+  html: __webpack_require__(72),
+  link: __webpack_require__(73),
+  reference: __webpack_require__(75),
+  strong: __webpack_require__(76),
+  emphasis: __webpack_require__(78),
+  deletion: __webpack_require__(81),
+  code: __webpack_require__(83),
+  break: __webpack_require__(85),
+  text: __webpack_require__(87)
 };
 
 /* Expose precedence. */
@@ -2283,7 +2070,7 @@ function keys(value) {
 
 
 /***/ }),
-/* 23 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2313,7 +2100,7 @@ function factory(key, state, ctx) {
 
 
 /***/ }),
-/* 24 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2397,7 +2184,7 @@ function indices(value) {
 
 
 /***/ }),
-/* 25 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2441,14 +2228,14 @@ function factory(ctx, key) {
 
 
 /***/ }),
-/* 26 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var xtend = __webpack_require__(20);
-var entities = __webpack_require__(27);
+var xtend = __webpack_require__(18);
+var entities = __webpack_require__(25);
 
 module.exports = factory;
 
@@ -2512,18 +2299,18 @@ function factory(ctx) {
 
 
 /***/ }),
-/* 27 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var characterEntities = __webpack_require__(28)
-var legacy = __webpack_require__(29)
-var invalid = __webpack_require__(30)
-var decimal = __webpack_require__(31)
-var hexadecimal = __webpack_require__(32)
-var alphanumerical = __webpack_require__(33)
+var characterEntities = __webpack_require__(26)
+var legacy = __webpack_require__(27)
+var invalid = __webpack_require__(28)
+var decimal = __webpack_require__(29)
+var hexadecimal = __webpack_require__(30)
+var alphanumerical = __webpack_require__(31)
 
 module.exports = parseEntities
 
@@ -2963,25 +2750,25 @@ function disallowed(code) {
 
 
 /***/ }),
-/* 28 */
+/* 26 */
 /***/ (function(module) {
 
 module.exports = {"AEli":"Æ","AElig":"Æ","AM":"&","AMP":"&","Aacut":"Á","Aacute":"Á","Abreve":"Ă","Acir":"Â","Acirc":"Â","Acy":"А","Afr":"𝔄","Agrav":"À","Agrave":"À","Alpha":"Α","Amacr":"Ā","And":"⩓","Aogon":"Ą","Aopf":"𝔸","ApplyFunction":"⁡","Arin":"Å","Aring":"Å","Ascr":"𝒜","Assign":"≔","Atild":"Ã","Atilde":"Ã","Aum":"Ä","Auml":"Ä","Backslash":"∖","Barv":"⫧","Barwed":"⌆","Bcy":"Б","Because":"∵","Bernoullis":"ℬ","Beta":"Β","Bfr":"𝔅","Bopf":"𝔹","Breve":"˘","Bscr":"ℬ","Bumpeq":"≎","CHcy":"Ч","COP":"©","COPY":"©","Cacute":"Ć","Cap":"⋒","CapitalDifferentialD":"ⅅ","Cayleys":"ℭ","Ccaron":"Č","Ccedi":"Ç","Ccedil":"Ç","Ccirc":"Ĉ","Cconint":"∰","Cdot":"Ċ","Cedilla":"¸","CenterDot":"·","Cfr":"ℭ","Chi":"Χ","CircleDot":"⊙","CircleMinus":"⊖","CirclePlus":"⊕","CircleTimes":"⊗","ClockwiseContourIntegral":"∲","CloseCurlyDoubleQuote":"”","CloseCurlyQuote":"’","Colon":"∷","Colone":"⩴","Congruent":"≡","Conint":"∯","ContourIntegral":"∮","Copf":"ℂ","Coproduct":"∐","CounterClockwiseContourIntegral":"∳","Cross":"⨯","Cscr":"𝒞","Cup":"⋓","CupCap":"≍","DD":"ⅅ","DDotrahd":"⤑","DJcy":"Ђ","DScy":"Ѕ","DZcy":"Џ","Dagger":"‡","Darr":"↡","Dashv":"⫤","Dcaron":"Ď","Dcy":"Д","Del":"∇","Delta":"Δ","Dfr":"𝔇","DiacriticalAcute":"´","DiacriticalDot":"˙","DiacriticalDoubleAcute":"˝","DiacriticalGrave":"`","DiacriticalTilde":"˜","Diamond":"⋄","DifferentialD":"ⅆ","Dopf":"𝔻","Dot":"¨","DotDot":"⃜","DotEqual":"≐","DoubleContourIntegral":"∯","DoubleDot":"¨","DoubleDownArrow":"⇓","DoubleLeftArrow":"⇐","DoubleLeftRightArrow":"⇔","DoubleLeftTee":"⫤","DoubleLongLeftArrow":"⟸","DoubleLongLeftRightArrow":"⟺","DoubleLongRightArrow":"⟹","DoubleRightArrow":"⇒","DoubleRightTee":"⊨","DoubleUpArrow":"⇑","DoubleUpDownArrow":"⇕","DoubleVerticalBar":"∥","DownArrow":"↓","DownArrowBar":"⤓","DownArrowUpArrow":"⇵","DownBreve":"̑","DownLeftRightVector":"⥐","DownLeftTeeVector":"⥞","DownLeftVector":"↽","DownLeftVectorBar":"⥖","DownRightTeeVector":"⥟","DownRightVector":"⇁","DownRightVectorBar":"⥗","DownTee":"⊤","DownTeeArrow":"↧","Downarrow":"⇓","Dscr":"𝒟","Dstrok":"Đ","ENG":"Ŋ","ET":"Ð","ETH":"Ð","Eacut":"É","Eacute":"É","Ecaron":"Ě","Ecir":"Ê","Ecirc":"Ê","Ecy":"Э","Edot":"Ė","Efr":"𝔈","Egrav":"È","Egrave":"È","Element":"∈","Emacr":"Ē","EmptySmallSquare":"◻","EmptyVerySmallSquare":"▫","Eogon":"Ę","Eopf":"𝔼","Epsilon":"Ε","Equal":"⩵","EqualTilde":"≂","Equilibrium":"⇌","Escr":"ℰ","Esim":"⩳","Eta":"Η","Eum":"Ë","Euml":"Ë","Exists":"∃","ExponentialE":"ⅇ","Fcy":"Ф","Ffr":"𝔉","FilledSmallSquare":"◼","FilledVerySmallSquare":"▪","Fopf":"𝔽","ForAll":"∀","Fouriertrf":"ℱ","Fscr":"ℱ","GJcy":"Ѓ","G":">","GT":">","Gamma":"Γ","Gammad":"Ϝ","Gbreve":"Ğ","Gcedil":"Ģ","Gcirc":"Ĝ","Gcy":"Г","Gdot":"Ġ","Gfr":"𝔊","Gg":"⋙","Gopf":"𝔾","GreaterEqual":"≥","GreaterEqualLess":"⋛","GreaterFullEqual":"≧","GreaterGreater":"⪢","GreaterLess":"≷","GreaterSlantEqual":"⩾","GreaterTilde":"≳","Gscr":"𝒢","Gt":"≫","HARDcy":"Ъ","Hacek":"ˇ","Hat":"^","Hcirc":"Ĥ","Hfr":"ℌ","HilbertSpace":"ℋ","Hopf":"ℍ","HorizontalLine":"─","Hscr":"ℋ","Hstrok":"Ħ","HumpDownHump":"≎","HumpEqual":"≏","IEcy":"Е","IJlig":"Ĳ","IOcy":"Ё","Iacut":"Í","Iacute":"Í","Icir":"Î","Icirc":"Î","Icy":"И","Idot":"İ","Ifr":"ℑ","Igrav":"Ì","Igrave":"Ì","Im":"ℑ","Imacr":"Ī","ImaginaryI":"ⅈ","Implies":"⇒","Int":"∬","Integral":"∫","Intersection":"⋂","InvisibleComma":"⁣","InvisibleTimes":"⁢","Iogon":"Į","Iopf":"𝕀","Iota":"Ι","Iscr":"ℐ","Itilde":"Ĩ","Iukcy":"І","Ium":"Ï","Iuml":"Ï","Jcirc":"Ĵ","Jcy":"Й","Jfr":"𝔍","Jopf":"𝕁","Jscr":"𝒥","Jsercy":"Ј","Jukcy":"Є","KHcy":"Х","KJcy":"Ќ","Kappa":"Κ","Kcedil":"Ķ","Kcy":"К","Kfr":"𝔎","Kopf":"𝕂","Kscr":"𝒦","LJcy":"Љ","L":"<","LT":"<","Lacute":"Ĺ","Lambda":"Λ","Lang":"⟪","Laplacetrf":"ℒ","Larr":"↞","Lcaron":"Ľ","Lcedil":"Ļ","Lcy":"Л","LeftAngleBracket":"⟨","LeftArrow":"←","LeftArrowBar":"⇤","LeftArrowRightArrow":"⇆","LeftCeiling":"⌈","LeftDoubleBracket":"⟦","LeftDownTeeVector":"⥡","LeftDownVector":"⇃","LeftDownVectorBar":"⥙","LeftFloor":"⌊","LeftRightArrow":"↔","LeftRightVector":"⥎","LeftTee":"⊣","LeftTeeArrow":"↤","LeftTeeVector":"⥚","LeftTriangle":"⊲","LeftTriangleBar":"⧏","LeftTriangleEqual":"⊴","LeftUpDownVector":"⥑","LeftUpTeeVector":"⥠","LeftUpVector":"↿","LeftUpVectorBar":"⥘","LeftVector":"↼","LeftVectorBar":"⥒","Leftarrow":"⇐","Leftrightarrow":"⇔","LessEqualGreater":"⋚","LessFullEqual":"≦","LessGreater":"≶","LessLess":"⪡","LessSlantEqual":"⩽","LessTilde":"≲","Lfr":"𝔏","Ll":"⋘","Lleftarrow":"⇚","Lmidot":"Ŀ","LongLeftArrow":"⟵","LongLeftRightArrow":"⟷","LongRightArrow":"⟶","Longleftarrow":"⟸","Longleftrightarrow":"⟺","Longrightarrow":"⟹","Lopf":"𝕃","LowerLeftArrow":"↙","LowerRightArrow":"↘","Lscr":"ℒ","Lsh":"↰","Lstrok":"Ł","Lt":"≪","Map":"⤅","Mcy":"М","MediumSpace":" ","Mellintrf":"ℳ","Mfr":"𝔐","MinusPlus":"∓","Mopf":"𝕄","Mscr":"ℳ","Mu":"Μ","NJcy":"Њ","Nacute":"Ń","Ncaron":"Ň","Ncedil":"Ņ","Ncy":"Н","NegativeMediumSpace":"​","NegativeThickSpace":"​","NegativeThinSpace":"​","NegativeVeryThinSpace":"​","NestedGreaterGreater":"≫","NestedLessLess":"≪","NewLine":"\n","Nfr":"𝔑","NoBreak":"⁠","NonBreakingSpace":" ","Nopf":"ℕ","Not":"⫬","NotCongruent":"≢","NotCupCap":"≭","NotDoubleVerticalBar":"∦","NotElement":"∉","NotEqual":"≠","NotEqualTilde":"≂̸","NotExists":"∄","NotGreater":"≯","NotGreaterEqual":"≱","NotGreaterFullEqual":"≧̸","NotGreaterGreater":"≫̸","NotGreaterLess":"≹","NotGreaterSlantEqual":"⩾̸","NotGreaterTilde":"≵","NotHumpDownHump":"≎̸","NotHumpEqual":"≏̸","NotLeftTriangle":"⋪","NotLeftTriangleBar":"⧏̸","NotLeftTriangleEqual":"⋬","NotLess":"≮","NotLessEqual":"≰","NotLessGreater":"≸","NotLessLess":"≪̸","NotLessSlantEqual":"⩽̸","NotLessTilde":"≴","NotNestedGreaterGreater":"⪢̸","NotNestedLessLess":"⪡̸","NotPrecedes":"⊀","NotPrecedesEqual":"⪯̸","NotPrecedesSlantEqual":"⋠","NotReverseElement":"∌","NotRightTriangle":"⋫","NotRightTriangleBar":"⧐̸","NotRightTriangleEqual":"⋭","NotSquareSubset":"⊏̸","NotSquareSubsetEqual":"⋢","NotSquareSuperset":"⊐̸","NotSquareSupersetEqual":"⋣","NotSubset":"⊂⃒","NotSubsetEqual":"⊈","NotSucceeds":"⊁","NotSucceedsEqual":"⪰̸","NotSucceedsSlantEqual":"⋡","NotSucceedsTilde":"≿̸","NotSuperset":"⊃⃒","NotSupersetEqual":"⊉","NotTilde":"≁","NotTildeEqual":"≄","NotTildeFullEqual":"≇","NotTildeTilde":"≉","NotVerticalBar":"∤","Nscr":"𝒩","Ntild":"Ñ","Ntilde":"Ñ","Nu":"Ν","OElig":"Œ","Oacut":"Ó","Oacute":"Ó","Ocir":"Ô","Ocirc":"Ô","Ocy":"О","Odblac":"Ő","Ofr":"𝔒","Ograv":"Ò","Ograve":"Ò","Omacr":"Ō","Omega":"Ω","Omicron":"Ο","Oopf":"𝕆","OpenCurlyDoubleQuote":"“","OpenCurlyQuote":"‘","Or":"⩔","Oscr":"𝒪","Oslas":"Ø","Oslash":"Ø","Otild":"Õ","Otilde":"Õ","Otimes":"⨷","Oum":"Ö","Ouml":"Ö","OverBar":"‾","OverBrace":"⏞","OverBracket":"⎴","OverParenthesis":"⏜","PartialD":"∂","Pcy":"П","Pfr":"𝔓","Phi":"Φ","Pi":"Π","PlusMinus":"±","Poincareplane":"ℌ","Popf":"ℙ","Pr":"⪻","Precedes":"≺","PrecedesEqual":"⪯","PrecedesSlantEqual":"≼","PrecedesTilde":"≾","Prime":"″","Product":"∏","Proportion":"∷","Proportional":"∝","Pscr":"𝒫","Psi":"Ψ","QUO":"\"","QUOT":"\"","Qfr":"𝔔","Qopf":"ℚ","Qscr":"𝒬","RBarr":"⤐","RE":"®","REG":"®","Racute":"Ŕ","Rang":"⟫","Rarr":"↠","Rarrtl":"⤖","Rcaron":"Ř","Rcedil":"Ŗ","Rcy":"Р","Re":"ℜ","ReverseElement":"∋","ReverseEquilibrium":"⇋","ReverseUpEquilibrium":"⥯","Rfr":"ℜ","Rho":"Ρ","RightAngleBracket":"⟩","RightArrow":"→","RightArrowBar":"⇥","RightArrowLeftArrow":"⇄","RightCeiling":"⌉","RightDoubleBracket":"⟧","RightDownTeeVector":"⥝","RightDownVector":"⇂","RightDownVectorBar":"⥕","RightFloor":"⌋","RightTee":"⊢","RightTeeArrow":"↦","RightTeeVector":"⥛","RightTriangle":"⊳","RightTriangleBar":"⧐","RightTriangleEqual":"⊵","RightUpDownVector":"⥏","RightUpTeeVector":"⥜","RightUpVector":"↾","RightUpVectorBar":"⥔","RightVector":"⇀","RightVectorBar":"⥓","Rightarrow":"⇒","Ropf":"ℝ","RoundImplies":"⥰","Rrightarrow":"⇛","Rscr":"ℛ","Rsh":"↱","RuleDelayed":"⧴","SHCHcy":"Щ","SHcy":"Ш","SOFTcy":"Ь","Sacute":"Ś","Sc":"⪼","Scaron":"Š","Scedil":"Ş","Scirc":"Ŝ","Scy":"С","Sfr":"𝔖","ShortDownArrow":"↓","ShortLeftArrow":"←","ShortRightArrow":"→","ShortUpArrow":"↑","Sigma":"Σ","SmallCircle":"∘","Sopf":"𝕊","Sqrt":"√","Square":"□","SquareIntersection":"⊓","SquareSubset":"⊏","SquareSubsetEqual":"⊑","SquareSuperset":"⊐","SquareSupersetEqual":"⊒","SquareUnion":"⊔","Sscr":"𝒮","Star":"⋆","Sub":"⋐","Subset":"⋐","SubsetEqual":"⊆","Succeeds":"≻","SucceedsEqual":"⪰","SucceedsSlantEqual":"≽","SucceedsTilde":"≿","SuchThat":"∋","Sum":"∑","Sup":"⋑","Superset":"⊃","SupersetEqual":"⊇","Supset":"⋑","THOR":"Þ","THORN":"Þ","TRADE":"™","TSHcy":"Ћ","TScy":"Ц","Tab":"\t","Tau":"Τ","Tcaron":"Ť","Tcedil":"Ţ","Tcy":"Т","Tfr":"𝔗","Therefore":"∴","Theta":"Θ","ThickSpace":"  ","ThinSpace":" ","Tilde":"∼","TildeEqual":"≃","TildeFullEqual":"≅","TildeTilde":"≈","Topf":"𝕋","TripleDot":"⃛","Tscr":"𝒯","Tstrok":"Ŧ","Uacut":"Ú","Uacute":"Ú","Uarr":"↟","Uarrocir":"⥉","Ubrcy":"Ў","Ubreve":"Ŭ","Ucir":"Û","Ucirc":"Û","Ucy":"У","Udblac":"Ű","Ufr":"𝔘","Ugrav":"Ù","Ugrave":"Ù","Umacr":"Ū","UnderBar":"_","UnderBrace":"⏟","UnderBracket":"⎵","UnderParenthesis":"⏝","Union":"⋃","UnionPlus":"⊎","Uogon":"Ų","Uopf":"𝕌","UpArrow":"↑","UpArrowBar":"⤒","UpArrowDownArrow":"⇅","UpDownArrow":"↕","UpEquilibrium":"⥮","UpTee":"⊥","UpTeeArrow":"↥","Uparrow":"⇑","Updownarrow":"⇕","UpperLeftArrow":"↖","UpperRightArrow":"↗","Upsi":"ϒ","Upsilon":"Υ","Uring":"Ů","Uscr":"𝒰","Utilde":"Ũ","Uum":"Ü","Uuml":"Ü","VDash":"⊫","Vbar":"⫫","Vcy":"В","Vdash":"⊩","Vdashl":"⫦","Vee":"⋁","Verbar":"‖","Vert":"‖","VerticalBar":"∣","VerticalLine":"|","VerticalSeparator":"❘","VerticalTilde":"≀","VeryThinSpace":" ","Vfr":"𝔙","Vopf":"𝕍","Vscr":"𝒱","Vvdash":"⊪","Wcirc":"Ŵ","Wedge":"⋀","Wfr":"𝔚","Wopf":"𝕎","Wscr":"𝒲","Xfr":"𝔛","Xi":"Ξ","Xopf":"𝕏","Xscr":"𝒳","YAcy":"Я","YIcy":"Ї","YUcy":"Ю","Yacut":"Ý","Yacute":"Ý","Ycirc":"Ŷ","Ycy":"Ы","Yfr":"𝔜","Yopf":"𝕐","Yscr":"𝒴","Yuml":"Ÿ","ZHcy":"Ж","Zacute":"Ź","Zcaron":"Ž","Zcy":"З","Zdot":"Ż","ZeroWidthSpace":"​","Zeta":"Ζ","Zfr":"ℨ","Zopf":"ℤ","Zscr":"𝒵","aacut":"á","aacute":"á","abreve":"ă","ac":"∾","acE":"∾̳","acd":"∿","acir":"â","acirc":"â","acut":"´","acute":"´","acy":"а","aeli":"æ","aelig":"æ","af":"⁡","afr":"𝔞","agrav":"à","agrave":"à","alefsym":"ℵ","aleph":"ℵ","alpha":"α","amacr":"ā","amalg":"⨿","am":"&","amp":"&","and":"∧","andand":"⩕","andd":"⩜","andslope":"⩘","andv":"⩚","ang":"∠","ange":"⦤","angle":"∠","angmsd":"∡","angmsdaa":"⦨","angmsdab":"⦩","angmsdac":"⦪","angmsdad":"⦫","angmsdae":"⦬","angmsdaf":"⦭","angmsdag":"⦮","angmsdah":"⦯","angrt":"∟","angrtvb":"⊾","angrtvbd":"⦝","angsph":"∢","angst":"Å","angzarr":"⍼","aogon":"ą","aopf":"𝕒","ap":"≈","apE":"⩰","apacir":"⩯","ape":"≊","apid":"≋","apos":"'","approx":"≈","approxeq":"≊","arin":"å","aring":"å","ascr":"𝒶","ast":"*","asymp":"≈","asympeq":"≍","atild":"ã","atilde":"ã","aum":"ä","auml":"ä","awconint":"∳","awint":"⨑","bNot":"⫭","backcong":"≌","backepsilon":"϶","backprime":"‵","backsim":"∽","backsimeq":"⋍","barvee":"⊽","barwed":"⌅","barwedge":"⌅","bbrk":"⎵","bbrktbrk":"⎶","bcong":"≌","bcy":"б","bdquo":"„","becaus":"∵","because":"∵","bemptyv":"⦰","bepsi":"϶","bernou":"ℬ","beta":"β","beth":"ℶ","between":"≬","bfr":"𝔟","bigcap":"⋂","bigcirc":"◯","bigcup":"⋃","bigodot":"⨀","bigoplus":"⨁","bigotimes":"⨂","bigsqcup":"⨆","bigstar":"★","bigtriangledown":"▽","bigtriangleup":"△","biguplus":"⨄","bigvee":"⋁","bigwedge":"⋀","bkarow":"⤍","blacklozenge":"⧫","blacksquare":"▪","blacktriangle":"▴","blacktriangledown":"▾","blacktriangleleft":"◂","blacktriangleright":"▸","blank":"␣","blk12":"▒","blk14":"░","blk34":"▓","block":"█","bne":"=⃥","bnequiv":"≡⃥","bnot":"⌐","bopf":"𝕓","bot":"⊥","bottom":"⊥","bowtie":"⋈","boxDL":"╗","boxDR":"╔","boxDl":"╖","boxDr":"╓","boxH":"═","boxHD":"╦","boxHU":"╩","boxHd":"╤","boxHu":"╧","boxUL":"╝","boxUR":"╚","boxUl":"╜","boxUr":"╙","boxV":"║","boxVH":"╬","boxVL":"╣","boxVR":"╠","boxVh":"╫","boxVl":"╢","boxVr":"╟","boxbox":"⧉","boxdL":"╕","boxdR":"╒","boxdl":"┐","boxdr":"┌","boxh":"─","boxhD":"╥","boxhU":"╨","boxhd":"┬","boxhu":"┴","boxminus":"⊟","boxplus":"⊞","boxtimes":"⊠","boxuL":"╛","boxuR":"╘","boxul":"┘","boxur":"└","boxv":"│","boxvH":"╪","boxvL":"╡","boxvR":"╞","boxvh":"┼","boxvl":"┤","boxvr":"├","bprime":"‵","breve":"˘","brvba":"¦","brvbar":"¦","bscr":"𝒷","bsemi":"⁏","bsim":"∽","bsime":"⋍","bsol":"\\","bsolb":"⧅","bsolhsub":"⟈","bull":"•","bullet":"•","bump":"≎","bumpE":"⪮","bumpe":"≏","bumpeq":"≏","cacute":"ć","cap":"∩","capand":"⩄","capbrcup":"⩉","capcap":"⩋","capcup":"⩇","capdot":"⩀","caps":"∩︀","caret":"⁁","caron":"ˇ","ccaps":"⩍","ccaron":"č","ccedi":"ç","ccedil":"ç","ccirc":"ĉ","ccups":"⩌","ccupssm":"⩐","cdot":"ċ","cedi":"¸","cedil":"¸","cemptyv":"⦲","cen":"¢","cent":"¢","centerdot":"·","cfr":"𝔠","chcy":"ч","check":"✓","checkmark":"✓","chi":"χ","cir":"○","cirE":"⧃","circ":"ˆ","circeq":"≗","circlearrowleft":"↺","circlearrowright":"↻","circledR":"®","circledS":"Ⓢ","circledast":"⊛","circledcirc":"⊚","circleddash":"⊝","cire":"≗","cirfnint":"⨐","cirmid":"⫯","cirscir":"⧂","clubs":"♣","clubsuit":"♣","colon":":","colone":"≔","coloneq":"≔","comma":",","commat":"@","comp":"∁","compfn":"∘","complement":"∁","complexes":"ℂ","cong":"≅","congdot":"⩭","conint":"∮","copf":"𝕔","coprod":"∐","cop":"©","copy":"©","copysr":"℗","crarr":"↵","cross":"✗","cscr":"𝒸","csub":"⫏","csube":"⫑","csup":"⫐","csupe":"⫒","ctdot":"⋯","cudarrl":"⤸","cudarrr":"⤵","cuepr":"⋞","cuesc":"⋟","cularr":"↶","cularrp":"⤽","cup":"∪","cupbrcap":"⩈","cupcap":"⩆","cupcup":"⩊","cupdot":"⊍","cupor":"⩅","cups":"∪︀","curarr":"↷","curarrm":"⤼","curlyeqprec":"⋞","curlyeqsucc":"⋟","curlyvee":"⋎","curlywedge":"⋏","curre":"¤","curren":"¤","curvearrowleft":"↶","curvearrowright":"↷","cuvee":"⋎","cuwed":"⋏","cwconint":"∲","cwint":"∱","cylcty":"⌭","dArr":"⇓","dHar":"⥥","dagger":"†","daleth":"ℸ","darr":"↓","dash":"‐","dashv":"⊣","dbkarow":"⤏","dblac":"˝","dcaron":"ď","dcy":"д","dd":"ⅆ","ddagger":"‡","ddarr":"⇊","ddotseq":"⩷","de":"°","deg":"°","delta":"δ","demptyv":"⦱","dfisht":"⥿","dfr":"𝔡","dharl":"⇃","dharr":"⇂","diam":"⋄","diamond":"⋄","diamondsuit":"♦","diams":"♦","die":"¨","digamma":"ϝ","disin":"⋲","div":"÷","divid":"÷","divide":"÷","divideontimes":"⋇","divonx":"⋇","djcy":"ђ","dlcorn":"⌞","dlcrop":"⌍","dollar":"$","dopf":"𝕕","dot":"˙","doteq":"≐","doteqdot":"≑","dotminus":"∸","dotplus":"∔","dotsquare":"⊡","doublebarwedge":"⌆","downarrow":"↓","downdownarrows":"⇊","downharpoonleft":"⇃","downharpoonright":"⇂","drbkarow":"⤐","drcorn":"⌟","drcrop":"⌌","dscr":"𝒹","dscy":"ѕ","dsol":"⧶","dstrok":"đ","dtdot":"⋱","dtri":"▿","dtrif":"▾","duarr":"⇵","duhar":"⥯","dwangle":"⦦","dzcy":"џ","dzigrarr":"⟿","eDDot":"⩷","eDot":"≑","eacut":"é","eacute":"é","easter":"⩮","ecaron":"ě","ecir":"ê","ecirc":"ê","ecolon":"≕","ecy":"э","edot":"ė","ee":"ⅇ","efDot":"≒","efr":"𝔢","eg":"⪚","egrav":"è","egrave":"è","egs":"⪖","egsdot":"⪘","el":"⪙","elinters":"⏧","ell":"ℓ","els":"⪕","elsdot":"⪗","emacr":"ē","empty":"∅","emptyset":"∅","emptyv":"∅","emsp13":" ","emsp14":" ","emsp":" ","eng":"ŋ","ensp":" ","eogon":"ę","eopf":"𝕖","epar":"⋕","eparsl":"⧣","eplus":"⩱","epsi":"ε","epsilon":"ε","epsiv":"ϵ","eqcirc":"≖","eqcolon":"≕","eqsim":"≂","eqslantgtr":"⪖","eqslantless":"⪕","equals":"=","equest":"≟","equiv":"≡","equivDD":"⩸","eqvparsl":"⧥","erDot":"≓","erarr":"⥱","escr":"ℯ","esdot":"≐","esim":"≂","eta":"η","et":"ð","eth":"ð","eum":"ë","euml":"ë","euro":"€","excl":"!","exist":"∃","expectation":"ℰ","exponentiale":"ⅇ","fallingdotseq":"≒","fcy":"ф","female":"♀","ffilig":"ﬃ","fflig":"ﬀ","ffllig":"ﬄ","ffr":"𝔣","filig":"ﬁ","fjlig":"fj","flat":"♭","fllig":"ﬂ","fltns":"▱","fnof":"ƒ","fopf":"𝕗","forall":"∀","fork":"⋔","forkv":"⫙","fpartint":"⨍","frac1":"¼","frac12":"½","frac13":"⅓","frac14":"¼","frac15":"⅕","frac16":"⅙","frac18":"⅛","frac23":"⅔","frac25":"⅖","frac3":"¾","frac34":"¾","frac35":"⅗","frac38":"⅜","frac45":"⅘","frac56":"⅚","frac58":"⅝","frac78":"⅞","frasl":"⁄","frown":"⌢","fscr":"𝒻","gE":"≧","gEl":"⪌","gacute":"ǵ","gamma":"γ","gammad":"ϝ","gap":"⪆","gbreve":"ğ","gcirc":"ĝ","gcy":"г","gdot":"ġ","ge":"≥","gel":"⋛","geq":"≥","geqq":"≧","geqslant":"⩾","ges":"⩾","gescc":"⪩","gesdot":"⪀","gesdoto":"⪂","gesdotol":"⪄","gesl":"⋛︀","gesles":"⪔","gfr":"𝔤","gg":"≫","ggg":"⋙","gimel":"ℷ","gjcy":"ѓ","gl":"≷","glE":"⪒","gla":"⪥","glj":"⪤","gnE":"≩","gnap":"⪊","gnapprox":"⪊","gne":"⪈","gneq":"⪈","gneqq":"≩","gnsim":"⋧","gopf":"𝕘","grave":"`","gscr":"ℊ","gsim":"≳","gsime":"⪎","gsiml":"⪐","g":">","gt":">","gtcc":"⪧","gtcir":"⩺","gtdot":"⋗","gtlPar":"⦕","gtquest":"⩼","gtrapprox":"⪆","gtrarr":"⥸","gtrdot":"⋗","gtreqless":"⋛","gtreqqless":"⪌","gtrless":"≷","gtrsim":"≳","gvertneqq":"≩︀","gvnE":"≩︀","hArr":"⇔","hairsp":" ","half":"½","hamilt":"ℋ","hardcy":"ъ","harr":"↔","harrcir":"⥈","harrw":"↭","hbar":"ℏ","hcirc":"ĥ","hearts":"♥","heartsuit":"♥","hellip":"…","hercon":"⊹","hfr":"𝔥","hksearow":"⤥","hkswarow":"⤦","hoarr":"⇿","homtht":"∻","hookleftarrow":"↩","hookrightarrow":"↪","hopf":"𝕙","horbar":"―","hscr":"𝒽","hslash":"ℏ","hstrok":"ħ","hybull":"⁃","hyphen":"‐","iacut":"í","iacute":"í","ic":"⁣","icir":"î","icirc":"î","icy":"и","iecy":"е","iexc":"¡","iexcl":"¡","iff":"⇔","ifr":"𝔦","igrav":"ì","igrave":"ì","ii":"ⅈ","iiiint":"⨌","iiint":"∭","iinfin":"⧜","iiota":"℩","ijlig":"ĳ","imacr":"ī","image":"ℑ","imagline":"ℐ","imagpart":"ℑ","imath":"ı","imof":"⊷","imped":"Ƶ","in":"∈","incare":"℅","infin":"∞","infintie":"⧝","inodot":"ı","int":"∫","intcal":"⊺","integers":"ℤ","intercal":"⊺","intlarhk":"⨗","intprod":"⨼","iocy":"ё","iogon":"į","iopf":"𝕚","iota":"ι","iprod":"⨼","iques":"¿","iquest":"¿","iscr":"𝒾","isin":"∈","isinE":"⋹","isindot":"⋵","isins":"⋴","isinsv":"⋳","isinv":"∈","it":"⁢","itilde":"ĩ","iukcy":"і","ium":"ï","iuml":"ï","jcirc":"ĵ","jcy":"й","jfr":"𝔧","jmath":"ȷ","jopf":"𝕛","jscr":"𝒿","jsercy":"ј","jukcy":"є","kappa":"κ","kappav":"ϰ","kcedil":"ķ","kcy":"к","kfr":"𝔨","kgreen":"ĸ","khcy":"х","kjcy":"ќ","kopf":"𝕜","kscr":"𝓀","lAarr":"⇚","lArr":"⇐","lAtail":"⤛","lBarr":"⤎","lE":"≦","lEg":"⪋","lHar":"⥢","lacute":"ĺ","laemptyv":"⦴","lagran":"ℒ","lambda":"λ","lang":"⟨","langd":"⦑","langle":"⟨","lap":"⪅","laqu":"«","laquo":"«","larr":"←","larrb":"⇤","larrbfs":"⤟","larrfs":"⤝","larrhk":"↩","larrlp":"↫","larrpl":"⤹","larrsim":"⥳","larrtl":"↢","lat":"⪫","latail":"⤙","late":"⪭","lates":"⪭︀","lbarr":"⤌","lbbrk":"❲","lbrace":"{","lbrack":"[","lbrke":"⦋","lbrksld":"⦏","lbrkslu":"⦍","lcaron":"ľ","lcedil":"ļ","lceil":"⌈","lcub":"{","lcy":"л","ldca":"⤶","ldquo":"“","ldquor":"„","ldrdhar":"⥧","ldrushar":"⥋","ldsh":"↲","le":"≤","leftarrow":"←","leftarrowtail":"↢","leftharpoondown":"↽","leftharpoonup":"↼","leftleftarrows":"⇇","leftrightarrow":"↔","leftrightarrows":"⇆","leftrightharpoons":"⇋","leftrightsquigarrow":"↭","leftthreetimes":"⋋","leg":"⋚","leq":"≤","leqq":"≦","leqslant":"⩽","les":"⩽","lescc":"⪨","lesdot":"⩿","lesdoto":"⪁","lesdotor":"⪃","lesg":"⋚︀","lesges":"⪓","lessapprox":"⪅","lessdot":"⋖","lesseqgtr":"⋚","lesseqqgtr":"⪋","lessgtr":"≶","lesssim":"≲","lfisht":"⥼","lfloor":"⌊","lfr":"𝔩","lg":"≶","lgE":"⪑","lhard":"↽","lharu":"↼","lharul":"⥪","lhblk":"▄","ljcy":"љ","ll":"≪","llarr":"⇇","llcorner":"⌞","llhard":"⥫","lltri":"◺","lmidot":"ŀ","lmoust":"⎰","lmoustache":"⎰","lnE":"≨","lnap":"⪉","lnapprox":"⪉","lne":"⪇","lneq":"⪇","lneqq":"≨","lnsim":"⋦","loang":"⟬","loarr":"⇽","lobrk":"⟦","longleftarrow":"⟵","longleftrightarrow":"⟷","longmapsto":"⟼","longrightarrow":"⟶","looparrowleft":"↫","looparrowright":"↬","lopar":"⦅","lopf":"𝕝","loplus":"⨭","lotimes":"⨴","lowast":"∗","lowbar":"_","loz":"◊","lozenge":"◊","lozf":"⧫","lpar":"(","lparlt":"⦓","lrarr":"⇆","lrcorner":"⌟","lrhar":"⇋","lrhard":"⥭","lrm":"‎","lrtri":"⊿","lsaquo":"‹","lscr":"𝓁","lsh":"↰","lsim":"≲","lsime":"⪍","lsimg":"⪏","lsqb":"[","lsquo":"‘","lsquor":"‚","lstrok":"ł","l":"<","lt":"<","ltcc":"⪦","ltcir":"⩹","ltdot":"⋖","lthree":"⋋","ltimes":"⋉","ltlarr":"⥶","ltquest":"⩻","ltrPar":"⦖","ltri":"◃","ltrie":"⊴","ltrif":"◂","lurdshar":"⥊","luruhar":"⥦","lvertneqq":"≨︀","lvnE":"≨︀","mDDot":"∺","mac":"¯","macr":"¯","male":"♂","malt":"✠","maltese":"✠","map":"↦","mapsto":"↦","mapstodown":"↧","mapstoleft":"↤","mapstoup":"↥","marker":"▮","mcomma":"⨩","mcy":"м","mdash":"—","measuredangle":"∡","mfr":"𝔪","mho":"℧","micr":"µ","micro":"µ","mid":"∣","midast":"*","midcir":"⫰","middo":"·","middot":"·","minus":"−","minusb":"⊟","minusd":"∸","minusdu":"⨪","mlcp":"⫛","mldr":"…","mnplus":"∓","models":"⊧","mopf":"𝕞","mp":"∓","mscr":"𝓂","mstpos":"∾","mu":"μ","multimap":"⊸","mumap":"⊸","nGg":"⋙̸","nGt":"≫⃒","nGtv":"≫̸","nLeftarrow":"⇍","nLeftrightarrow":"⇎","nLl":"⋘̸","nLt":"≪⃒","nLtv":"≪̸","nRightarrow":"⇏","nVDash":"⊯","nVdash":"⊮","nabla":"∇","nacute":"ń","nang":"∠⃒","nap":"≉","napE":"⩰̸","napid":"≋̸","napos":"ŉ","napprox":"≉","natur":"♮","natural":"♮","naturals":"ℕ","nbs":" ","nbsp":" ","nbump":"≎̸","nbumpe":"≏̸","ncap":"⩃","ncaron":"ň","ncedil":"ņ","ncong":"≇","ncongdot":"⩭̸","ncup":"⩂","ncy":"н","ndash":"–","ne":"≠","neArr":"⇗","nearhk":"⤤","nearr":"↗","nearrow":"↗","nedot":"≐̸","nequiv":"≢","nesear":"⤨","nesim":"≂̸","nexist":"∄","nexists":"∄","nfr":"𝔫","ngE":"≧̸","nge":"≱","ngeq":"≱","ngeqq":"≧̸","ngeqslant":"⩾̸","nges":"⩾̸","ngsim":"≵","ngt":"≯","ngtr":"≯","nhArr":"⇎","nharr":"↮","nhpar":"⫲","ni":"∋","nis":"⋼","nisd":"⋺","niv":"∋","njcy":"њ","nlArr":"⇍","nlE":"≦̸","nlarr":"↚","nldr":"‥","nle":"≰","nleftarrow":"↚","nleftrightarrow":"↮","nleq":"≰","nleqq":"≦̸","nleqslant":"⩽̸","nles":"⩽̸","nless":"≮","nlsim":"≴","nlt":"≮","nltri":"⋪","nltrie":"⋬","nmid":"∤","nopf":"𝕟","no":"¬","not":"¬","notin":"∉","notinE":"⋹̸","notindot":"⋵̸","notinva":"∉","notinvb":"⋷","notinvc":"⋶","notni":"∌","notniva":"∌","notnivb":"⋾","notnivc":"⋽","npar":"∦","nparallel":"∦","nparsl":"⫽⃥","npart":"∂̸","npolint":"⨔","npr":"⊀","nprcue":"⋠","npre":"⪯̸","nprec":"⊀","npreceq":"⪯̸","nrArr":"⇏","nrarr":"↛","nrarrc":"⤳̸","nrarrw":"↝̸","nrightarrow":"↛","nrtri":"⋫","nrtrie":"⋭","nsc":"⊁","nsccue":"⋡","nsce":"⪰̸","nscr":"𝓃","nshortmid":"∤","nshortparallel":"∦","nsim":"≁","nsime":"≄","nsimeq":"≄","nsmid":"∤","nspar":"∦","nsqsube":"⋢","nsqsupe":"⋣","nsub":"⊄","nsubE":"⫅̸","nsube":"⊈","nsubset":"⊂⃒","nsubseteq":"⊈","nsubseteqq":"⫅̸","nsucc":"⊁","nsucceq":"⪰̸","nsup":"⊅","nsupE":"⫆̸","nsupe":"⊉","nsupset":"⊃⃒","nsupseteq":"⊉","nsupseteqq":"⫆̸","ntgl":"≹","ntild":"ñ","ntilde":"ñ","ntlg":"≸","ntriangleleft":"⋪","ntrianglelefteq":"⋬","ntriangleright":"⋫","ntrianglerighteq":"⋭","nu":"ν","num":"#","numero":"№","numsp":" ","nvDash":"⊭","nvHarr":"⤄","nvap":"≍⃒","nvdash":"⊬","nvge":"≥⃒","nvgt":">⃒","nvinfin":"⧞","nvlArr":"⤂","nvle":"≤⃒","nvlt":"<⃒","nvltrie":"⊴⃒","nvrArr":"⤃","nvrtrie":"⊵⃒","nvsim":"∼⃒","nwArr":"⇖","nwarhk":"⤣","nwarr":"↖","nwarrow":"↖","nwnear":"⤧","oS":"Ⓢ","oacut":"ó","oacute":"ó","oast":"⊛","ocir":"ô","ocirc":"ô","ocy":"о","odash":"⊝","odblac":"ő","odiv":"⨸","odot":"⊙","odsold":"⦼","oelig":"œ","ofcir":"⦿","ofr":"𝔬","ogon":"˛","ograv":"ò","ograve":"ò","ogt":"⧁","ohbar":"⦵","ohm":"Ω","oint":"∮","olarr":"↺","olcir":"⦾","olcross":"⦻","oline":"‾","olt":"⧀","omacr":"ō","omega":"ω","omicron":"ο","omid":"⦶","ominus":"⊖","oopf":"𝕠","opar":"⦷","operp":"⦹","oplus":"⊕","or":"∨","orarr":"↻","ord":"º","order":"ℴ","orderof":"ℴ","ordf":"ª","ordm":"º","origof":"⊶","oror":"⩖","orslope":"⩗","orv":"⩛","oscr":"ℴ","oslas":"ø","oslash":"ø","osol":"⊘","otild":"õ","otilde":"õ","otimes":"⊗","otimesas":"⨶","oum":"ö","ouml":"ö","ovbar":"⌽","par":"¶","para":"¶","parallel":"∥","parsim":"⫳","parsl":"⫽","part":"∂","pcy":"п","percnt":"%","period":".","permil":"‰","perp":"⊥","pertenk":"‱","pfr":"𝔭","phi":"φ","phiv":"ϕ","phmmat":"ℳ","phone":"☎","pi":"π","pitchfork":"⋔","piv":"ϖ","planck":"ℏ","planckh":"ℎ","plankv":"ℏ","plus":"+","plusacir":"⨣","plusb":"⊞","pluscir":"⨢","plusdo":"∔","plusdu":"⨥","pluse":"⩲","plusm":"±","plusmn":"±","plussim":"⨦","plustwo":"⨧","pm":"±","pointint":"⨕","popf":"𝕡","poun":"£","pound":"£","pr":"≺","prE":"⪳","prap":"⪷","prcue":"≼","pre":"⪯","prec":"≺","precapprox":"⪷","preccurlyeq":"≼","preceq":"⪯","precnapprox":"⪹","precneqq":"⪵","precnsim":"⋨","precsim":"≾","prime":"′","primes":"ℙ","prnE":"⪵","prnap":"⪹","prnsim":"⋨","prod":"∏","profalar":"⌮","profline":"⌒","profsurf":"⌓","prop":"∝","propto":"∝","prsim":"≾","prurel":"⊰","pscr":"𝓅","psi":"ψ","puncsp":" ","qfr":"𝔮","qint":"⨌","qopf":"𝕢","qprime":"⁗","qscr":"𝓆","quaternions":"ℍ","quatint":"⨖","quest":"?","questeq":"≟","quo":"\"","quot":"\"","rAarr":"⇛","rArr":"⇒","rAtail":"⤜","rBarr":"⤏","rHar":"⥤","race":"∽̱","racute":"ŕ","radic":"√","raemptyv":"⦳","rang":"⟩","rangd":"⦒","range":"⦥","rangle":"⟩","raqu":"»","raquo":"»","rarr":"→","rarrap":"⥵","rarrb":"⇥","rarrbfs":"⤠","rarrc":"⤳","rarrfs":"⤞","rarrhk":"↪","rarrlp":"↬","rarrpl":"⥅","rarrsim":"⥴","rarrtl":"↣","rarrw":"↝","ratail":"⤚","ratio":"∶","rationals":"ℚ","rbarr":"⤍","rbbrk":"❳","rbrace":"}","rbrack":"]","rbrke":"⦌","rbrksld":"⦎","rbrkslu":"⦐","rcaron":"ř","rcedil":"ŗ","rceil":"⌉","rcub":"}","rcy":"р","rdca":"⤷","rdldhar":"⥩","rdquo":"”","rdquor":"”","rdsh":"↳","real":"ℜ","realine":"ℛ","realpart":"ℜ","reals":"ℝ","rect":"▭","re":"®","reg":"®","rfisht":"⥽","rfloor":"⌋","rfr":"𝔯","rhard":"⇁","rharu":"⇀","rharul":"⥬","rho":"ρ","rhov":"ϱ","rightarrow":"→","rightarrowtail":"↣","rightharpoondown":"⇁","rightharpoonup":"⇀","rightleftarrows":"⇄","rightleftharpoons":"⇌","rightrightarrows":"⇉","rightsquigarrow":"↝","rightthreetimes":"⋌","ring":"˚","risingdotseq":"≓","rlarr":"⇄","rlhar":"⇌","rlm":"‏","rmoust":"⎱","rmoustache":"⎱","rnmid":"⫮","roang":"⟭","roarr":"⇾","robrk":"⟧","ropar":"⦆","ropf":"𝕣","roplus":"⨮","rotimes":"⨵","rpar":")","rpargt":"⦔","rppolint":"⨒","rrarr":"⇉","rsaquo":"›","rscr":"𝓇","rsh":"↱","rsqb":"]","rsquo":"’","rsquor":"’","rthree":"⋌","rtimes":"⋊","rtri":"▹","rtrie":"⊵","rtrif":"▸","rtriltri":"⧎","ruluhar":"⥨","rx":"℞","sacute":"ś","sbquo":"‚","sc":"≻","scE":"⪴","scap":"⪸","scaron":"š","sccue":"≽","sce":"⪰","scedil":"ş","scirc":"ŝ","scnE":"⪶","scnap":"⪺","scnsim":"⋩","scpolint":"⨓","scsim":"≿","scy":"с","sdot":"⋅","sdotb":"⊡","sdote":"⩦","seArr":"⇘","searhk":"⤥","searr":"↘","searrow":"↘","sec":"§","sect":"§","semi":";","seswar":"⤩","setminus":"∖","setmn":"∖","sext":"✶","sfr":"𝔰","sfrown":"⌢","sharp":"♯","shchcy":"щ","shcy":"ш","shortmid":"∣","shortparallel":"∥","sh":"­","shy":"­","sigma":"σ","sigmaf":"ς","sigmav":"ς","sim":"∼","simdot":"⩪","sime":"≃","simeq":"≃","simg":"⪞","simgE":"⪠","siml":"⪝","simlE":"⪟","simne":"≆","simplus":"⨤","simrarr":"⥲","slarr":"←","smallsetminus":"∖","smashp":"⨳","smeparsl":"⧤","smid":"∣","smile":"⌣","smt":"⪪","smte":"⪬","smtes":"⪬︀","softcy":"ь","sol":"/","solb":"⧄","solbar":"⌿","sopf":"𝕤","spades":"♠","spadesuit":"♠","spar":"∥","sqcap":"⊓","sqcaps":"⊓︀","sqcup":"⊔","sqcups":"⊔︀","sqsub":"⊏","sqsube":"⊑","sqsubset":"⊏","sqsubseteq":"⊑","sqsup":"⊐","sqsupe":"⊒","sqsupset":"⊐","sqsupseteq":"⊒","squ":"□","square":"□","squarf":"▪","squf":"▪","srarr":"→","sscr":"𝓈","ssetmn":"∖","ssmile":"⌣","sstarf":"⋆","star":"☆","starf":"★","straightepsilon":"ϵ","straightphi":"ϕ","strns":"¯","sub":"⊂","subE":"⫅","subdot":"⪽","sube":"⊆","subedot":"⫃","submult":"⫁","subnE":"⫋","subne":"⊊","subplus":"⪿","subrarr":"⥹","subset":"⊂","subseteq":"⊆","subseteqq":"⫅","subsetneq":"⊊","subsetneqq":"⫋","subsim":"⫇","subsub":"⫕","subsup":"⫓","succ":"≻","succapprox":"⪸","succcurlyeq":"≽","succeq":"⪰","succnapprox":"⪺","succneqq":"⪶","succnsim":"⋩","succsim":"≿","sum":"∑","sung":"♪","sup":"⊃","sup1":"¹","sup2":"²","sup3":"³","supE":"⫆","supdot":"⪾","supdsub":"⫘","supe":"⊇","supedot":"⫄","suphsol":"⟉","suphsub":"⫗","suplarr":"⥻","supmult":"⫂","supnE":"⫌","supne":"⊋","supplus":"⫀","supset":"⊃","supseteq":"⊇","supseteqq":"⫆","supsetneq":"⊋","supsetneqq":"⫌","supsim":"⫈","supsub":"⫔","supsup":"⫖","swArr":"⇙","swarhk":"⤦","swarr":"↙","swarrow":"↙","swnwar":"⤪","szli":"ß","szlig":"ß","target":"⌖","tau":"τ","tbrk":"⎴","tcaron":"ť","tcedil":"ţ","tcy":"т","tdot":"⃛","telrec":"⌕","tfr":"𝔱","there4":"∴","therefore":"∴","theta":"θ","thetasym":"ϑ","thetav":"ϑ","thickapprox":"≈","thicksim":"∼","thinsp":" ","thkap":"≈","thksim":"∼","thor":"þ","thorn":"þ","tilde":"˜","time":"×","times":"×","timesb":"⊠","timesbar":"⨱","timesd":"⨰","tint":"∭","toea":"⤨","top":"⊤","topbot":"⌶","topcir":"⫱","topf":"𝕥","topfork":"⫚","tosa":"⤩","tprime":"‴","trade":"™","triangle":"▵","triangledown":"▿","triangleleft":"◃","trianglelefteq":"⊴","triangleq":"≜","triangleright":"▹","trianglerighteq":"⊵","tridot":"◬","trie":"≜","triminus":"⨺","triplus":"⨹","trisb":"⧍","tritime":"⨻","trpezium":"⏢","tscr":"𝓉","tscy":"ц","tshcy":"ћ","tstrok":"ŧ","twixt":"≬","twoheadleftarrow":"↞","twoheadrightarrow":"↠","uArr":"⇑","uHar":"⥣","uacut":"ú","uacute":"ú","uarr":"↑","ubrcy":"ў","ubreve":"ŭ","ucir":"û","ucirc":"û","ucy":"у","udarr":"⇅","udblac":"ű","udhar":"⥮","ufisht":"⥾","ufr":"𝔲","ugrav":"ù","ugrave":"ù","uharl":"↿","uharr":"↾","uhblk":"▀","ulcorn":"⌜","ulcorner":"⌜","ulcrop":"⌏","ultri":"◸","umacr":"ū","um":"¨","uml":"¨","uogon":"ų","uopf":"𝕦","uparrow":"↑","updownarrow":"↕","upharpoonleft":"↿","upharpoonright":"↾","uplus":"⊎","upsi":"υ","upsih":"ϒ","upsilon":"υ","upuparrows":"⇈","urcorn":"⌝","urcorner":"⌝","urcrop":"⌎","uring":"ů","urtri":"◹","uscr":"𝓊","utdot":"⋰","utilde":"ũ","utri":"▵","utrif":"▴","uuarr":"⇈","uum":"ü","uuml":"ü","uwangle":"⦧","vArr":"⇕","vBar":"⫨","vBarv":"⫩","vDash":"⊨","vangrt":"⦜","varepsilon":"ϵ","varkappa":"ϰ","varnothing":"∅","varphi":"ϕ","varpi":"ϖ","varpropto":"∝","varr":"↕","varrho":"ϱ","varsigma":"ς","varsubsetneq":"⊊︀","varsubsetneqq":"⫋︀","varsupsetneq":"⊋︀","varsupsetneqq":"⫌︀","vartheta":"ϑ","vartriangleleft":"⊲","vartriangleright":"⊳","vcy":"в","vdash":"⊢","vee":"∨","veebar":"⊻","veeeq":"≚","vellip":"⋮","verbar":"|","vert":"|","vfr":"𝔳","vltri":"⊲","vnsub":"⊂⃒","vnsup":"⊃⃒","vopf":"𝕧","vprop":"∝","vrtri":"⊳","vscr":"𝓋","vsubnE":"⫋︀","vsubne":"⊊︀","vsupnE":"⫌︀","vsupne":"⊋︀","vzigzag":"⦚","wcirc":"ŵ","wedbar":"⩟","wedge":"∧","wedgeq":"≙","weierp":"℘","wfr":"𝔴","wopf":"𝕨","wp":"℘","wr":"≀","wreath":"≀","wscr":"𝓌","xcap":"⋂","xcirc":"◯","xcup":"⋃","xdtri":"▽","xfr":"𝔵","xhArr":"⟺","xharr":"⟷","xi":"ξ","xlArr":"⟸","xlarr":"⟵","xmap":"⟼","xnis":"⋻","xodot":"⨀","xopf":"𝕩","xoplus":"⨁","xotime":"⨂","xrArr":"⟹","xrarr":"⟶","xscr":"𝓍","xsqcup":"⨆","xuplus":"⨄","xutri":"△","xvee":"⋁","xwedge":"⋀","yacut":"ý","yacute":"ý","yacy":"я","ycirc":"ŷ","ycy":"ы","ye":"¥","yen":"¥","yfr":"𝔶","yicy":"ї","yopf":"𝕪","yscr":"𝓎","yucy":"ю","yum":"ÿ","yuml":"ÿ","zacute":"ź","zcaron":"ž","zcy":"з","zdot":"ż","zeetrf":"ℨ","zeta":"ζ","zfr":"𝔷","zhcy":"ж","zigrarr":"⇝","zopf":"𝕫","zscr":"𝓏","zwj":"‍","zwnj":"‌"};
 
 /***/ }),
-/* 29 */
+/* 27 */
 /***/ (function(module) {
 
 module.exports = {"AElig":"Æ","AMP":"&","Aacute":"Á","Acirc":"Â","Agrave":"À","Aring":"Å","Atilde":"Ã","Auml":"Ä","COPY":"©","Ccedil":"Ç","ETH":"Ð","Eacute":"É","Ecirc":"Ê","Egrave":"È","Euml":"Ë","GT":">","Iacute":"Í","Icirc":"Î","Igrave":"Ì","Iuml":"Ï","LT":"<","Ntilde":"Ñ","Oacute":"Ó","Ocirc":"Ô","Ograve":"Ò","Oslash":"Ø","Otilde":"Õ","Ouml":"Ö","QUOT":"\"","REG":"®","THORN":"Þ","Uacute":"Ú","Ucirc":"Û","Ugrave":"Ù","Uuml":"Ü","Yacute":"Ý","aacute":"á","acirc":"â","acute":"´","aelig":"æ","agrave":"à","amp":"&","aring":"å","atilde":"ã","auml":"ä","brvbar":"¦","ccedil":"ç","cedil":"¸","cent":"¢","copy":"©","curren":"¤","deg":"°","divide":"÷","eacute":"é","ecirc":"ê","egrave":"è","eth":"ð","euml":"ë","frac12":"½","frac14":"¼","frac34":"¾","gt":">","iacute":"í","icirc":"î","iexcl":"¡","igrave":"ì","iquest":"¿","iuml":"ï","laquo":"«","lt":"<","macr":"¯","micro":"µ","middot":"·","nbsp":" ","not":"¬","ntilde":"ñ","oacute":"ó","ocirc":"ô","ograve":"ò","ordf":"ª","ordm":"º","oslash":"ø","otilde":"õ","ouml":"ö","para":"¶","plusmn":"±","pound":"£","quot":"\"","raquo":"»","reg":"®","sect":"§","shy":"­","sup1":"¹","sup2":"²","sup3":"³","szlig":"ß","thorn":"þ","times":"×","uacute":"ú","ucirc":"û","ugrave":"ù","uml":"¨","uuml":"ü","yacute":"ý","yen":"¥","yuml":"ÿ"};
 
 /***/ }),
-/* 30 */
+/* 28 */
 /***/ (function(module) {
 
 module.exports = {"0":"�","128":"€","130":"‚","131":"ƒ","132":"„","133":"…","134":"†","135":"‡","136":"ˆ","137":"‰","138":"Š","139":"‹","140":"Œ","142":"Ž","145":"‘","146":"’","147":"“","148":"”","149":"•","150":"–","151":"—","152":"˜","153":"™","154":"š","155":"›","156":"œ","158":"ž","159":"Ÿ"};
 
 /***/ }),
-/* 31 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2999,7 +2786,7 @@ function decimal(character) {
 
 
 /***/ }),
-/* 32 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3021,14 +2808,14 @@ function hexadecimal(character) {
 
 
 /***/ }),
-/* 33 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var alphabetical = __webpack_require__(34)
-var decimal = __webpack_require__(31)
+var alphabetical = __webpack_require__(32)
+var decimal = __webpack_require__(29)
 
 module.exports = alphanumerical
 
@@ -3040,7 +2827,7 @@ function alphanumerical(character) {
 
 
 /***/ }),
-/* 34 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3061,7 +2848,7 @@ function alphabetical(character) {
 
 
 /***/ }),
-/* 35 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3399,15 +3186,15 @@ function factory(type) {
 
 
 /***/ }),
-/* 36 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var xtend = __webpack_require__(20);
-var escapes = __webpack_require__(37);
-var defaults = __webpack_require__(38);
+var xtend = __webpack_require__(18);
+var escapes = __webpack_require__(35);
+var defaults = __webpack_require__(36);
 
 module.exports = setOptions;
 
@@ -3453,7 +3240,7 @@ function setOptions(options) {
 
 
 /***/ }),
-/* 37 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3517,7 +3304,7 @@ function escapes(options) {
 
 
 /***/ }),
-/* 38 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3529,25 +3316,25 @@ module.exports = {
   commonmark: false,
   footnotes: false,
   pedantic: false,
-  blocks: __webpack_require__(39)
+  blocks: __webpack_require__(37)
 };
 
 
 /***/ }),
-/* 39 */
+/* 37 */
 /***/ (function(module) {
 
 module.exports = ["address","article","aside","base","basefont","blockquote","body","caption","center","col","colgroup","dd","details","dialog","dir","div","dl","dt","fieldset","figcaption","figure","footer","form","frame","frameset","h1","h2","h3","h4","h5","h6","head","header","hgroup","hr","html","iframe","legend","li","link","main","menu","menuitem","meta","nav","noframes","ol","optgroup","option","p","param","pre","section","source","title","summary","table","tbody","td","tfoot","th","thead","title","tr","track","ul"];
 
 /***/ }),
-/* 40 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var xtend = __webpack_require__(20);
-var removePosition = __webpack_require__(41);
+var xtend = __webpack_require__(18);
+var removePosition = __webpack_require__(39);
 
 module.exports = parse;
 
@@ -3592,13 +3379,13 @@ function parse() {
 
 
 /***/ }),
-/* 41 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var visit = __webpack_require__(42)
+var visit = __webpack_require__(40)
 
 module.exports = removePosition
 
@@ -3618,7 +3405,7 @@ function soft(node) {
 
 
 /***/ }),
-/* 42 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3626,7 +3413,7 @@ function soft(node) {
 
 module.exports = visit
 
-var visitParents = __webpack_require__(43)
+var visitParents = __webpack_require__(41)
 
 var CONTINUE = visitParents.CONTINUE
 var SKIP = visitParents.SKIP
@@ -3654,7 +3441,7 @@ function visit(tree, test, visitor, reverse) {
 
 
 /***/ }),
-/* 43 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3662,7 +3449,7 @@ function visit(tree, test, visitor, reverse) {
 
 module.exports = visitParents
 
-var is = __webpack_require__(44)
+var is = __webpack_require__(42)
 
 var CONTINUE = true
 var SKIP = 'skip'
@@ -3723,7 +3510,7 @@ function visitParents(tree, test, visitor, reverse) {
 
 
 /***/ }),
-/* 44 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3849,13 +3636,13 @@ function ok() {
 
 
 /***/ }),
-/* 45 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var whitespace = __webpack_require__(46);
+var whitespace = __webpack_require__(44);
 
 module.exports = newline;
 
@@ -3903,7 +3690,7 @@ function newline(eat, value, silent) {
 
 
 /***/ }),
-/* 46 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3924,14 +3711,14 @@ function whitespace(character) {
 
 
 /***/ }),
-/* 47 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var repeat = __webpack_require__(48);
-var trim = __webpack_require__(49);
+var repeat = __webpack_require__(46);
+var trim = __webpack_require__(47);
 
 module.exports = indentedCode;
 
@@ -4029,7 +3816,7 @@ function indentedCode(eat, value, silent) {
 
 
 /***/ }),
-/* 48 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4106,7 +3893,7 @@ function repeat(str, num) {
 
 
 /***/ }),
-/* 49 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4130,13 +3917,13 @@ function trimTrailingLines(value) {
 
 
 /***/ }),
-/* 50 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var trim = __webpack_require__(49);
+var trim = __webpack_require__(47);
 
 module.exports = fencedCode;
 
@@ -4373,14 +4160,14 @@ function fencedCode(eat, value, silent) {
 
 
 /***/ }),
-/* 51 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var trim = __webpack_require__(52);
-var interrupt = __webpack_require__(53);
+var trim = __webpack_require__(50);
+var interrupt = __webpack_require__(51);
 
 module.exports = blockquote;
 
@@ -4509,7 +4296,7 @@ function blockquote(eat, value, silent) {
 
 
 /***/ }),
-/* 52 */
+/* 50 */
 /***/ (function(module, exports) {
 
 
@@ -4529,7 +4316,7 @@ exports.right = function(str){
 
 
 /***/ }),
-/* 53 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4579,7 +4366,7 @@ function interrupt(interruptors, tokenizers, ctx, params) {
 
 
 /***/ }),
-/* 54 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4727,7 +4514,7 @@ function atxHeading(eat, value, silent) {
 
 
 /***/ }),
-/* 55 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4804,7 +4591,7 @@ function thematicBreak(eat, value, silent) {
 
 
 /***/ }),
-/* 56 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4812,12 +4599,12 @@ function thematicBreak(eat, value, silent) {
 
 /* eslint-disable max-params */
 
-var trim = __webpack_require__(52);
-var repeat = __webpack_require__(48);
-var decimal = __webpack_require__(31);
-var getIndent = __webpack_require__(57);
-var removeIndent = __webpack_require__(58);
-var interrupt = __webpack_require__(53);
+var trim = __webpack_require__(50);
+var repeat = __webpack_require__(46);
+var decimal = __webpack_require__(29);
+var getIndent = __webpack_require__(55);
+var removeIndent = __webpack_require__(56);
+var interrupt = __webpack_require__(51);
 
 module.exports = list;
 
@@ -5285,7 +5072,7 @@ function normalListItem(ctx, value, position) {
 
 
 /***/ }),
-/* 57 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5324,15 +5111,15 @@ function indentation(value) {
 
 
 /***/ }),
-/* 58 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var trim = __webpack_require__(52);
-var repeat = __webpack_require__(48);
-var getIndent = __webpack_require__(57);
+var trim = __webpack_require__(50);
+var repeat = __webpack_require__(46);
+var getIndent = __webpack_require__(55);
 
 module.exports = indentation;
 
@@ -5409,7 +5196,7 @@ function indentation(value, maximum) {
 
 
 /***/ }),
-/* 59 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5523,13 +5310,13 @@ function setextHeading(eat, value, silent) {
 
 
 /***/ }),
-/* 60 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var openCloseTag = __webpack_require__(61).openCloseTag;
+var openCloseTag = __webpack_require__(59).openCloseTag;
 
 module.exports = blockHTML;
 
@@ -5624,7 +5411,7 @@ function blockHTML(eat, value, silent) {
 
 
 /***/ }),
-/* 61 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5656,14 +5443,14 @@ exports.tag = new RegExp('^(?:' +
 
 
 /***/ }),
-/* 62 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var whitespace = __webpack_require__(46);
-var normalize = __webpack_require__(63);
+var whitespace = __webpack_require__(44);
+var normalize = __webpack_require__(61);
 
 module.exports = footnoteDefinition;
 footnoteDefinition.notInList = true;
@@ -5848,13 +5635,13 @@ function footnoteDefinition(eat, value, silent) {
 
 
 /***/ }),
-/* 63 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var collapseWhiteSpace = __webpack_require__(64);
+var collapseWhiteSpace = __webpack_require__(62);
 
 module.exports = normalize;
 
@@ -5866,7 +5653,7 @@ function normalize(value) {
 
 
 /***/ }),
-/* 64 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5881,14 +5668,14 @@ function collapse(value) {
 
 
 /***/ }),
-/* 65 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var whitespace = __webpack_require__(46);
-var normalize = __webpack_require__(63);
+var whitespace = __webpack_require__(44);
+var normalize = __webpack_require__(61);
 
 module.exports = definition;
 definition.notInList = true;
@@ -6166,13 +5953,13 @@ function isUnclosedURLCharacter(character) {
 
 
 /***/ }),
-/* 66 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var whitespace = __webpack_require__(46);
+var whitespace = __webpack_require__(44);
 
 module.exports = table;
 
@@ -6439,16 +6226,16 @@ function table(eat, value, silent) {
 
 
 /***/ }),
-/* 67 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var trim = __webpack_require__(52);
-var decimal = __webpack_require__(31);
-var trimTrailingLines = __webpack_require__(49);
-var interrupt = __webpack_require__(53);
+var trim = __webpack_require__(50);
+var decimal = __webpack_require__(29);
+var trimTrailingLines = __webpack_require__(47);
+var interrupt = __webpack_require__(51);
 
 module.exports = paragraph;
 
@@ -6568,13 +6355,13 @@ function paragraph(eat, value, silent) {
 
 
 /***/ }),
-/* 68 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var locate = __webpack_require__(69);
+var locate = __webpack_require__(67);
 
 module.exports = escape;
 escape.locator = locate;
@@ -6609,7 +6396,7 @@ function escape(eat, value, silent) {
 
 
 /***/ }),
-/* 69 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6623,15 +6410,15 @@ function locate(value, fromIndex) {
 
 
 /***/ }),
-/* 70 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var whitespace = __webpack_require__(46);
-var decode = __webpack_require__(27);
-var locate = __webpack_require__(71);
+var whitespace = __webpack_require__(44);
+var decode = __webpack_require__(25);
+var locate = __webpack_require__(69);
 
 module.exports = autoLink;
 autoLink.locator = locate;
@@ -6775,7 +6562,7 @@ function autoLink(eat, value, silent) {
 
 
 /***/ }),
-/* 71 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6789,15 +6576,15 @@ function locate(value, fromIndex) {
 
 
 /***/ }),
-/* 72 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var decode = __webpack_require__(27);
-var whitespace = __webpack_require__(46);
-var locate = __webpack_require__(73);
+var decode = __webpack_require__(25);
+var whitespace = __webpack_require__(44);
+var locate = __webpack_require__(71);
 
 module.exports = url;
 url.locator = locate;
@@ -6940,7 +6727,7 @@ function url(eat, value, silent) {
 
 
 /***/ }),
-/* 73 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6973,15 +6760,15 @@ function locate(value, fromIndex) {
 
 
 /***/ }),
-/* 74 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var alphabetical = __webpack_require__(34);
-var locate = __webpack_require__(71);
-var tag = __webpack_require__(61).tag;
+var alphabetical = __webpack_require__(32);
+var locate = __webpack_require__(69);
+var tag = __webpack_require__(59).tag;
 
 module.exports = inlineHTML;
 inlineHTML.locator = locate;
@@ -7034,14 +6821,14 @@ function inlineHTML(eat, value, silent) {
 
 
 /***/ }),
-/* 75 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var whitespace = __webpack_require__(46);
-var locate = __webpack_require__(76);
+var whitespace = __webpack_require__(44);
+var locate = __webpack_require__(74);
 
 module.exports = link;
 link.locator = locate;
@@ -7433,7 +7220,7 @@ function link(eat, value, silent) {
 
 
 /***/ }),
-/* 76 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7456,15 +7243,15 @@ function locate(value, fromIndex) {
 
 
 /***/ }),
-/* 77 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var whitespace = __webpack_require__(46);
-var locate = __webpack_require__(76);
-var normalize = __webpack_require__(63);
+var whitespace = __webpack_require__(44);
+var locate = __webpack_require__(74);
+var normalize = __webpack_require__(61);
 
 module.exports = reference;
 reference.locator = locate;
@@ -7669,15 +7456,15 @@ function reference(eat, value, silent) {
 
 
 /***/ }),
-/* 78 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var trim = __webpack_require__(52);
-var whitespace = __webpack_require__(46);
-var locate = __webpack_require__(79);
+var trim = __webpack_require__(50);
+var whitespace = __webpack_require__(44);
+var locate = __webpack_require__(77);
 
 module.exports = strong;
 strong.locator = locate;
@@ -7760,7 +7547,7 @@ function strong(eat, value, silent) {
 
 
 /***/ }),
-/* 79 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7785,16 +7572,16 @@ function locate(value, fromIndex) {
 
 
 /***/ }),
-/* 80 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var trim = __webpack_require__(52);
-var word = __webpack_require__(81);
-var whitespace = __webpack_require__(46);
-var locate = __webpack_require__(82);
+var trim = __webpack_require__(50);
+var word = __webpack_require__(79);
+var whitespace = __webpack_require__(44);
+var locate = __webpack_require__(80);
 
 module.exports = emphasis;
 emphasis.locator = locate;
@@ -7877,7 +7664,7 @@ function emphasis(eat, value, silent) {
 
 
 /***/ }),
-/* 81 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7898,7 +7685,7 @@ function wordCharacter(character) {
 
 
 /***/ }),
-/* 82 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7923,14 +7710,14 @@ function locate(value, fromIndex) {
 
 
 /***/ }),
-/* 83 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var whitespace = __webpack_require__(46);
-var locate = __webpack_require__(84);
+var whitespace = __webpack_require__(44);
+var locate = __webpack_require__(82);
 
 module.exports = strikethrough;
 strikethrough.locator = locate;
@@ -7990,7 +7777,7 @@ function strikethrough(eat, value, silent) {
 
 
 /***/ }),
-/* 84 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8004,14 +7791,14 @@ function locate(value, fromIndex) {
 
 
 /***/ }),
-/* 85 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var whitespace = __webpack_require__(46);
-var locate = __webpack_require__(86);
+var whitespace = __webpack_require__(44);
+var locate = __webpack_require__(84);
 
 module.exports = inlineCode;
 inlineCode.locator = locate;
@@ -8123,7 +7910,7 @@ function inlineCode(eat, value, silent) {
 
 
 /***/ }),
-/* 86 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8137,13 +7924,13 @@ function locate(value, fromIndex) {
 
 
 /***/ }),
-/* 87 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var locate = __webpack_require__(88);
+var locate = __webpack_require__(86);
 
 module.exports = hardBreak;
 hardBreak.locator = locate;
@@ -8184,7 +7971,7 @@ function hardBreak(eat, value, silent) {
 
 
 /***/ }),
-/* 88 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8208,7 +7995,7 @@ function locate(value, fromIndex) {
 
 
 /***/ }),
-/* 89 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8273,31 +8060,23 @@ function text(eat, value, silent) {
 
 
 /***/ }),
-/* 90 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var plugin = __webpack_require__(91);
+var plugin = __webpack_require__(89);
 
 module.exports = plugin;
 
 
 
 /***/ }),
-/* 91 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Parser = __webpack_require__(92);
+var Parser = __webpack_require__(90);
 
 module.exports = function plugin(options) {
-    var renderer = options.renderer;
-
-    if(!renderer) {
-        throw new Error('renderer not found. Did you specify the correct plugin option?');
-    }
-
-    var parser = new Parser({
-        renderer: renderer
-    });
+    var parser = new Parser(options);
 
     this.Compiler = function compiler(node) {
         return parser.parse(node);
@@ -8305,12 +8084,31 @@ module.exports = function plugin(options) {
 };
 
 /***/ }),
-/* 92 */
-/***/ (function(module, exports) {
+/* 90 */
+/***/ (function(module, exports, __webpack_require__) {
+
+function getRenderer(mode) {
+    switch (mode){
+        case 'react' :
+            return __webpack_require__(93);
+        case 'vue' :
+            return __webpack_require__(94);
+        case 'hyperscript' :
+            return __webpack_require__(91);
+        case 'preact' :
+            return __webpack_require__(95);
+        case 'snabbdom' :
+            return __webpack_require__(96);
+        case 'virtual-dom' :
+            return __webpack_require__(97);
+    }
+    return null;
+}
 
 function Parser(options) {
+    var Renderer = options.Renderer?options.Renderer:getRenderer(options.mode);
     this.options = options;
-    this.renderer = options.renderer;
+    this.renderer = new Renderer(options);
 }
 
 Parser.prototype.parseNodes = function(nodes) {
@@ -8338,11 +8136,1031 @@ Parser.prototype.parse = function(node) {
     catch (e) {
         console.error(e);
     }
-    var h = this.renderer.h || this.renderer.options.h;
+    var h = this.options.h || this.renderer.h || this.renderer.options.h;
     return h?h('div', {}, 'error'):null;
 };
 
 module.exports = Parser;
+
+/***/ }),
+/* 91 */
+/***/ (function(module, exports) {
+
+/**
+ * hyperscript Renderer
+ */
+
+function Renderer(options) {
+    this.options = options || {};
+    this.h = options.h;
+}
+
+Renderer.prototype.root = function(node, children) { var h = this.h;
+    var rootClassName = this.options.rootClassName || 'markdown-body';
+    return h('div' , {
+        className: rootClassName
+    }, children);
+};
+
+Renderer.prototype.text = function(node, children) { var h = this.h;
+    return h('span', {
+    }, node.value);
+};
+
+Renderer.prototype.inlineCode = function(node, children) { var h = this.h;
+    return h('code', {
+    }, node.value);
+};
+
+Renderer.prototype.code = function(node, children) { var h = this.h;
+    return h('pre', {
+    }, h('code', {
+        className: node.lang?'language-'+node.lang:''
+    }, node.value));
+};
+
+Renderer.prototype.blockquote = function(node, children) { var h = this.h;
+    return h('blockquote', {
+    }, children);
+};
+
+Renderer.prototype.heading = function(node, children) { var h = this.h;
+    return h('h'+node.depth, {
+    }, children);
+};
+
+Renderer.prototype.thematicBreak = function(node, children) { var h = this.h;
+    return h('hr', {
+    });
+};
+
+Renderer.prototype.list = function(node, children) { var h = this.h;
+    return h(node.ordered?'ol':'ul', {
+    }, children);
+};
+
+Renderer.prototype.listItem = function(node, children) { var h = this.h;
+    return h('li', {
+    }, children);
+};
+
+Renderer.prototype.checkbox = function(node, children) { var h = this.h;
+    return h('input', {
+        type: 'checkbox',
+        checked: node.checked,
+        readOnly: true
+    });
+};
+
+Renderer.prototype.paragraph = function(node, children) { var h = this.h;
+    return h('p', {
+    }, children);
+};
+
+Renderer.prototype.table = function(node, children) { var h = this.h;
+    return h('table', {},
+        h('tbody',{key:0}, children)
+    );
+};
+
+Renderer.prototype.tableRow = function(node, children) { var h = this.h;
+    return h('tr', {}, children);
+};
+
+Renderer.prototype.tableCell = function(node, children) { var h = this.h;
+    return h('td', {
+        align: node.align
+    }, children);
+};
+
+Renderer.prototype.strong = function(node, children) { var h = this.h;
+    return h('strong', {
+    }, children);
+};
+
+Renderer.prototype.emphasis = function(node, children) { var h = this.h;
+    return h('em', {
+    }, children);
+};
+
+Renderer.prototype.break = function(node, children) { var h = this.h;
+    return h('br', {
+    });
+};
+
+Renderer.prototype.delete = function(node, children) { var h = this.h;
+    return h('del', {
+    }, children);
+};
+
+Renderer.prototype.link = function(node, children) { var h = this.h;
+    return h('a', {
+        href: node.url,
+        title: node.title
+    }, children);
+};
+
+Renderer.prototype.linkReference = function(node, children) { var h = this.h;
+    return h('a', {
+        href: node.url,
+        title: node.title
+    }, children);
+};
+
+Renderer.prototype.definition = function(node, children) { var h = this.h;
+    return h('div', {
+            style: {
+                height: '0',
+                visibility: 'hidden'
+            }
+        },
+        h('a', {
+            href: node.url,
+            'data-identifier': node.identifier
+        }, [
+            '['+node.identifier+']: ',
+            node.url
+        ])
+    );
+};
+
+Renderer.prototype.image = function(node, children) { var h = this.h;
+    return h('img', {
+        src: node.url,
+        alt: node.alt,
+        title: node.title
+    });
+};
+
+Renderer.prototype.math = function(node, children) { var h = this.h;
+    return h('p', {
+        innerHTML : node.value
+    });
+};
+
+Renderer.prototype.inlineMath = function(node, children) { var h = this.h;
+    return h('span', {
+        innerHTML : node.value
+    });
+};
+
+Renderer.prototype.html = function(node, children) { var h = this.h;
+    return h('div', {
+        innerHTML : node.value
+    });
+};
+
+module.exports = Renderer;
+
+
+
+/***/ }),
+/* 92 */
+/***/ (function(module, exports) {
+
+module.exports = "**NOTE:** This is Simplelified  Chinese Edition Document of Markdown Syntax. If you are seeking for English Edition Document. Please refer to [Markdown: Syntax][eng-doc].\n\n[eng-doc]:http://daringfireball.net/projects/markdown/syntax\n\n**声明：** 这份文档派生(fork)于[繁体中文版](http://markdown.tw/)，在此基础上进行了繁体转简体工作，并进行了适当的润色。此文档用 Markdown 语法编写，你可以到这里[查看它的源文件][src1]。「繁体中文版的原始文件可以[查看这里][src] 。」--By @[riku][t]\n\n**注：** 本项目托管于 [GitHub][]上，请通过\"派生\"和\"合并请求\"来帮忙改进本项目。\n\n  [src1]: http://gitcafe.com/riku/Markdown-Syntax-CN/blob/master/syntax.md\n  [src]: https://github.com/othree/markdown-syntax-zhtw/blob/master/syntax.md\n  [t]: http://twitter.com/riku\n  [g]: http://gitcafe.com/riku/Markdown-Syntax-CN\n  [Github]: https://github.com/riku/Markdown-Syntax-CN\n  [GitCafe]: http://gitcafe.com/riku/Markdown-Syntax-CN/\n\nMarkdown 语法说明 (简体中文版) / ([点击查看快速入门](./basic.html))\n================\n\n*   [概述](#overview)\n    *   [宗旨](#philosophy)\n    *   [兼容 HTML](#html)\n    *   [特殊字符自动转换](#autoescape)\n*   [区块元素](#block)\n    *   [段落和换行](#p)\n    *   [标题](#header)\n    *   [区块引用](#blockquote)\n    *   [列表](#list)\n    *   [代码区块](#precode)\n    *   [分隔线](#hr)\n*   [区段元素](#span)\n    *   [链接](#link)\n    *   [强调](#em)\n    *   [代码](#code)\n    *   [图片](#img)\n*   [其它](#misc)\n    *   [反斜杠](#backslash)\n    *   [自动链接](#autolink)\n*   [感谢](#acknowledgement)\n*\t[Markdown 免费编辑器](#editor)\n\n* * *\n\n<h2 id=\"overview\">概述</h2>\n\n<h3 id=\"philosophy\">宗旨</h3>\n\nMarkdown 的目标是实现「易读易写」。\n\n可读性，无论如何，都是最重要的。一份使用 Markdown 格式撰写的文件应该可以直接以纯文本发布，并且看起来不会像是由许多标签或是格式指令所构成。Markdown 语法受到一些既有 text-to-HTML 格式的影响，包括 [Setext] [1]、[atx] [2]、[Textile] [3]、[reStructuredText] [4]、[Grutatext] [5] 和 [EtText] [6]，而最大灵感来源其实是纯文本电子邮件的格式。\n\n  [1]: http://docutils.sourceforge.net/mirror/setext.html\n  [2]: http://www.aaronsw.com/2002/atx/\n  [3]: http://textism.com/tools/textile/\n  [4]: http://docutils.sourceforge.net/rst.html\n  [5]: http://www.triptico.com/software/grutatxt.html\n  [6]: http://ettext.taint.org/doc/\n\n总之， Markdown 的语法全由一些符号所组成，这些符号经过精挑细选，其作用一目了然。比如：在文字两旁加上星号，看起来就像\\*强调\\*。Markdown 的列表看起来，嗯，就是列表。Markdown 的区块引用看起来就真的像是引用一段文字，就像你曾在电子邮件中见过的那样。\n\n<h3 id=\"html\">兼容 HTML</h3>\n\nMarkdown 语法的目标是：成为一种适用于网络的*书写*语言。\n\nMarkdown 不是想要取代 HTML，甚至也没有要和它相近，它的语法种类很少，只对应 HTML 标记的一小部分。Markdown 的构想*不是*要使得 HTML 文档更容易书写。在我看来， HTML 已经很容易写了。Markdown 的理念是，能让文档更容易读、写和随意改。HTML 是一种*发布*的格式，Markdown 是一种*书写*的格式。就这样，Markdown 的格式语法只涵盖纯文本可以涵盖的范围。\n\n不在 Markdown 涵盖范围之内的标签，都可以直接在文档里面用 HTML 撰写。不需要额外标注这是 HTML 或是 Markdown；只要直接加标签就可以了。\n\n要制约的只有一些 HTML 区块元素――比如 `<div>`、`<table>`、`<pre>`、`<p>` 等标签，必须在前后加上空行与其它内容区隔开，还要求它们的开始标签与结尾标签不能用制表符或空格来缩进。Markdown 的生成器有足够智能，不会在 HTML 区块标签外加上不必要的 `<p>` 标签。\n\n例子如下，在 Markdown 文件里加上一段 HTML 表格：\n\n    这是一个普通段落。\n\n    <table>\n        <tr>\n            <td>Foo</td>\n        </tr>\n    </table>\n\n    这是另一个普通段落。\n\n请注意，在 HTML 区块标签间的 Markdown 格式语法将不会被处理。比如，你在 HTML 区块内使用 Markdown 样式的`*强调*`会没有效果。\n\nHTML 的区段（行内）标签如 `<span>`、`<cite>`、`<del>` 可以在 Markdown 的段落、列表或是标题里随意使用。依照个人习惯，甚至可以不用 Markdown 格式，而直接采用 HTML 标签来格式化。举例说明：如果比较喜欢 HTML 的 `<a>` 或 `<img>` 标签，可以直接使用这些标签，而不用 Markdown 提供的链接或是图像标签语法。\n\n和处在 HTML 区块标签间不同，Markdown 语法在 HTML 区段标签间是有效的。\n\n<h3 id=\"autoescape\">特殊字符自动转换</h3>\n\n在 HTML 文件中，有两个字符需要特殊处理： `<` 和 `&` 。 `<` 符号用于起始标签，`&` 符号则用于标记 HTML 实体，如果你只是想要显示这些字符的原型，你必须要使用实体的形式，像是 `&lt;` 和 `&amp;`。\n\n`&` 字符尤其让网络文档编写者受折磨，如果你要打「`AT&T`」 ，你必须要写成「`AT&amp;T`」。而网址中的 `&` 字符也要转换。比如你要链接到：\n\n    http://images.google.com/images?num=30&q=larry+bird\n\n你必须要把网址转换写为：\n\n    http://images.google.com/images?num=30&amp;q=larry+bird\n\n才能放到链接标签的 `href` 属性里。不用说也知道这很容易忽略，这也可能是 HTML 标准检验所检查到的错误中，数量最多的。\n\nMarkdown 让你可以自然地书写字符，需要转换的由它来处理好了。如果你使用的 `&` 字符是 HTML 字符实体的一部分，它会保留原状，否则它会被转换成 `&amp`;。\n\n所以你如果要在文档中插入一个版权符号 `©`，你可以这样写：\n\n    &copy;\n\nMarkdown 会保留它不动。而若你写：\n\n    AT&T\n\nMarkdown 就会将它转为：\n\n    AT&amp;T\n\n类似的状况也会发生在 `<` 符号上，因为 Markdown 允许 [兼容 HTML](#html) ，如果你是把 `<` 符号作为 HTML 标签的定界符使用，那 Markdown 也不会对它做任何转换，但是如果你写：\n\n    4 < 5\n\nMarkdown 将会把它转换为：\n\n    4 &lt; 5\n\n不过需要注意的是，code 范围内，不论是行内还是区块， `<` 和 `&` 两个符号都*一定*会被转换成 HTML 实体，这项特性让你可以很容易地用 Markdown 写 HTML code （和 HTML 相对而言， HTML 语法中，你要把所有的 `<` 和 `&` 都转换为 HTML 实体，才能在 HTML 文件里面写出 HTML code。）\n\n* * *\n\n<h2 id=\"block\">区块元素</h2>\n\n\n<h3 id=\"p\">段落和换行</h3>\n\n一个 Markdown 段落是由一个或多个连续的文本行组成，它的前后要有一个以上的空行（空行的定义是显示上看起来像是空的，便会被视为空行。比方说，若某一行只包含空格和制表符，则该行也会被视为空行）。普通段落不该用空格或制表符来缩进。\n\n「由一个或多个连续的文本行组成」这句话其实暗示了 Markdown 允许段落内的强迫换行（插入换行符），这个特性和其他大部分的 text-to-HTML 格式不一样（包括 Movable Type 的「Convert Line Breaks」选项），其它的格式会把每个换行符都转成 `<br />` 标签。\n\n如果你*确实*想要依赖 Markdown 来插入 `<br />` 标签的话，在插入处先按入两个以上的空格然后回车。\n\n的确，需要多费点事（多加空格）来产生 `<br />` ，但是简单地「每个换行都转换为 `<br />`」的方法在 Markdown 中并不适合， Markdown 中 email 式的 [区块引用][bq] 和多段落的 [列表][l] 在使用换行来排版的时候，不但更好用，还更方便阅读。\n\n  [bq]: #blockquote\n  [l]:  #list\n\n<h3 id=\"header\">标题</h3>\n\nMarkdown 支持两种标题的语法，类 [Setext] [1] 和类 [atx] [2] 形式。\n\n类 Setext 形式是用底线的形式，利用 `=` （最高阶标题）和 `-` （第二阶标题），例如：\n\n    This is an H1\n    =============\n\n    This is an H2\n    -------------\n\n任何数量的 `=` 和 `-` 都可以有效果。\n\n类 Atx 形式则是在行首插入 1 到 6 个 `#` ，对应到标题 1 到 6 阶，例如：\n\n    # 这是 H1\n\n    ## 这是 H2\n\n    ###### 这是 H6\n\n你可以选择性地「闭合」类 atx 样式的标题，这纯粹只是美观用的，若是觉得这样看起来比较舒适，你就可以在行尾加上 `#`，而行尾的 `#` 数量也不用和开头一样（行首的井字符数量决定标题的阶数）：\n\n    # 这是 H1 #\n\n    ## 这是 H2 ##\n\n    ### 这是 H3 ######\n\n\n<h3 id=\"blockquote\">区块引用 Blockquotes</h3>\n\nMarkdown 标记区块引用是使用类似 email 中用 `>` 的引用方式。如果你还熟悉在 email 信件中的引言部分，你就知道怎么在 Markdown 文件中建立一个区块引用，那会看起来像是你自己先断好行，然后在每行的最前面加上 `>` ：\n\n    > This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet,\n    > consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.\n    > Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.\n    > \n    > Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse\n    > id sem consectetuer libero luctus adipiscing.\n\nMarkdown 也允许你偷懒只在整个段落的第一行最前面加上 `>` ：\n\n    > This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet,\n    consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.\n    Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.\n\n    > Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse\n    id sem consectetuer libero luctus adipiscing.\n\n区块引用可以嵌套（例如：引用内的引用），只要根据层次加上不同数量的 `>` ：\n\n    > This is the first level of quoting.\n    >\n    > > This is nested blockquote.\n    >\n    > Back to the first level.\n\n引用的区块内也可以使用其他的 Markdown 语法，包括标题、列表、代码区块等：\n\n\t> ## 这是一个标题。\n\t> \n\t> 1.   这是第一行列表项。\n\t> 2.   这是第二行列表项。\n\t> \n\t> 给出一些例子代码：\n\t> \n\t>     return shell_exec(\"echo $input | $markdown_script\");\n\n任何像样的文本编辑器都能轻松地建立 email 型的引用。例如在 BBEdit 中，你可以选取文字后然后从选单中选择*增加引用阶层*。\n\n<h3 id=\"list\">列表</h3>\n\nMarkdown 支持有序列表和无序列表。\n\n无序列表使用星号、加号或是减号作为列表标记：\n\n    *   Red\n    *   Green\n    *   Blue\n\n等同于：\n\n    +   Red\n    +   Green\n    +   Blue\n\n也等同于：\n\n    -   Red\n    -   Green\n    -   Blue\n\n有序列表则使用数字接着一个英文句点：\n\n    1.  Bird\n    2.  McHale\n    3.  Parish\n\n很重要的一点是，你在列表标记上使用的数字并不会影响输出的 HTML 结果，上面的列表所产生的 HTML 标记为：\n\n    <ol>\n    <li>Bird</li>\n    <li>McHale</li>\n    <li>Parish</li>\n    </ol>\n\n如果你的列表标记写成：\n\n    1.  Bird\n    1.  McHale\n    1.  Parish\n\n或甚至是：\n\n    3. Bird\n    1. McHale\n    8. Parish\n\n你都会得到完全相同的 HTML 输出。重点在于，你可以让 Markdown 文件的列表数字和输出的结果相同，或是你懒一点，你可以完全不用在意数字的正确性。\n\n如果你使用懒惰的写法，建议第一个项目最好还是从 1. 开始，因为 Markdown 未来可能会支持有序列表的 start 属性。\n\n列表项目标记通常是放在最左边，但是其实也可以缩进，最多 3 个空格，项目标记后面则一定要接着至少一个空格或制表符。\n\n要让列表看起来更漂亮，你可以把内容用固定的缩进整理好：\n\n    *   Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\n        Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi,\n        viverra nec, fringilla in, laoreet vitae, risus.\n    *   Donec sit amet nisl. Aliquam semper ipsum sit amet velit.\n        Suspendisse id sem consectetuer libero luctus adipiscing.\n\n但是如果你懒，那也行：\n\n    *   Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\n    Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi,\n    viverra nec, fringilla in, laoreet vitae, risus.\n    *   Donec sit amet nisl. Aliquam semper ipsum sit amet velit.\n    Suspendisse id sem consectetuer libero luctus adipiscing.\n\n如果列表项目间用空行分开，在输出 HTML 时 Markdown 就会将项目内容用 `<p>` \n标签包起来，举例来说：\n\n    *   Bird\n    *   Magic\n\n会被转换为：\n\n    <ul>\n    <li>Bird</li>\n    <li>Magic</li>\n    </ul>\n\n但是这个：\n\n    *   Bird\n\n    *   Magic\n\n会被转换为：\n\n    <ul>\n    <li><p>Bird</p></li>\n    <li><p>Magic</p></li>\n    </ul>\n\n列表项目可以包含多个段落，每个项目下的段落都必须缩进 4 个空格或是 1 个制表符：\n\n    1.  This is a list item with two paragraphs. Lorem ipsum dolor\n        sit amet, consectetuer adipiscing elit. Aliquam hendrerit\n        mi posuere lectus.\n\n        Vestibulum enim wisi, viverra nec, fringilla in, laoreet\n        vitae, risus. Donec sit amet nisl. Aliquam semper ipsum\n        sit amet velit.\n\n    2.  Suspendisse id sem consectetuer libero luctus adipiscing.\n\n如果你每行都有缩进，看起来会看好很多，当然，再次地，如果你很懒惰，Markdown 也允许：\n\n    *   This is a list item with two paragraphs.\n\n        This is the second paragraph in the list item. You're\n    only required to indent the first line. Lorem ipsum dolor\n    sit amet, consectetuer adipiscing elit.\n\n    *   Another item in the same list.\n\n如果要在列表项目内放进引用，那 `>` 就需要缩进：\n\n    *   A list item with a blockquote:\n\n        > This is a blockquote\n        > inside a list item.\n\n如果要放代码区块的话，该区块就需要缩进*两次*，也就是 8 个空格或是 2 个制表符：\n\n    *   一列表项包含一个列表区块：\n\n            <代码写在这>\n\n\n当然，项目列表很可能会不小心产生，像是下面这样的写法：\n\n    1986. What a great season.\n\n换句话说，也就是在行首出现*数字-句点-空白*，要避免这样的状况，你可以在句点前面加上反斜杠。\n\n    1986\\. What a great season.\n\n<h3 id=\"precode\">代码区块</h3>\n\n和程序相关的写作或是标签语言原始码通常会有已经排版好的代码区块，通常这些区块我们并不希望它以一般段落文件的方式去排版，而是照原来的样子显示，Markdown 会用 `<pre>` 和 `<code>` 标签来把代码区块包起来。\n\n要在 Markdown 中建立代码区块很简单，只要简单地缩进 4 个空格或是 1 个制表符就可以，例如，下面的输入：\n\n    这是一个普通段落：\n\n        这是一个代码区块。\n\nMarkdown 会转换成：\n\n    <p>这是一个普通段落：</p>\n\n    <pre><code>这是一个代码区块。\n    </code></pre>\n\n这个每行一阶的缩进（4 个空格或是 1 个制表符），都会被移除，例如：\n\n    Here is an example of AppleScript:\n\n        tell application \"Foo\"\n            beep\n        end tell\n\n会被转换为：\n\n    <p>Here is an example of AppleScript:</p>\n\n    <pre><code>tell application \"Foo\"\n        beep\n    end tell\n    </code></pre>\n\n一个代码区块会一直持续到没有缩进的那一行（或是文件结尾）。\n\n在代码区块里面， `&` 、 `<` 和 `>` 会自动转成 HTML 实体，这样的方式让你非常容易使用 Markdown 插入范例用的 HTML 原始码，只需要复制贴上，再加上缩进就可以了，剩下的 Markdown 都会帮你处理，例如：\n\n        <div class=\"footer\">\n            &copy; 2004 Foo Corporation\n        </div>\n\n会被转换为：\n\n    <pre><code>&lt;div class=\"footer\"&gt;\n        &amp;copy; 2004 Foo Corporation\n    &lt;/div&gt;\n    </code></pre>\n\n代码区块中，一般的 Markdown 语法不会被转换，像是星号便只是星号，这表示你可以很容易地以 Markdown 语法撰写 Markdown 语法相关的文件。\n\n<h3 id=\"hr\">分隔线</h3>\n\n你可以在一行中用三个以上的星号、减号、底线来建立一个分隔线，行内不能有其他东西。你也可以在星号或是减号中间插入空格。下面每种写法都可以建立分隔线：\n\n    * * *\n\n    ***\n\n    *****\n\n    - - -\n\n    ---------------------------------------\n\n\n* * *\n\n<h2 id=\"span\">区段元素</h2>\n\n<h3 id=\"link\">链接</h3>\n\nMarkdown 支持两种形式的链接语法： *行内式*和*参考式*两种形式。\n\n不管是哪一种，链接文字都是用 [方括号] 来标记。\n\n要建立一个*行内式*的链接，只要在方块括号后面紧接着圆括号并插入网址链接即可，如果你还想要加上链接的 title 文字，只要在网址后面，用双引号把 title 文字包起来即可，例如：\n\n    This is [an example](http://example.com/ \"Title\") inline link.\n\n    [This link](http://example.net/) has no title attribute.\n\n会产生：\n\n    <p>This is <a href=\"http://example.com/\" title=\"Title\">\n    an example</a> inline link.</p>\n\n    <p><a href=\"http://example.net/\">This link</a> has no\n    title attribute.</p>\n\n如果你是要链接到同样主机的资源，你可以使用相对路径：\n\n    See my [About](/about/) page for details.   \n\n*参考式*的链接是在链接文字的括号后面再接上另一个方括号，而在第二个方括号里面要填入用以辨识链接的标记：\n\n    This is [an example][id] reference-style link.\n\n你也可以选择性地在两个方括号中间加上一个空格：\n\n    This is [an example] [id] reference-style link.\n\n接着，在文件的任意处，你可以把这个标记的链接内容定义出来：\n\n    [id]: http://example.com/  \"Optional Title Here\"\n\n链接内容定义的形式为：\n\n*   方括号（前面可以选择性地加上至多三个空格来缩进），里面输入链接文字\n*   接着一个冒号\n*   接着一个以上的空格或制表符\n*   接着链接的网址\n*   选择性地接着 title 内容，可以用单引号、双引号或是括弧包着\n\n下面这三种链接的定义都是相同：\n\n\t[foo]: http://example.com/  \"Optional Title Here\"\n\t[foo]: http://example.com/  'Optional Title Here'\n\t[foo]: http://example.com/  (Optional Title Here)\n\n**请注意：**有一个已知的问题是 Markdown.pl 1.0.1 会忽略单引号包起来的链接 title。\n\n链接网址也可以用尖括号包起来：\n\n    [id]: <http://example.com/>  \"Optional Title Here\"\n\n你也可以把 title 属性放到下一行，也可以加一些缩进，若网址太长的话，这样会比较好看：\n\n    [id]: http://example.com/longish/path/to/resource/here\n        \"Optional Title Here\"\n\n网址定义只有在产生链接的时候用到，并不会直接出现在文件之中。\n\n链接辨别标签可以有字母、数字、空白和标点符号，但是并*不*区分大小写，因此下面两个链接是一样的：\n\n\t[link text][a]\n\t[link text][A]\n\n*隐式链接标记*功能让你可以省略指定链接标记，这种情形下，链接标记会视为等同于链接文字，要用隐式链接标记只要在链接文字后面加上一个空的方括号，如果你要让 \"Google\" 链接到 google.com，你可以简化成：\n\n\t[Google][]\n\n然后定义链接内容：\n\n\t[Google]: http://google.com/\n\n由于链接文字可能包含空白，所以这种简化型的标记内也许包含多个单词：\n\n\tVisit [Daring Fireball][] for more information.\n\n然后接着定义链接：\n\n\t[Daring Fireball]: http://daringfireball.net/\n\n链接的定义可以放在文件中的任何一个地方，我比较偏好直接放在链接出现段落的后面，你也可以把它放在文件最后面，就像是注解一样。\n\n下面是一个参考式链接的范例：\n\n    I get 10 times more traffic from [Google] [1] than from\n    [Yahoo] [2] or [MSN] [3].\n\n      [1]: http://google.com/        \"Google\"\n      [2]: http://search.yahoo.com/  \"Yahoo Search\"\n      [3]: http://search.msn.com/    \"MSN Search\"\n\n如果改成用链接名称的方式写：\n\n    I get 10 times more traffic from [Google][] than from\n    [Yahoo][] or [MSN][].\n\n      [google]: http://google.com/        \"Google\"\n      [yahoo]:  http://search.yahoo.com/  \"Yahoo Search\"\n      [msn]:    http://search.msn.com/    \"MSN Search\"\n\n上面两种写法都会产生下面的 HTML。\n\n    <p>I get 10 times more traffic from <a href=\"http://google.com/\"\n    title=\"Google\">Google</a> than from\n    <a href=\"http://search.yahoo.com/\" title=\"Yahoo Search\">Yahoo</a>\n    or <a href=\"http://search.msn.com/\" title=\"MSN Search\">MSN</a>.</p>\n\n下面是用行内式写的同样一段内容的 Markdown 文件，提供作为比较之用：\n\n    I get 10 times more traffic from [Google](http://google.com/ \"Google\")\n    than from [Yahoo](http://search.yahoo.com/ \"Yahoo Search\") or\n    [MSN](http://search.msn.com/ \"MSN Search\").\n\n参考式的链接其实重点不在于它比较好写，而是它比较好读，比较一下上面的范例，使用参考式的文章本身只有 81 个字符，但是用行内形式的却会增加到 176 个字元，如果是用纯 HTML 格式来写，会有 234 个字元，在 HTML 格式中，标签比文本还要多。\n\n使用 Markdown 的参考式链接，可以让文件更像是浏览器最后产生的结果，让你可以把一些标记相关的元数据移到段落文字之外，你就可以增加链接而不让文章的阅读感觉被打断。\n\n<h3 id=\"em\">强调</h3>\n\nMarkdown 使用星号（`*`）和底线（`_`）作为标记强调字词的符号，被 `*` 或 `_` 包围的字词会被转成用 `<em>` 标签包围，用两个 `*` 或 `_` 包起来的话，则会被转成 `<strong>`，例如：\n\n    *single asterisks*\n\n    _single underscores_\n\n    **double asterisks**\n\n    __double underscores__\n\n会转成：\n\n    <em>single asterisks</em>\n\n    <em>single underscores</em>\n\n    <strong>double asterisks</strong>\n\n    <strong>double underscores</strong>\n\n你可以随便用你喜欢的样式，唯一的限制是，你用什么符号开启标签，就要用什么符号结束。\n\n强调也可以直接插在文字中间：\n\n    un*frigging*believable\n\n但是**如果你的 `*` 和 `_` 两边都有空白的话，它们就只会被当成普通的符号**。\n\n如果要在文字前后直接插入普通的星号或底线，你可以用反斜线：\n\n    \\*this text is surrounded by literal asterisks\\*\n\n<h3 id=\"code\">代码</h3>\n\n如果要标记一小段行内代码，你可以用反引号把它包起来（`` ` ``），例如：\n\n    Use the `printf()` function.\n\n会产生：\n\n    <p>Use the <code>printf()</code> function.</p>\n\n如果要在代码区段内插入反引号，你可以用多个反引号来开启和结束代码区段：\n\n    ``There is a literal backtick (`) here.``\n\n这段语法会产生：\n\n    <p><code>There is a literal backtick (`) here.</code></p>\n\n代码区段的起始和结束端都可以放入一个空白，起始端后面一个，结束端前面一个，这样你就可以在区段的一开始就插入反引号：\n\n\tA single backtick in a code span: `` ` ``\n\t\n\tA backtick-delimited string in a code span: `` `foo` ``\n\n会产生：\n\n\t<p>A single backtick in a code span: <code>`</code></p>\n\t\n\t<p>A backtick-delimited string in a code span: <code>`foo`</code></p>\n\n在代码区段内，`&` 和尖括号**都**会被自动地转成 HTML 实体，这使得插入 HTML 原始码变得很容易，Markdown 会把下面这段：\n\n    Please don't use any `<blink>` tags.\n\n转为：\n\n    <p>Please don't use any <code>&lt;blink&gt;</code> tags.</p>\n\n你也可以这样写：\n\n    `&#8212;` is the decimal-encoded equivalent of `&mdash;`.\n\n以产生：\n\n    <p><code>&amp;#8212;</code> is the decimal-encoded\n    equivalent of <code>&amp;mdash;</code>.</p>\n\n\n\n<h3 id=\"img\">图片</h3>\n\n很明显地，要在纯文字应用中设计一个「自然」的语法来插入图片是有一定难度的。\n\nMarkdown 使用一种和链接很相似的语法来标记图片，同样也允许两种样式： *行内式*和*参考式*。\n\n行内式的图片语法看起来像是：\n\n    ![Alt text](/path/to/img.jpg)\n\n    ![Alt text](/path/to/img.jpg \"Optional title\")\n\n详细叙述如下：\n\n*   一个惊叹号 `!`\n*   接着一个方括号，里面放上图片的替代文字\n*   接着一个普通括号，里面放上图片的网址，最后还可以用引号包住并加上\n    选择性的 'title' 文字。\n\n参考式的图片语法则长得像这样：\n\n    ![Alt text][id]\n\n「id」是图片参考的名称，图片参考的定义方式则和连结参考一样：\n\n    [id]: url/to/image  \"Optional title attribute\"\n\n到目前为止， Markdown 还没有办法指定图片的宽高，如果你需要的话，你可以使用普通的 `<img>` 标签。\n\n* * *\n\n<h2 id=\"misc\">其它</h2>\n\n<h3 id=\"autolink\">自动链接</h3>\n\nMarkdown 支持以比较简短的自动链接形式来处理网址和电子邮件信箱，只要是用尖括号包起来， Markdown 就会自动把它转成链接。一般网址的链接文字就和链接地址一样，例如：\n\n    <http://example.com/>\n\nMarkdown 会转为：\n\n    <a href=\"http://example.com/\">http://example.com/</a>\n\n邮址的自动链接也很类似，只是 Markdown 会先做一个编码转换的过程，把文字字符转成 16 进位码的 HTML 实体，这样的格式可以糊弄一些不好的邮址收集机器人，例如：\n\n    <address@example.com>\n\nMarkdown 会转成：\n\n    <a href=\"&#x6D;&#x61;i&#x6C;&#x74;&#x6F;:&#x61;&#x64;&#x64;&#x72;&#x65;\n    &#115;&#115;&#64;&#101;&#120;&#x61;&#109;&#x70;&#x6C;e&#x2E;&#99;&#111;\n    &#109;\">&#x61;&#x64;&#x64;&#x72;&#x65;&#115;&#115;&#64;&#101;&#120;&#x61;\n    &#109;&#x70;&#x6C;e&#x2E;&#99;&#111;&#109;</a>\n\n在浏览器里面，这段字串（其实是 `<a href=\"mailto:address@example.com\">address@example.com</a>`）会变成一个可以点击的「address@example.com」链接。\n\n（这种作法虽然可以糊弄不少的机器人，但并不能全部挡下来，不过总比什么都不做好些。不管怎样，公开你的信箱终究会引来广告信件的。）\n\n<h3 id=\"backslash\">反斜杠</h3>\n\nMarkdown 可以利用反斜杠来插入一些在语法中有其它意义的符号，例如：如果你想要用星号加在文字旁边的方式来做出强调效果（但不用 `<em>` 标签），你可以在星号的前面加上反斜杠：\n\n    \\*literal asterisks\\*\n\nMarkdown 支持以下这些符号前面加上反斜杠来帮助插入普通的符号：\n\n    \\   反斜线\n    `   反引号\n    *   星号\n    _   底线\n    {}  花括号\n    []  方括号\n    ()  括弧\n    #   井字号\n    +   加号\n    -   减号\n    .   英文句点\n    !   惊叹号\n\n<h2 id=\"acknowledgement\">感谢</h2>\n\n感谢 [leafy7382][] 协助翻译，[hlb][]、[Randylien][] 帮忙润稿，[ethantw][] 的[汉字标准格式・CSS Reset][]， [WM][] 回报文字错误。\n\n[leafy7382]:https://twitter.com/#!/leafy7382\n[hlb]:http://iamhlb.com/\n[Randylien]:http://twitter.com/randylien\n[ethantw]:https://twitter.com/#!/ethantw\n[汉字标准格式・CSS Reset]:http://ethantw.net/projects/han/\n[WM]:http://kidwm.net/\n\n感谢 [fenprace][]，[addv][]。\n\n[fenprace]:https://github.com/fenprace\n[addv]:https://github.com/addv\n\n"
+
+/***/ }),
+/* 93 */
+/***/ (function(module, exports) {
+
+/**
+ * react Renderer
+ */
+
+function Renderer(options) {
+    this.options = options || {};
+    this.h = options.h;
+}
+
+Renderer.prototype.root = function(node, children, index) { var h = this.h; 
+    return h('div', {
+        key: index,
+        className: this.options.rootClassName || 'markdown-body'
+    }, children);
+};
+
+Renderer.prototype.blockquote = function(node, children, index) { var h = this.h; 
+    return h('blockquote', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.heading = function(node, children, index) { var h = this.h; 
+    return h('h'+node.depth, {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.thematicBreak = function(node, children, index) { var h = this.h; 
+    return h('hr', {
+        key: index
+    });
+};
+
+Renderer.prototype.list = function(node, children, index) { var h = this.h; 
+    return h(node.ordered?'ol':'ul', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.listItem = function(node, children, index) { var h = this.h; 
+    return h('li', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.checkbox = function(node, children, index) { var h = this.h; 
+    return h('input', {
+        key: index,
+        type: 'checkbox',
+        checked: node.checked,
+        readOnly: true
+    });
+};
+
+Renderer.prototype.paragraph = function(node, children, index) { var h = this.h; 
+    return h('p', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.table = function(node, children, index) { var h = this.h; 
+    return h('table', {
+            key: index
+        },
+        h('tbody',{key:0}, children)
+    );
+};
+
+Renderer.prototype.tableRow = function(node, children, index) { var h = this.h; 
+    return h('tr', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.tableCell = function(node, children, index) { var h = this.h; 
+    return h('td', {
+        key: index,
+        align: node.align
+    }, children);
+};
+
+Renderer.prototype.strong = function(node, children, index) { var h = this.h; 
+    return h('strong', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.emphasis = function(node, children, index) { var h = this.h; 
+    return h('em', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.break = function(node, children, index) { var h = this.h; 
+    return h('br', {
+        key: index
+    });
+};
+
+Renderer.prototype.delete = function(node, children, index) { var h = this.h; 
+    return h('del', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.link = function(node, children, index) { var h = this.h; 
+    return h('a', {
+        key: index,
+        href: node.url,
+        title: node.title
+    }, children);
+};
+
+Renderer.prototype.linkReference = function(node, children, index) { var h = this.h; 
+    return h('a', {
+        key: index,
+        href: node.url,
+        title: node.title
+    }, children);
+};
+
+Renderer.prototype.definition = function(node, children, index) { var h = this.h; 
+    return h('div', {
+            key: index,
+            style: {
+                height: 0,
+                visibility: 'hidden'
+            }
+        },
+        h('a', {
+            key: 0,
+            href: node.url,
+            'data-identifier': node.identifier
+        }, [
+            '['+node.identifier+']: ',
+            node.url
+        ])
+    );
+};
+
+Renderer.prototype.image = function(node, children, index) { var h = this.h; 
+    return h('img', {
+        key: index,
+        src: node.url,
+        alt: node.alt,
+        title: node.title
+    });
+};
+
+Renderer.prototype.text = function(node, children, index) { var h = this.h; 
+    return h('span', {
+        key: index
+    }, node.value);
+};
+
+Renderer.prototype.inlineCode = function(node, children, index) { var h = this.h;
+    return h('code', {
+        key: index,
+    }, node.value);
+};
+
+
+Renderer.prototype.code = function(node, children, index) { var h = this.h;
+    return h('pre', {
+        key: index
+    }, h('code', {
+        className: node.lang?'language-'+node.lang:''
+    }, node.value));
+};
+
+Renderer.prototype.math = function(node, children, index) { var h = this.h;
+    return h('p', {
+        key: index,
+        dangerouslySetInnerHTML: {
+            __html: node.value
+        }
+    });
+};
+
+Renderer.prototype.inlineMath = function(node, children, index) { var h = this.h;
+    return h('span', {
+        key: index,
+        dangerouslySetInnerHTML: {
+            __html: node.value
+        }
+    });
+};
+
+Renderer.prototype.html = function(node, children, index) { var h = this.h;
+    return h('div', {
+        key: index,
+        dangerouslySetInnerHTML: {
+            __html: node.value
+        }
+    });
+};
+
+module.exports = Renderer;
+
+
+/***/ }),
+/* 94 */
+/***/ (function(module, exports) {
+
+/**
+ * vue Renderer
+ */
+
+function Renderer(options) {
+    this.options = options || {};
+}
+
+Renderer.prototype.root = function(node, children, index) { var h = this.h; 
+    return h('div', {
+        key: index,
+        'class': [this.options.rootClassName || 'markdown-body']
+    }, children);
+};
+
+Renderer.prototype.inlineCode = function(node, children, index) { var h = this.h; 
+    return h('code', {
+        key: index,
+    }, node.value);
+};
+
+Renderer.prototype.code = function(node, children, index) { var h = this.h; 
+    return h('pre', {
+        key: index
+    }, [
+        h('code', {
+            'class': [node.lang?'language-'+node.lang:'']
+        }, node.value)
+    ]);
+};
+
+Renderer.prototype.blockquote = function(node, children, index) { var h = this.h; 
+    return h('blockquote', {
+        key: index
+    }, children);
+};
+
+
+
+Renderer.prototype.heading = function(node, children, index) { var h = this.h; 
+    return h('h'+node.depth, {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.thematicBreak = function(node, children, index) { var h = this.h; 
+    return h('hr', {
+        key: index
+    });
+};
+
+Renderer.prototype.list = function(node, children, index) { var h = this.h; 
+    return h(node.ordered?'ol':'ul', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.listItem = function(node, children, index) { var h = this.h; 
+    return h('li', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.checkbox = function(node, children, index) { var h = this.h; 
+    return h('input', {
+        key: index,
+        attrs: {
+            type: 'checkbox',
+            checked: node.checked,
+            disabled: true
+        }
+    });
+};
+
+Renderer.prototype.paragraph = function(node, children, index) { var h = this.h; 
+    return h('p', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.table = function(node, children, index) { var h = this.h; 
+    return h('table', {
+            key: index
+        },
+        [h('tbody',{key:0}, children)]
+    );
+};
+
+Renderer.prototype.tableRow = function(node, children, index) { var h = this.h; 
+    return h('tr', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.tableCell = function(node, children, index) { var h = this.h; 
+    return h('td', {
+        key: index,
+        align: node.align
+    }, children);
+};
+
+Renderer.prototype.strong = function(node, children, index) { var h = this.h; 
+    return h('strong', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.emphasis = function(node, children, index) { var h = this.h; 
+    return h('em', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.break = function(node, children, index) { var h = this.h; 
+    return h('br', {
+        key: index
+    });
+};
+
+Renderer.prototype.delete = function(node, children, index) { var h = this.h; 
+    return h('del', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.link = function(node, children, index) { var h = this.h; 
+    return h('a', {
+        key: index,
+        attrs:{
+            target: '_blank',
+            href: node.url,
+            title: node.title
+        }
+    }, children);
+};
+
+Renderer.prototype.linkReference = function(node, children, index) { var h = this.h; 
+    return h('a', {
+        key: index,
+        attrs:{
+            target: '_blank',
+            href: node.url,
+            title: node.title
+        }
+    }, children);
+};
+
+Renderer.prototype.definition = function(node, children, index) { var h = this.h; 
+    return h('div', {
+            key: index,
+            style: {
+                // height: 0,
+                // visibility: 'hidden'
+                'word-break': 'break-all'
+            }
+        },[
+            h('a', {
+                key: 0,
+                attrs: {
+                    target: '_blank',
+                    href: node.url,
+                    'data-identifier': node.identifier
+                }
+            }, [
+                '['+node.identifier+']: ',
+                node.url
+            ])
+        ]
+    );
+};
+
+Renderer.prototype.image = function(node, children, index) { var h = this.h; 
+    return h('img', {
+        key: index,
+        attrs: {
+            src: node.url,
+            alt: node.alt,
+            title: node.title
+        }
+    });
+};
+
+Renderer.prototype.text = function(node, children, index) { var h = this.h; 
+    return h('span', {
+        key: index
+    }, node.value);
+};
+
+
+Renderer.prototype.math = function(node, children, index) { var h = this.h;
+    return h('p', {
+        key: index,
+        domProps: {
+            "innerHTML": node.value
+        }
+    });
+};
+
+Renderer.prototype.inlineMath = function(node, children, index) { var h = this.h;
+    return h('span', {
+        key: index,
+        domProps: {
+            "innerHTML": node.value
+        }
+    });
+};
+
+Renderer.prototype.html = function(node, children, index) { var h = this.h;
+    return h('div', {
+        key: index,
+        domProps: {
+            "innerHTML": node.value
+        }
+    });
+};
+
+module.exports = Renderer;
+
+
+/***/ }),
+/* 95 */
+/***/ (function(module, exports) {
+
+/**
+ * preact Renderer
+ */
+
+function Renderer(options) {
+    this.options = options || {};
+    this.h = options.h;
+}
+
+Renderer.prototype.root = function(h, node, index, children) {
+    return h('div', {
+        key: index,
+        className: this.options.rootClassName || 'markdown-body'
+    }, children);
+};
+
+Renderer.prototype.inlineCode = function(h, node, index, children) {
+    return h('code', {
+        key: index,
+    }, node.value);
+};
+
+Renderer.prototype.math = function(h, node, index, children) {
+    return h('p', {
+        key: index,
+        dangerouslySetInnerHTML: {
+            __html: node.renderedValue
+        }
+    });
+};
+
+Renderer.prototype.inlineMath = function(h, node, index, children) {
+    return h('span', {
+        key: index,
+        dangerouslySetInnerHTML: {
+            __html: node.renderedValue
+        }
+    });
+};
+
+Renderer.prototype.code = function(h, node, index, children) {
+    return h('pre', {
+        key: index
+    }, h('code', {
+        className: node.lang?'language-'+node.lang:''
+    }, node.value));
+};
+
+Renderer.prototype.blockquote = function(h, node, index, children) {
+    return h('blockquote', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.html = function(h, node, index, children) {
+    return h('div', {
+        key: index,
+        dangerouslySetInnerHTML: {
+            __html: node.value
+        }
+    });
+};
+
+Renderer.prototype.heading = function(h, node, index, children) {
+    return h('h'+node.depth, {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.thematicBreak = function(h, node, index, children) {
+    return h('hr', {
+        key: index
+    });
+};
+
+Renderer.prototype.list = function(h, node, index, children) {
+    return h(node.ordered?'ol':'ul', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.listItem = function(h, node, index, children) {
+    return h('li', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.checkbox = function(h, node, index, children) {
+    return h('input', {
+        key: index,
+        type: 'checkbox',
+        checked: node.checked,
+        readOnly: true
+    });
+};
+
+Renderer.prototype.paragraph = function(h, node, index, children) {
+    return h('p', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.table = function(h, node, index, children) {
+    return h('table', {
+            key: index
+        },
+        h('tbody',{key:0}, children)
+    );
+};
+
+Renderer.prototype.tableRow = function(h, node, index, children) {
+    return h('tr', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.tableCell = function(h, node, index, children) {
+    return h('td', {
+        key: index,
+        align: node.align
+    }, children);
+};
+
+Renderer.prototype.strong = function(h, node, index, children) {
+    return h('strong', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.emphasis = function(h, node, index, children) {
+    return h('em', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.break = function(h, node, index, children) {
+    return h('br', {
+        key: index
+    });
+};
+
+Renderer.prototype.delete = function(h, node, index, children) {
+    return h('del', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.link = function(h, node, index, children) {
+    return h('a', {
+        key: index,
+        href: node.url,
+        title: node.title
+    }, children);
+};
+
+Renderer.prototype.linkReference = function(h, node, index, children) {
+    return h('a', {
+        key: index,
+        href: node.url,
+        title: node.title
+    }, children);
+};
+
+Renderer.prototype.definition = function(h, node, index, children) {
+    return h('div', {
+            key: index,
+            style: {
+                height: 0,
+                visibility: 'hidden'
+            }
+        },
+        h('a', {
+            key: 0,
+            href: node.url,
+            'data-identifier': node.identifier
+        }, [
+            '['+node.identifier+']: ',
+            node.url
+        ])
+    );
+};
+
+Renderer.prototype.image = function(h, node, index, children) {
+    return h('img', {
+        key: index,
+        src: node.url,
+        alt: node.alt,
+        title: node.title
+    });
+};
+
+Renderer.prototype.text = function(h, node, index, children) {
+    return h('span', {
+        key: index
+    }, node.value);
+};
+
+module.exports = Renderer;
+
+
+/***/ }),
+/* 96 */
+/***/ (function(module, exports) {
+
+
+
+/***/ }),
+/* 97 */
+/***/ (function(module, exports) {
+
+/**
+ * virtual-dom Renderer
+ */
+
+function Renderer(options) {
+    this.options = options || {};
+    this.h = options.h;
+}
+
+Renderer.prototype.root = function(h, node, index, children) {
+    return h('div', {
+        key: index,
+        className: this.options.rootClassName || 'markdown-body'
+    }, children);
+};
+
+Renderer.prototype.inlineCode = function(h, node, index, children) {
+    return h('code', {
+        key: index,
+    }, node.value);
+};
+
+Renderer.prototype.math = function(h, node, index, children) {
+    return h('p', {
+        key: index,
+        dangerouslySetInnerHTML: {
+            __html: node.renderedValue
+        }
+    });
+};
+
+Renderer.prototype.inlineMath = function(h, node, index, children) {
+    return h('span', {
+        key: index,
+        dangerouslySetInnerHTML: {
+            __html: node.renderedValue
+        }
+    });
+};
+
+Renderer.prototype.code = function(h, node, index, children) {
+    return h('pre', {
+        key: index
+    }, h('code', {
+        className: node.lang?'language-'+node.lang:''
+    }, node.value));
+};
+
+Renderer.prototype.blockquote = function(h, node, index, children) {
+    return h('blockquote', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.html = function(h, node, index, children) {
+    return h('div', {
+        key: index,
+        dangerouslySetInnerHTML: {
+            __html: node.value
+        }
+    });
+};
+
+Renderer.prototype.heading = function(h, node, index, children) {
+    return h('h'+node.depth, {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.thematicBreak = function(h, node, index, children) {
+    return h('hr', {
+        key: index
+    });
+};
+
+Renderer.prototype.list = function(h, node, index, children) {
+    return h(node.ordered?'ol':'ul', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.listItem = function(h, node, index, children) {
+    return h('li', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.checkbox = function(h, node, index, children) {
+    return h('input', {
+        key: index,
+        type: 'checkbox',
+        checked: node.checked,
+        readOnly: true
+    });
+};
+
+Renderer.prototype.paragraph = function(h, node, index, children) {
+    return h('p', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.table = function(h, node, index, children) {
+    return h('table', {
+            key: index
+        },
+        h('tbody',{key:0}, children)
+    );
+};
+
+Renderer.prototype.tableRow = function(h, node, index, children) {
+    return h('tr', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.tableCell = function(h, node, index, children) {
+    return h('td', {
+        key: index,
+        align: node.align
+    }, children);
+};
+
+Renderer.prototype.strong = function(h, node, index, children) {
+    return h('strong', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.emphasis = function(h, node, index, children) {
+    return h('em', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.break = function(h, node, index, children) {
+    return h('br', {
+        key: index
+    });
+};
+
+Renderer.prototype.delete = function(h, node, index, children) {
+    return h('del', {
+        key: index
+    }, children);
+};
+
+Renderer.prototype.link = function(h, node, index, children) {
+    return h('a', {
+        key: index,
+        href: node.url,
+        title: node.title
+    }, children);
+};
+
+Renderer.prototype.linkReference = function(h, node, index, children) {
+    return h('a', {
+        key: index,
+        href: node.url,
+        title: node.title
+    }, children);
+};
+
+Renderer.prototype.definition = function(h, node, index, children) {
+    return h('div', {
+            key: index,
+            style: {
+                height: 0,
+                visibility: 'hidden'
+            }
+        },
+        h('a', {
+            key: 0,
+            href: node.url,
+            'data-identifier': node.identifier
+        }, [
+            '['+node.identifier+']: ',
+            node.url
+        ])
+    );
+};
+
+Renderer.prototype.image = function(h, node, index, children) {
+    return h('img', {
+        key: index,
+        src: node.url,
+        alt: node.alt,
+        title: node.title
+    });
+};
+
+Renderer.prototype.text = function(h, node, index, children) {
+    return h('span', {
+        key: index
+    }, node.value);
+};
+
+module.exports = Renderer;
+
 
 /***/ })
 /******/ ]);
