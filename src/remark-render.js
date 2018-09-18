@@ -1,6 +1,10 @@
 var Parser = require('./parser');
 
 module.exports = function plugin(options) {
+
+    var mode = this.data('mode') || options.mode;
+    options.mode = mode;
+
     var parser = new Parser(options);
 
     var self = this;

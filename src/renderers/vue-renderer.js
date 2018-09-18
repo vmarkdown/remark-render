@@ -214,4 +214,14 @@ Renderer.prototype.html = function(node, children, index) { var h = this.h;
     });
 };
 
+Renderer.prototype.flow = function(node, children, index) { var h = this.h;
+    return h('div', {
+        key: index,
+        'class': [node.className || ''],
+        domProps: {
+            "innerHTML": node.value
+        }
+    });
+};
+
 module.exports = Renderer;

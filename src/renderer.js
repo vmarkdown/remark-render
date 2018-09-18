@@ -20,8 +20,6 @@ Renderer.prototype.text = function(node, children, index) {};
 
 Renderer.prototype.inlineCode = function(node, children, index) {};
 
-Renderer.prototype.code = function(node, children, index) {};
-
 Renderer.prototype.blockquote = function(node, children, index) {};
 
 Renderer.prototype.heading = function(node, children, index) {};
@@ -66,6 +64,8 @@ Renderer.prototype.inlineMath = function(node, children, index) {};
 
 Renderer.prototype.html = function(node, children, index) {};
 
-Renderer.prototype.flowchart = function(node, children, index) {};
+Renderer.prototype.code = function(node, children, index) {};
+
+Renderer.prototype.flow = function(node, children, index) {};
 
 module.exports = Renderer;
