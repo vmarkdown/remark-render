@@ -19,33 +19,6 @@ Renderer.prototype.inlineCode = function(node, children, index) { var h = this.h
     }, node.value);
 };
 
-Renderer.prototype.math = function(node, children, index) { var h = this.h; 
-    return h('p', {
-        key: index,
-        domProps:{
-            "innerHTML": node.renderedValue
-        }
-    });
-};
-
-Renderer.prototype.inlineMath = function(node, children, index) { var h = this.h; 
-    return h('span', {
-        key: index,
-        domProps:{
-            "innerHTML": node.renderedValue
-        }
-    });
-};
-
-Renderer.prototype.html = function(node, children, index) { var h = this.h; 
-    return h('div', {
-        key: index,
-        domProps:{
-            "innerHTML": node.value
-        }
-    });
-};
-
 Renderer.prototype.code = function(node, children, index) { var h = this.h; 
     return h('pre', {
         key: index
@@ -211,6 +184,34 @@ Renderer.prototype.text = function(node, children, index) { var h = this.h;
     return h('span', {
         key: index
     }, node.value);
+};
+
+
+Renderer.prototype.math = function(node, children, index) { var h = this.h;
+    return h('p', {
+        key: index,
+        domProps: {
+            "innerHTML": node.value
+        }
+    });
+};
+
+Renderer.prototype.inlineMath = function(node, children, index) { var h = this.h;
+    return h('span', {
+        key: index,
+        domProps: {
+            "innerHTML": node.value
+        }
+    });
+};
+
+Renderer.prototype.html = function(node, children, index) { var h = this.h;
+    return h('div', {
+        key: index,
+        domProps: {
+            "innerHTML": node.value
+        }
+    });
 };
 
 module.exports = Renderer;

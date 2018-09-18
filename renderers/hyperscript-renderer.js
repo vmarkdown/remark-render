@@ -146,13 +146,13 @@ Renderer.prototype.image = function(node, children) { var h = this.h;
 
 Renderer.prototype.math = function(node, children) { var h = this.h;
     return h('p', {
-        innerHTML : node.renderedValue
+        innerHTML : node.value
     });
 };
 
 Renderer.prototype.inlineMath = function(node, children) { var h = this.h;
     return h('span', {
-        innerHTML : node.renderedValue
+        innerHTML : node.value
     });
 };
 
