@@ -4,15 +4,8 @@
 
 function Renderer(options) {
     this.options = options || {};
-    this._h = options.h;
+    this.h = options.h;
 }
-
-Renderer.prototype.h = function(h) {
-    if(h) {
-        this._h = h;
-    }
-    return this._h;
-};
 
 /**
  * root element (根元素)
@@ -21,56 +14,58 @@ Renderer.prototype.h = function(h) {
  * @param {*} index node index if node in array for key. default is 0 (如果当前节点在数组中，返回当前节点在数组中的序列，这是为了构建数组key)
  * @param {*} children node create element children (当前节点的子节点)
  */
-Renderer.prototype.root = function(h, node, index, children) {};
+Renderer.prototype.root = function(node, children, index) {};
 
-Renderer.prototype.text = function(h, node, index) {};
+Renderer.prototype.text = function(node, children, index) {};
 
-Renderer.prototype.inlineCode = function(h, node, index, children) {};
+Renderer.prototype.inlineCode = function(node, children, index) {};
 
-Renderer.prototype.code = function(h, node, index, children) {};
+Renderer.prototype.code = function(node, children, index) {};
 
-Renderer.prototype.blockquote = function(h, node, index, children) {};
+Renderer.prototype.blockquote = function(node, children, index) {};
 
-Renderer.prototype.heading = function(h, node, index, children) {};
+Renderer.prototype.heading = function(node, children, index) {};
 
-Renderer.prototype.thematicBreak = function(h, node, index, children) {};
+Renderer.prototype.thematicBreak = function(node, children, index) {};
 
-Renderer.prototype.list = function(h, node, index, children) {};
+Renderer.prototype.list = function(node, children, index) {};
 
-Renderer.prototype.listItem = function(h, node, index, children) {};
+Renderer.prototype.listItem = function(node, children, index) {};
 
-Renderer.prototype.checkbox = function(h, node, index, children) {};
+Renderer.prototype.checkbox = function(node, children, index) {};
 
-Renderer.prototype.paragraph = function(h, node, index, children) {};
+Renderer.prototype.paragraph = function(node, children, index) {};
 
-Renderer.prototype.table = function(h, node, index, children) {};
+Renderer.prototype.table = function(node, children, index) {};
 
-Renderer.prototype.tableRow = function(h, node, index, children) {};
+Renderer.prototype.tableRow = function(node, children, index) {};
 
-Renderer.prototype.tableCell = function(h, node, index, children) {};
+Renderer.prototype.tableCell = function(node, children, index) {};
 
-Renderer.prototype.strong = function(h, node, index, children) {};
+Renderer.prototype.strong = function(node, children, index) {};
 
-Renderer.prototype.emphasis = function(h, node, index, children) {};
+Renderer.prototype.emphasis = function(node, children, index) {};
 
-Renderer.prototype.break = function(h, node, index, children) {};
+Renderer.prototype.break = function(node, children, index) {};
 
-Renderer.prototype.delete = function(h, node, index, children) {};
+Renderer.prototype.delete = function(node, children, index) {};
 
-Renderer.prototype.link = function(h, node, index, children) {};
+Renderer.prototype.link = function(node, children, index) {};
 
-Renderer.prototype.linkReference = function(h, node, index, children) {};
+Renderer.prototype.linkReference = function(node, children, index) {};
 
-Renderer.prototype.definition = function(h, node, index, children) {};
+Renderer.prototype.definition = function(node, children, index) {};
 
-Renderer.prototype.image = function(h, node, index, children) {};
+Renderer.prototype.image = function(node, children, index) {};
 
-Renderer.prototype.imageReference = function(h, node, index, children) {};
+Renderer.prototype.imageReference = function(node, children, index) {};
 
-Renderer.prototype.math = function(h, node, index, children) {};
+Renderer.prototype.math = function(node, children, index) {};
 
-Renderer.prototype.inlineMath = function(h, node, index, children) {};
+Renderer.prototype.inlineMath = function(node, children, index) {};
 
-Renderer.prototype.html = function(h, node, index, children) {};
+Renderer.prototype.html = function(node, children, index) {};
+
+Renderer.prototype.flowchart = function(node, children, index) {};
 
 module.exports = Renderer;
