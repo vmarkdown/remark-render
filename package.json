@@ -21,8 +21,7 @@
   "main": "src/index.js",
   "files": [
     "src",
-    "dist/*.js",
-    "renderers/*.js"
+    "dist/*.js"
   ],
   "author": "yucopowo@gmail.com",
   "license": "MIT",
