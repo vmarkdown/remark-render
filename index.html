@@ -5,30 +5,54 @@
     <title>remark-render online demo</title>
 
     <link rel="stylesheet" href="examples/dist/docs.css">
+    <link rel="stylesheet" href="//cdn.bootcss.com/KaTeX/0.10.0-alpha/katex.min.css">
+
     <style>
         html,body{
             padding: 0;
             margin: 0;
-            height: 100%;
         }
 
-        #preview{
-            margin-top: 60px;
+        .container{
+            text-align: center;
+            margin-top: 40px;
             margin-bottom: 60px;
+        }
+
+        .preview-panel{
+            display: inline-block;
+            vertical-align: top;
+            width: 49%;
+            text-align: start;
+            box-sizing: border-box;
+        }
+
+        .preview-panel-title{
+            text-align: center;
+            font-weight: bold;
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        #html-preview{
+
+        }
+
+        #vdom-preview{
+        }
+
+        #html-render-time{
+            color: #e96a54;
+        }
+
+        #vdom-render-time{
+            color: #e96a54;
         }
     </style>
 </head>
 <body>
 
-<div id="preview"></div>
-
-<script src="//cdn.bootcss.com/react/16.4.0/umd/react.production.min.js"></script>
-<script src="//cdn.bootcss.com/react-dom/16.4.0/umd/react-dom.production.min.js"></script>
-<script src="examples/dist/vremark.min.js"></script>
-<script src="dist/remark-render.min.js"></script>
-
 <div id="template" style="display: none">
-
 # %%datatime%%
 
 <div>
@@ -36,26 +60,154 @@
     <input type="text" style="width: 100%;">
 </div>
 
-# A First Level Header
+## Headers
 
-## A Second Level Header
+# H1
+## H2
+### H3
+#### H4
+##### H5
+###### H6
 
-### A Third Level Header
+Alternatively, for H1 and H2, an underline-ish style:
 
-#### A Fourth Level Header
+Alt-H1
+======
 
-##### A Fifth Level Header
+Alt-H2
+------
 
-###### A Sixed Level Header
+## Emphasis
 
-Now is the time for all good men to come to
-the aid of their country. This is just a
-regular paragraph.
+Emphasis, aka italics, with *asterisks* or _underscores_.
 
-The quick brown fox jumped over the lazy
-dog's back.
+Strong emphasis, aka bold, with **asterisks** or __underscores__.
+
+Combined emphasis with **asterisks and _underscores_**.
+
+Strikethrough uses two tildes. ~~Scratch this.~~
+
+## Lists
+
+1. First ordered list item
+2. Another item
+3. Actual numbers don't matter, just that it's a number
+4. And another item.
+
+
+## Links
+[I'm an inline-style link](https://www.google.com)
+
+[I'm an inline-style link with title](https://www.google.com "Google's Homepage")
+
+[I'm a reference-style link][Arbitrary case-insensitive reference text]
+
+[I'm a relative reference to a repository file](../blob/master/LICENSE)
+
+[You can use numbers for reference-style link definitions][1]
+
+Or leave it empty and use the [link text itself].
+
+URLs and URLs in angle brackets will automatically get turned into links.
+example.com (but not on Github, for example).
+
+Some text to show that the reference links can follow later.
+
+[arbitrary case-insensitive reference text]: https://www.mozilla.org
+[1]: http://slashdot.org
+[link text itself]: http://www.reddit.com
+
+## Images
+
+Here's our logo (hover to see the title text):
+
+Inline-style: ![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
+
+
+## Tables
+
+Colons can be used to align columns.
+
+| Tables        | Are           | Cool  |
+| ------------- |:-------------:| -----:|
+| col 3 is      | right-aligned | $1600 |
+| col 2 is      | centered      |   $12 |
+| zebra stripes | are neat      |    $1 |
+
+There must be at least 3 dashes separating each header cell.
+The outer pipes (|) are optional, and you don't need to make the
+raw Markdown line up prettily. You can also use inline Markdown.
+
+Markdown | Less | Pretty
+--- | --- | ---
+*Still* | `renders` | **nicely**
+1 | 2 | 3
+
+## LaTeX
+
+$$ax^2+bx+c=0$$.
+
+$$x_{1,2} = {-b\pm\sqrt{b^2 - 4ac} \over 2a}.$$
+
+$$|\vec{A}|=\sqrt{A_x^2 + A_y^2 + A_z^2}.$$(1)
+</div>
+
+<div class="container">
+
+    <div id="html-preview-container" class="preview-panel ">
+        <div class="preview-panel-title">html render time: <span id="html-render-time"></span> ms</div>
+        <div id="html-preview" class="wysiwyg"></div>
+    </div>
+    <div id="vdom-preview-container" class="preview-panel">
+        <div class="preview-panel-title">virtual dom render time: <span id="vdom-render-time"></span> ms</div>
+        <div id="vdom-preview"></div>
+    </div>
 
 </div>
+
+
+<script src="//cdn.bootcss.com/marked/0.4.0/marked.min.js"></script>
+<script src="//cdn.bootcss.com/KaTeX/0.10.0-alpha/katex.min.js"></script>
+
+<script>
+    (function () {
+
+        function compile_expressions(text) {
+            var res, reg = new RegExp(/\$\$(.+?)\$\$/m);
+            while ((res = reg.exec(text)) !== null) {
+                text = text.replace(res[0], katex.renderToString(res[1]));
+            }
+            return text;
+        }
+
+        var template = document.getElementById('template').innerHTML;
+        var htmlRenderTime = document.getElementById('html-render-time');
+
+        function render() {
+            var startTime = new Date().getTime();
+            var md = template.replace('%%datatime%%', new Date);
+            var text = marked(md);
+            var html = compile_expressions(text);
+            document.getElementById('html-preview').innerHTML = html;
+            var endTime = new Date().getTime();
+            htmlRenderTime.innerText = endTime-startTime;
+        }
+
+        render();
+
+        setInterval(function () {
+            render();
+        }, 1000);
+    })();
+</script>
+
+
+<script src="//cdn.bootcss.com/react/16.4.0/umd/react.production.min.js"></script>
+<script src="//cdn.bootcss.com/react-dom/16.4.0/umd/react-dom.production.min.js"></script>
+
+
+<script src="examples/dist/vremark.min.js"></script>
+<script src="dist/remark-render.min.js"></script>
 
 <script>
     (function () {
@@ -69,6 +221,7 @@ dog's back.
         });
 
         var template = document.getElementById('template').innerHTML;
+        var vdomRenderTime = document.getElementById('vdom-render-time');
 
         function render() {
             var md = template.replace('%%datatime%%', new Date);
@@ -76,10 +229,13 @@ dog's back.
                 if(err){
                     throw err;
                 }
+                var startTime = new Date().getTime();
                 ReactDOM.render(
                     file.contents,
-                    document.getElementById('preview')
+                    document.getElementById('vdom-preview')
                 );
+                var endTime = new Date().getTime();
+                vdomRenderTime.innerText = endTime-startTime;
             });
         }
 
@@ -91,6 +247,9 @@ dog's back.
 
     })();
 </script>
+
+
+
 
 </body>
 </html>
