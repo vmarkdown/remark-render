@@ -1,15 +1,12 @@
 const path = require('path');
-
-module.exports = {
+const merge = require('webpack-merge');
+const config = {
     mode: 'none',
-    entry:{
-        'remark-render': './src/remark-render.js'
-    },
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].js',
         libraryTarget: "umd",
-        library: "[name]"
+        library: "remarkRender"
     },
     module: {
     },
@@ -19,4 +16,18 @@ module.exports = {
 
     ]
 };
+
+module.exports = [
+    merge(config, {
+        entry: {
+            'remark-render': './src/remark-render.js'
+        }
+    }),
+    merge(config, {
+        mode: 'production',
+        entry: {
+            'remark-render.min': './src/remark-render.js'
+        }
+    })
+];
 

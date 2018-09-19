@@ -2,12 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>demo</title>
+    <title>remark-render online demo</title>
 
-    <link rel="stylesheet" href="//cdn.bootcss.com/github-markdown-css/2.10.0/github-markdown.min.css">
-    <!--<script src="//cdn.bootcss.com/react/16.4.0/umd/react.development.js"></script>-->
-    <!--<script src="//cdn.bootcss.com/react-dom/16.4.0/umd/react-dom.development.js"></script>-->
-
+    <link rel="stylesheet" href="examples/dist/docs.css">
     <style>
         html,body{
             padding: 0;
@@ -16,17 +13,82 @@
         }
 
         #preview{
-            width: 600px;
-            margin: 0 auto;
-            border: 1px darkgray solid;
-            margin-top: 40px;
-            padding: 40px;
+            margin-top: 60px;
+            margin-bottom: 60px;
         }
     </style>
 </head>
 <body>
 
-<div id="preview">demo</div>
+<div id="preview"></div>
+
+<script src="//cdn.bootcss.com/react/16.4.0/umd/react.production.min.js"></script>
+<script src="//cdn.bootcss.com/react-dom/16.4.0/umd/react-dom.production.min.js"></script>
+<script src="examples/dist/vremark.min.js"></script>
+<script src="dist/remark-render.min.js"></script>
+
+<div id="template" style="display: none">
+
+# %%datatime%%
+
+<div>
+    <div>The input value will not be lost when Markdown is compiled</div>
+    <input type="text" style="width: 100%;">
+</div>
+
+# A First Level Header
+
+## A Second Level Header
+
+### A Third Level Header
+
+#### A Fourth Level Header
+
+##### A Fifth Level Header
+
+###### A Sixed Level Header
+
+Now is the time for all good men to come to
+the aid of their country. This is just a
+regular paragraph.
+
+The quick brown fox jumped over the lazy
+dog's back.
+
+</div>
+
+<script>
+    (function () {
+
+        var h = React.createElement;
+
+        var processor = vremark().data({
+            'h': h
+        });
+
+        var template = document.getElementById('template').innerHTML;
+
+        function render() {
+            var md = template.replace('%%datatime%%', new Date);
+            processor.process(md, function(err, file) {
+                if(err){
+                    throw err;
+                }
+                ReactDOM.render(
+                    file.contents,
+                    document.getElementById('preview')
+                );
+            });
+        }
+
+        render();
+
+        setInterval(function () {
+            render();
+        }, 2000);
+
+    })();
+</script>
 
 </body>
 </html>

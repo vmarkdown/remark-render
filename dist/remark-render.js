@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["remark-render"] = factory();
+		exports["remarkRender"] = factory();
 	else
-		root["remark-render"] = factory();
+		root["remarkRender"] = factory();
 })(window, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -175,7 +175,6 @@ Parser.prototype.parseNode = function(node) {
 
 Parser.prototype.parse = function(root, _h) {
     try {
-        // _h && (this.renderer.h = _h);
         _h && (this.h = _h);
         extendProps(root, {
             key: 0,
@@ -187,9 +186,6 @@ Parser.prototype.parse = function(root, _h) {
         console.error(e);
         return this.h?this.h('div', {}, 'error'):null;
     }
-    // return null;
-    // var h = _h || this.options.h || this.renderer.h || this.renderer.options.h;
-    // return h?h('div', {}, 'error'):null;
 };
 
 module.exports = Parser;
