@@ -4,7 +4,7 @@
   "description": "Compile markdown to Virtual DOM with remark.",
   "scripts": {
     "dist": "webpack -c webpack.config.js",
-    "dev": "webpack -w --config ./examples/webpack.config.js --example react",
+    "dev": "webpack -w --config ./examples/webpack.config.js --example morphdom",
     "test": "mocha test/**/*.js"
   },
   "repository": {

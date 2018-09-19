@@ -121,7 +121,7 @@ var processor = unified()
     });
  
 const app = new Vue({
-    el: '#app',
+    el: '#preview',
     render(h) {
         var file = processor.data('h', h).processSync('# h1');
         return file.contents;
@@ -130,7 +130,7 @@ const app = new Vue({
 ```
 
 
-###### Writing a custom rule/Extend a rule 
+###### Writing a custom renderer/Extend a renderer
 
 ```javascript 
 var unified = require('unified')
@@ -160,6 +160,70 @@ unified()
   })
 ```
 
+
+###### [morphdom](examples/morphdom/renderer.js) - Writing a custom renderer.
+
+```javascript
+var unified = require('unified');
+var parse = require('remark-parse');
+var render = require('remark-render')
+var morphdom = require('morphdom');
+
+function createElement(type, props, children) {
+    let dom = document.createElement(type);
+    if(props.className) {
+        dom.className = props.className;
+    }
+    if(props.hasOwnProperty('id')) {
+        dom.id = props.id;
+    }
+    dom.appendChild( createElements(children) );
+    return dom;
+}
+
+function createElements(children) {
+    const doms = document.createDocumentFragment();
+    children && children.length > 0 && children.forEach(function (dom) {
+        dom && doms.appendChild(dom);
+    });
+    return doms;
+}
+
+
+function Renderer(options) {
+    this.options = options || {};
+}
+
+Renderer.prototype.root = function(h, node, children) {
+    return h('div', node.props, children);
+};
+
+Renderer.prototype.text = function(h, node, children) {
+    return document.createTextNode(node.value);
+};
+
+Renderer.prototype.blockquote = function(h, node, children) {
+    return h('blockquote', node.props, children);
+};
+
+Renderer.prototype.heading = function(h, node, children) {
+    return h('h'+node.depth, node.props, children);
+};
+
+let processor = unified()
+    .use(parse, {})
+    .use(render, {
+        Renderer: Renderer,
+        h: createElement
+    });
+
+const file = processor.processSync('# h1\n## h2');
+const markdownContainer = file.contents;
+
+const previewContainer = document.getElementById('preview');
+
+morphdom(previewContainer, markdownContainer);
+```
 
 
 
