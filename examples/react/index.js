@@ -12,7 +12,7 @@ let processor = unified()
         rootClassName: 'markdown-body'
     });
 
-const file = processor.processSync(require('../md/syntax.md'));
+const file = processor.processSync(require('../md/maxiang.md'));
 const vdom = file.contents;
 
 ReactDOM.render(

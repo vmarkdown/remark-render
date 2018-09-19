@@ -1,146 +1,111 @@
 /**
  * react Renderer
  */
-// const extend = require('extend');
+const extend = require('extend');
 
-function props(node, index, defaultProps) {
+function props(node, defaultProps) {
 
-    defaultProps = defaultProps?defaultProps:{};
+    var dataProps = extend({}, node.data);
 
-    (index > -1) && (defaultProps.key = index);
+    // if(node.position) {
+    //     extend(dataProps, {
+    //         'data-start-line': node.position.start.line,
+    //         'data-end-line': node.position.end.line
+    //     });
+    // }
 
-    if( node.data ){
-        defaultProps.id = node.data.id;
-        defaultProps.className = node.data.className;
-    }
-
-    return defaultProps;
+    return extend({}, dataProps, defaultProps);
 }
 
 function Renderer(options) {
     this.options = options || {};
-    this.h = options.h;
 }
 
-Renderer.prototype.root = function(node, children, index) { var h = this.h; 
-    return h('div', {
-        key: index,
-        className: this.options.rootClassName || 'markdown-body'
-    }, children);
+Renderer.prototype.root = function(h, node, children) { 
+    return h('div', props(node), children);
 };
 
-Renderer.prototype.blockquote = function(node, children, index) { var h = this.h; 
-    return h('blockquote', {
-        key: index
-    }, children);
+Renderer.prototype.blockquote = function(h, node, children) { 
+    return h('blockquote', props(node), children);
 };
 
-Renderer.prototype.heading = function(node, children, index) { var h = this.h; 
-    return h('h'+node.depth, props(node, index), children);
+Renderer.prototype.heading = function(h, node, children) { 
+    return h('h'+node.depth, props(node), children);
 };
 
-Renderer.prototype.thematicBreak = function(node, children, index) { var h = this.h; 
-    return h('hr', {
-        key: index
-    });
+Renderer.prototype.thematicBreak = function(h, node) { 
+    return h('hr', props(node));
 };
 
-Renderer.prototype.list = function(node, children, index) { var h = this.h; 
-    return h(node.ordered?'ol':'ul', {
-        key: index
-    }, children);
+Renderer.prototype.list = function(h, node, children) { 
+    return h(node.ordered?'ol':'ul', props(node), children);
 };
 
-Renderer.prototype.listItem = function(node, children, index) { var h = this.h; 
-    return h('li', {
-        key: index
-    }, children);
+Renderer.prototype.listItem = function(h, node, children) { 
+    return h('li', props(node), children);
 };
 
-Renderer.prototype.checkbox = function(node, children, index) { var h = this.h; 
-    return h('input', {
-        key: index,
+Renderer.prototype.checkbox = function(h, node) { 
+    return h('input', props(node, {
         type: 'checkbox',
         checked: node.checked,
         readOnly: true
-    });
+    }));
 };
 
-Renderer.prototype.paragraph = function(node, children, index) { var h = this.h; 
-    return h('p', {
-        key: index
-    }, children);
+Renderer.prototype.paragraph = function(h, node, children) { 
+    return h('p', props(node), children);
 };
 
-Renderer.prototype.table = function(node, children, index) { var h = this.h; 
-    return h('table', {
-            key: index
-        },
-        h('tbody',{key:0}, children)
-    );
+Renderer.prototype.table = function(h, node, children) { 
+    return h('table', props(node), h('tbody',{key:0}, children));
 };
 
-Renderer.prototype.tableRow = function(node, children, index) { var h = this.h; 
-    return h('tr', {
-        key: index
-    }, children);
+Renderer.prototype.tableRow = function(h, node, children) { 
+    return h('tr', props(node), children);
 };
 
-Renderer.prototype.tableCell = function(node, children, index) { var h = this.h; 
-    return h('td', {
-        key: index,
-        align: node.align
-    }, children);
+Renderer.prototype.tableCell = function(h, node, children) { 
+    return h('td', props(node, {align: node.align}), children);
 };
 
-Renderer.prototype.strong = function(node, children, index) { var h = this.h; 
-    return h('strong', {
-        key: index
-    }, children);
+Renderer.prototype.strong = function(h, node, children) {
+    return h('strong', props(node), children);
 };
 
-Renderer.prototype.emphasis = function(node, children, index) { var h = this.h; 
-    return h('em', {
-        key: index
-    }, children);
+Renderer.prototype.emphasis = function(h, node, children) { 
+    return h('em', props(node), children);
 };
 
-Renderer.prototype.break = function(node, children, index) { var h = this.h; 
-    return h('br', {
-        key: index
-    });
+Renderer.prototype.break = function(h, node) { 
+    return h('br', props(node));
 };
 
-Renderer.prototype.delete = function(node, children, index) { var h = this.h; 
-    return h('del', {
-        key: index
-    }, children);
+Renderer.prototype.delete = function(h, node, children) { 
+    return h('del', props(node), children);
 };
 
-Renderer.prototype.link = function(node, children, index) { var h = this.h; 
-    return h('a', {
-        key: index,
+Renderer.prototype.link = function(h, node, children) { 
+    return h('a', props(node, {
         href: node.url,
         title: node.title
-    }, children);
+    }), children);
 };
 
-Renderer.prototype.linkReference = function(node, children, index) { var h = this.h; 
-    return h('a', {
-        key: index,
+Renderer.prototype.linkReference = function(h, node, children) { 
+    return h('a', props(node, {
         href: node.url,
         title: node.title
-    }, children);
+    }), children);
 };
 
-Renderer.prototype.definition = function(node, children, index) { var h = this.h; 
-    return h('div', {
-            key: index,
+Renderer.prototype.definition = function(h, node, children) { 
+    return h('div', props(node, {
             style: {
                 height: 0,
                 visibility: 'hidden'
             }
-        },
+        }),
         h('a', {
             key: 0,
             href: node.url,
@@ -152,64 +117,50 @@ Renderer.prototype.definition = function(node, children, index) { var h = this.h
     );
 };
 
-Renderer.prototype.image = function(node, children, index) { var h = this.h; 
-    return h('img', {
-        key: index,
+Renderer.prototype.image = function(h, node) {
+    return h('img', props(node, {
         src: node.url,
         alt: node.alt,
         title: node.title
-    });
+    }));
 };
 
-Renderer.prototype.text = function(node, children, index) { var h = this.h; 
-    return h('span', {
-        key: index
-    }, node.value);
+Renderer.prototype.text = function(h, node) { 
+    return h('span', props(node), node.value);
 };
 
-Renderer.prototype.inlineCode = function(node, children, index) { var h = this.h;
-    return h('code', {
-        key: index,
-    }, node.value);
+Renderer.prototype.inlineCode = function(h, node, children) { 
+    return h('code', props(node), node.value);
 };
 
-
-Renderer.prototype.code = function(node, children, index) { var h = this.h;
-    return h('pre', {
-        key: index
-    }, h('code', {
-        className: node.lang?'language-'+node.lang:''
+Renderer.prototype.code = function(h, node, children) { 
+    return h('pre', props(node), h('code', {
+        className: node.lang?'language-'+node.lang:null
     }, node.value));
 };
 
-Renderer.prototype.math = function(node, children, index) { var h = this.h;
-    return h('p', {
-        key: index,
-        className: node.className,
+Renderer.prototype.math = function(h, node, children) { 
+    return h('p', props(node, {
         dangerouslySetInnerHTML: {
             __html: node.value
         }
-    });
+    }));
 };
 
-Renderer.prototype.inlineMath = function(node, children, index) { var h = this.h;
-    return h('span', {
-        key: index,
-        className: node.className,
+Renderer.prototype.inlineMath = function(h, node, children) { 
+    return h('span', props(node, {
         dangerouslySetInnerHTML: {
             __html: node.value
         }
-    });
+    }));
 };
 
-Renderer.prototype.html = function(node, children, index) { var h = this.h;
-    return h('div', {
-        key: index,
-        className: node.className,
+Renderer.prototype.html = function(h, node, children) { 
+    return h('div', props(node, {
         dangerouslySetInnerHTML: {
             __html: node.value
         }
-    });
+    }));
 };
 
 module.exports = Renderer;

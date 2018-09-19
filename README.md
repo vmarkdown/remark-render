@@ -88,11 +88,7 @@ var render = require('remark-render')
   
 var React = require('react');
 var h = React.createElement;
-var renderer = new Renderer({
-    h: h,
-    rootClassName: 'markdown-body'
-});
- 
+
 var processor = unified()
     .use(parse)
     .use(render, {
@@ -144,8 +140,9 @@ var render = require('remark-render')
 var h = require('hyperscript');
 var Renderer = require('remark-render/src/renderers/hyperscript-renderer');
 
-renderer.text = function(node, children, index) {
+renderer.text = function(h, node, children) {
     return h('span', {
+        key: node.data.key,
         style: {'font-size': '60px'}
     }, node.value);
 };
