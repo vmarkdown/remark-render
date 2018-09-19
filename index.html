@@ -48,6 +48,24 @@
         #vdom-render-time{
             color: #e96a54;
         }
+
+        input {
+            font-size: 16px;
+            padding: 4px 10px;
+            height: 40px;
+            width: 240px;
+            text-align: center;
+            line-height: 40px;
+            position: relative;
+            cursor: pointer;
+            color: #666;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            display: inline-block;
+            *display: inline;
+            *zoom: 1;
+        }
     </style>
 </head>
 <body>
@@ -278,7 +296,7 @@ $$|\vec{A}|=\sqrt{A_x^2 + A_y^2 + A_z^2}.$$(1)
 
         function render() {
             var startTime = new Date().getTime();
-            var md = template.replace('%%datatime%%', new Date);
+            var md = template.replace('%%datatime%%', new Date).replace('will not be', 'will be');
             var text = marked(md);
             var html = compile_expressions(text);
             document.getElementById('html-preview').innerHTML = html;
