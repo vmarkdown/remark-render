@@ -63,7 +63,9 @@ dog's back.
         var h = React.createElement;
 
         var processor = vremark().data({
-            'h': h
+            h: h,
+            mode: 'react',
+            rootClassName: 'wysiwyg'
         });
 
         var template = document.getElementById('template').innerHTML;
@@ -85,7 +87,7 @@ dog's back.
 
         setInterval(function () {
             render();
-        }, 2000);
+        }, 1000);
 
     })();
 </script>
