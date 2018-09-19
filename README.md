@@ -210,17 +210,17 @@ Renderer.prototype.heading = function(h, node, children) {
     return h('h'+node.depth, node.props, children);
 };
 
-let processor = unified()
+var processor = unified()
     .use(parse, {})
     .use(render, {
         Renderer: Renderer,
         h: createElement
     });
 
-const file = processor.processSync('# h1\n## h2');
-const markdownContainer = file.contents;
+var file = processor.processSync('# h1\n## h2');
+var markdownContainer = file.contents;
 
-const previewContainer = document.getElementById('preview');
+var previewContainer = document.getElementById('preview');
 
 morphdom(previewContainer, markdownContainer);
 ```
