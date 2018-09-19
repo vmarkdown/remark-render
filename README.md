@@ -142,7 +142,7 @@ var Renderer = require('remark-render/src/renderers/hyperscript-renderer');
 
 renderer.text = function(h, node, children) {
     return h('span', {
-        key: node.data.key,
+        key: node.props.key,
         style: {'font-size': '60px'}
     }, node.value);
 };
