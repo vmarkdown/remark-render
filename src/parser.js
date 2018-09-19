@@ -1,10 +1,10 @@
 const extend = require('extend');
 
 function extendProps(node, props) {
-    if(!node.data){
-        node.data = {};
+    if(!node.props){
+        node.props = {};
     }
-    extend(node.data, props);
+    extend(node.props, props);
 }
 
 function getRenderer(mode) {

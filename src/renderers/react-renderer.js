@@ -5,7 +5,7 @@ const extend = require('extend');
 
 function props(node, defaultProps) {
 
-    var dataProps = extend({}, node.data);
+    var dataProps = extend({}, node.props);
 
     // if(node.position) {
     //     extend(dataProps, {
@@ -45,7 +45,7 @@ Renderer.prototype.listItem = function(h, node, children) {
     return h('li', props(node), children);
 };
 
-Renderer.prototype.checkbox = function(h, node) { 
+Renderer.prototype.checkbox = function(h, node) {
     return h('input', props(node, {
         type: 'checkbox',
         checked: node.checked,
