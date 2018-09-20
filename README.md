@@ -37,7 +37,7 @@ unified().use(render, {
 
 #### options
 |  | remark |
-| :------| ------: |
+| :------| :------ |
 | renderer |  framework renderer |
 | h | create element function |
 | rootClassName | vdom root element class name |
