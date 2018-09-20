@@ -101,18 +101,19 @@ return /******/ (function(modules) { // webpackBootstrap
 const unified = __webpack_require__(1);
 const parse = __webpack_require__(16);
 const render = __webpack_require__(88);
-
+const renderer = __webpack_require__(92);
 const h = React.createElement;
 
 let processor = unified()
     .use(parse, {})
     .use(render, {
-        mode: 'react',
+        renderer: renderer,
         h: h,
-        rootClassName: 'markdown-body'
+        rootClassName: 'markdown-body',
+        rootTagName: 'main'
     });
 
-const file = processor.processSync(__webpack_require__(97));
+const file = processor.processSync(__webpack_require__(94));
 const vdom = file.contents;
 
 ReactDOM.render(
@@ -8064,7 +8065,7 @@ function text(eat, value, silent) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var plugin = __webpack_require__(89);
-var Renderer = __webpack_require__(98);
+var Renderer = __webpack_require__(91);
 plugin.Renderer = Renderer;
 module.exports = plugin;
 
@@ -8078,18 +8079,17 @@ var Parser = __webpack_require__(90);
 
 module.exports = function plugin(options) {
 
-    var mode = this.data('mode') || options.mode;
-    options.mode = mode;
-
-    var parser = new Parser(options);
-
     var self = this;
 
-    self.data('renderer', parser.renderer);
+    var renderer = this.data('renderer') || options.renderer;
+
+    var parser = new Parser(options);
+    parser.renderer = renderer;
 
     this.Compiler = function compiler(node) {
         var h = self.data('h');
-        return parser.parse(node, h);
+        h && (parser.h = h);
+        return parser.parse(node);
     }
 };
 
@@ -8097,37 +8097,15 @@ module.exports = function plugin(options) {
 /* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const extend = __webpack_require__(2);
+var extend = __webpack_require__(2);
 
 function extendProps(node, props) {
-    if(!node.props){
-        node.props = {};
-    }
-    extend(node.props, props);
-}
-
-function getRenderer(mode) {
-    switch (mode){
-        case 'react' :
-            return __webpack_require__(91);
-        case 'vue' :
-            return __webpack_require__(92);
-        case 'hyperscript' :
-            return __webpack_require__(93);
-        case 'preact' :
-            return __webpack_require__(94);
-        case 'snabbdom' :
-            return __webpack_require__(95);
-        case 'virtual-dom' :
-            return __webpack_require__(96);
-    }
-    return null;
+    if(!node.properties){ node.properties = {}; }
+    extend(node.properties, props);
 }
 
 function Parser(options) {
-    var Renderer = options.Renderer?options.Renderer:getRenderer(options.mode);
     this.options = options;
-    this.renderer = new Renderer(options);
     this.h = options.h;
 }
 
@@ -8137,7 +8115,8 @@ Parser.prototype.parseNodes = function(nodes) {
     for(var i=0;i<nodes.length;i++){
         var node = nodes[i];
         extendProps(node, {key: i});
-        vnodes.push(this.parseNode(node));
+        var tempNode = this.parseNode(node);
+        tempNode && vnodes.push(tempNode);
     }
     return vnodes;
 };
@@ -8146,16 +8125,16 @@ Parser.prototype.parseNode = function(node) {
     if(!node) return null;
     var children = this.parseNodes(node.children);
     var h = this.h;
-    return this.renderer[node.type].apply(this.renderer, [h, node, children]);
+    return this.renderer[node.type].apply(null, [h, node, children]);
 };
 
-Parser.prototype.parse = function(root, _h) {
+Parser.prototype.parse = function(root) {
     try {
-        _h && (this.h = _h);
         extendProps(root, {
             key: 0,
             className: this.options.rootClassName || 'markdown-body'
         });
+        this.options.rootTagName && (root.tagName = this.options.rootTagName);
         return this.parseNode(root);
     }
     catch (e) {
@@ -8168,1003 +8147,6 @@ module.exports = Parser;
 
 /***/ }),
 /* 91 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/**
- * react Renderer
- */
-const extend = __webpack_require__(2);
-
-function props(node, defaultProps) {
-
-    var dataProps = extend({}, node.props);
-
-    // if(node.position) {
-    //     extend(dataProps, {
-    //         'data-start-line': node.position.start.line,
-    //         'data-end-line': node.position.end.line
-    //     });
-    // }
-
-    return extend({}, dataProps, defaultProps);
-}
-
-function Renderer(options) {
-    this.options = options || {};
-}
-
-Renderer.prototype.root = function(h, node, children) { 
-    return h('div', props(node), children);
-};
-
-Renderer.prototype.blockquote = function(h, node, children) { 
-    return h('blockquote', props(node), children);
-};
-
-Renderer.prototype.heading = function(h, node, children) { 
-    return h('h'+node.depth, props(node), children);
-};
-
-Renderer.prototype.thematicBreak = function(h, node) { 
-    return h('hr', props(node));
-};
-
-Renderer.prototype.list = function(h, node, children) { 
-    return h(node.ordered?'ol':'ul', props(node), children);
-};
-
-Renderer.prototype.listItem = function(h, node, children) { 
-    return h('li', props(node), children);
-};
-
-Renderer.prototype.checkbox = function(h, node) {
-    return h('input', props(node, {
-        type: 'checkbox',
-        checked: node.checked,
-        readOnly: true
-    }));
-};
-
-Renderer.prototype.paragraph = function(h, node, children) { 
-    return h('p', props(node), children);
-};
-
-Renderer.prototype.table = function(h, node, children) { 
-    return h('table', props(node), h('tbody',{key:0}, children));
-};
-
-Renderer.prototype.tableRow = function(h, node, children) { 
-    return h('tr', props(node), children);
-};
-
-Renderer.prototype.tableCell = function(h, node, children) { 
-    return h('td', props(node, {align: node.align}), children);
-};
-
-Renderer.prototype.strong = function(h, node, children) {
-    return h('strong', props(node), children);
-};
-
-Renderer.prototype.emphasis = function(h, node, children) { 
-    return h('em', props(node), children);
-};
-
-Renderer.prototype.break = function(h, node) { 
-    return h('br', props(node));
-};
-
-Renderer.prototype.delete = function(h, node, children) { 
-    return h('del', props(node), children);
-};
-
-Renderer.prototype.link = function(h, node, children) { 
-    return h('a', props(node, {
-        href: node.url,
-        title: node.title
-    }), children);
-};
-
-Renderer.prototype.linkReference = function(h, node, children) { 
-    return h('a', props(node, {
-        href: node.url,
-        title: node.title
-    }), children);
-};
-
-Renderer.prototype.definition = function(h, node, children) { 
-    return h('div', props(node, {
-            style: {
-                height: 0,
-                visibility: 'hidden'
-            }
-        }),
-        h('a', {
-            key: 0,
-            href: node.url,
-            'data-identifier': node.identifier
-        }, [
-            '['+node.identifier+']: ',
-            node.url
-        ])
-    );
-};
-
-Renderer.prototype.image = function(h, node) {
-    return h('img', props(node, {
-        src: node.url,
-        alt: node.alt,
-        title: node.title
-    }));
-};
-
-Renderer.prototype.text = function(h, node) { 
-    return h('span', props(node), node.value);
-};
-
-Renderer.prototype.inlineCode = function(h, node, children) { 
-    return h('code', props(node), node.value);
-};
-
-Renderer.prototype.code = function(h, node, children) { 
-    return h('pre', props(node), h('code', {
-        className: node.lang?'language-'+node.lang:null
-    }, node.value));
-};
-
-Renderer.prototype.math = function(h, node, children) { 
-    return h('p', props(node, {
-        dangerouslySetInnerHTML: {
-            __html: node.value
-        }
-    }));
-};
-
-Renderer.prototype.inlineMath = function(h, node, children) { 
-    return h('span', props(node, {
-        dangerouslySetInnerHTML: {
-            __html: node.value
-        }
-    }));
-};
-
-Renderer.prototype.html = function(h, node, children) { 
-    return h('div', props(node, {
-        dangerouslySetInnerHTML: {
-            __html: node.value
-        }
-    }));
-};
-
-module.exports = Renderer;
-
-
-/***/ }),
-/* 92 */
-/***/ (function(module, exports) {
-
-/**
- * vue Renderer
- */
-
-function Renderer(options) {
-    this.options = options || {};
-}
-
-Renderer.prototype.root = function(node, children, index) { var h = this.h; 
-    return h('div', {
-        key: index,
-        'class': [this.options.rootClassName || 'markdown-body']
-    }, children);
-};
-
-Renderer.prototype.inlineCode = function(node, children, index) { var h = this.h; 
-    return h('code', {
-        key: index,
-    }, node.value);
-};
-
-Renderer.prototype.code = function(node, children, index) { var h = this.h; 
-    return h('pre', {
-        key: index
-    }, [
-        h('code', {
-            'class': [node.lang?'language-'+node.lang:'']
-        }, node.value)
-    ]);
-};
-
-Renderer.prototype.blockquote = function(node, children, index) { var h = this.h; 
-    return h('blockquote', {
-        key: index
-    }, children);
-};
-
-
-
-Renderer.prototype.heading = function(node, children, index) { var h = this.h; 
-    return h('h'+node.depth, {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.thematicBreak = function(node, children, index) { var h = this.h; 
-    return h('hr', {
-        key: index
-    });
-};
-
-Renderer.prototype.list = function(node, children, index) { var h = this.h; 
-    return h(node.ordered?'ol':'ul', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.listItem = function(node, children, index) { var h = this.h; 
-    return h('li', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.checkbox = function(node, children, index) { var h = this.h; 
-    return h('input', {
-        key: index,
-        attrs: {
-            type: 'checkbox',
-            checked: node.checked,
-            disabled: true
-        }
-    });
-};
-
-Renderer.prototype.paragraph = function(node, children, index) { var h = this.h; 
-    return h('p', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.table = function(node, children, index) { var h = this.h; 
-    return h('table', {
-            key: index
-        },
-        [h('tbody',{key:0}, children)]
-    );
-};
-
-Renderer.prototype.tableRow = function(node, children, index) { var h = this.h; 
-    return h('tr', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.tableCell = function(node, children, index) { var h = this.h; 
-    return h('td', {
-        key: index,
-        align: node.align
-    }, children);
-};
-
-Renderer.prototype.strong = function(node, children, index) { var h = this.h; 
-    return h('strong', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.emphasis = function(node, children, index) { var h = this.h; 
-    return h('em', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.break = function(node, children, index) { var h = this.h; 
-    return h('br', {
-        key: index
-    });
-};
-
-Renderer.prototype.delete = function(node, children, index) { var h = this.h; 
-    return h('del', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.link = function(node, children, index) { var h = this.h; 
-    return h('a', {
-        key: index,
-        attrs:{
-            target: '_blank',
-            href: node.url,
-            title: node.title
-        }
-    }, children);
-};
-
-Renderer.prototype.linkReference = function(node, children, index) { var h = this.h; 
-    return h('a', {
-        key: index,
-        attrs:{
-            target: '_blank',
-            href: node.url,
-            title: node.title
-        }
-    }, children);
-};
-
-Renderer.prototype.definition = function(node, children, index) { var h = this.h; 
-    return h('div', {
-            key: index,
-            style: {
-                // height: 0,
-                // visibility: 'hidden'
-                'word-break': 'break-all'
-            }
-        },[
-            h('a', {
-                key: 0,
-                attrs: {
-                    target: '_blank',
-                    href: node.url,
-                    'data-identifier': node.identifier
-                }
-            }, [
-                '['+node.identifier+']: ',
-                node.url
-            ])
-        ]
-    );
-};
-
-Renderer.prototype.image = function(node, children, index) { var h = this.h; 
-    return h('img', {
-        key: index,
-        attrs: {
-            src: node.url,
-            alt: node.alt,
-            title: node.title
-        }
-    });
-};
-
-Renderer.prototype.text = function(node, children, index) { var h = this.h; 
-    return h('span', {
-        key: index
-    }, node.value);
-};
-
-
-Renderer.prototype.math = function(node, children, index) { var h = this.h;
-    return h('p', {
-        key: index,
-        domProps: {
-            "innerHTML": node.value
-        }
-    });
-};
-
-Renderer.prototype.inlineMath = function(node, children, index) { var h = this.h;
-    return h('span', {
-        key: index,
-        domProps: {
-            "innerHTML": node.value
-        }
-    });
-};
-
-Renderer.prototype.html = function(node, children, index) { var h = this.h;
-    return h('div', {
-        key: index,
-        domProps: {
-            "innerHTML": node.value
-        }
-    });
-};
-
-Renderer.prototype.flow = function(node, children, index) { var h = this.h;
-    return h('div', {
-        key: index,
-        'class': [node.className || ''],
-        domProps: {
-            "innerHTML": node.value
-        }
-    });
-};
-
-module.exports = Renderer;
-
-
-/***/ }),
-/* 93 */
-/***/ (function(module, exports) {
-
-/**
- * hyperscript Renderer
- */
-
-function Renderer(options) {
-    this.options = options || {};
-    this.h = options.h;
-}
-
-Renderer.prototype.root = function(node, children) { var h = this.h;
-    var rootClassName = this.options.rootClassName || 'markdown-body';
-    return h('div' , {
-        className: rootClassName
-    }, children);
-};
-
-Renderer.prototype.text = function(node, children) { var h = this.h;
-    return h('span', {
-    }, node.value);
-};
-
-Renderer.prototype.inlineCode = function(node, children) { var h = this.h;
-    return h('code', {
-    }, node.value);
-};
-
-Renderer.prototype.code = function(node, children) { var h = this.h;
-    return h('pre', {
-    }, h('code', {
-        className: node.lang?'language-'+node.lang:''
-    }, node.value));
-};
-
-Renderer.prototype.blockquote = function(node, children) { var h = this.h;
-    return h('blockquote', {
-    }, children);
-};
-
-Renderer.prototype.heading = function(node, children) { var h = this.h;
-    return h('h'+node.depth, {
-    }, children);
-};
-
-Renderer.prototype.thematicBreak = function(node, children) { var h = this.h;
-    return h('hr', {
-    });
-};
-
-Renderer.prototype.list = function(node, children) { var h = this.h;
-    return h(node.ordered?'ol':'ul', {
-    }, children);
-};
-
-Renderer.prototype.listItem = function(node, children) { var h = this.h;
-    return h('li', {
-    }, children);
-};
-
-Renderer.prototype.checkbox = function(node, children) { var h = this.h;
-    return h('input', {
-        type: 'checkbox',
-        checked: node.checked,
-        readOnly: true
-    });
-};
-
-Renderer.prototype.paragraph = function(node, children) { var h = this.h;
-    return h('p', {
-    }, children);
-};
-
-Renderer.prototype.table = function(node, children) { var h = this.h;
-    return h('table', {},
-        h('tbody',{key:0}, children)
-    );
-};
-
-Renderer.prototype.tableRow = function(node, children) { var h = this.h;
-    return h('tr', {}, children);
-};
-
-Renderer.prototype.tableCell = function(node, children) { var h = this.h;
-    return h('td', {
-        align: node.align
-    }, children);
-};
-
-Renderer.prototype.strong = function(node, children) { var h = this.h;
-    return h('strong', {
-    }, children);
-};
-
-Renderer.prototype.emphasis = function(node, children) { var h = this.h;
-    return h('em', {
-    }, children);
-};
-
-Renderer.prototype.break = function(node, children) { var h = this.h;
-    return h('br', {
-    });
-};
-
-Renderer.prototype.delete = function(node, children) { var h = this.h;
-    return h('del', {
-    }, children);
-};
-
-Renderer.prototype.link = function(node, children) { var h = this.h;
-    return h('a', {
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.linkReference = function(node, children) { var h = this.h;
-    return h('a', {
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.definition = function(node, children) { var h = this.h;
-    return h('div', {
-            style: {
-                height: '0',
-                visibility: 'hidden'
-            }
-        },
-        h('a', {
-            href: node.url,
-            'data-identifier': node.identifier
-        }, [
-            '['+node.identifier+']: ',
-            node.url
-        ])
-    );
-};
-
-Renderer.prototype.image = function(node, children) { var h = this.h;
-    return h('img', {
-        src: node.url,
-        alt: node.alt,
-        title: node.title
-    });
-};
-
-Renderer.prototype.math = function(node, children) { var h = this.h;
-    return h('p', {
-        innerHTML : node.value
-    });
-};
-
-Renderer.prototype.inlineMath = function(node, children) { var h = this.h;
-    return h('span', {
-        innerHTML : node.value
-    });
-};
-
-Renderer.prototype.html = function(node, children) { var h = this.h;
-    return h('div', {
-        innerHTML : node.value
-    });
-};
-
-module.exports = Renderer;
-
-
-
-/***/ }),
-/* 94 */
-/***/ (function(module, exports) {
-
-/**
- * preact Renderer
- */
-
-function Renderer(options) {
-    this.options = options || {};
-    this.h = options.h;
-}
-
-Renderer.prototype.root = function(h, node, index, children) {
-    return h('div', {
-        key: index,
-        className: this.options.rootClassName || 'markdown-body'
-    }, children);
-};
-
-Renderer.prototype.inlineCode = function(h, node, index, children) {
-    return h('code', {
-        key: index,
-    }, node.value);
-};
-
-Renderer.prototype.math = function(h, node, index, children) {
-    return h('p', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.renderedValue
-        }
-    });
-};
-
-Renderer.prototype.inlineMath = function(h, node, index, children) {
-    return h('span', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.renderedValue
-        }
-    });
-};
-
-Renderer.prototype.code = function(h, node, index, children) {
-    return h('pre', {
-        key: index
-    }, h('code', {
-        className: node.lang?'language-'+node.lang:''
-    }, node.value));
-};
-
-Renderer.prototype.blockquote = function(h, node, index, children) {
-    return h('blockquote', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.html = function(h, node, index, children) {
-    return h('div', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.value
-        }
-    });
-};
-
-Renderer.prototype.heading = function(h, node, index, children) {
-    return h('h'+node.depth, {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.thematicBreak = function(h, node, index, children) {
-    return h('hr', {
-        key: index
-    });
-};
-
-Renderer.prototype.list = function(h, node, index, children) {
-    return h(node.ordered?'ol':'ul', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.listItem = function(h, node, index, children) {
-    return h('li', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.checkbox = function(h, node, index, children) {
-    return h('input', {
-        key: index,
-        type: 'checkbox',
-        checked: node.checked,
-        readOnly: true
-    });
-};
-
-Renderer.prototype.paragraph = function(h, node, index, children) {
-    return h('p', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.table = function(h, node, index, children) {
-    return h('table', {
-            key: index
-        },
-        h('tbody',{key:0}, children)
-    );
-};
-
-Renderer.prototype.tableRow = function(h, node, index, children) {
-    return h('tr', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.tableCell = function(h, node, index, children) {
-    return h('td', {
-        key: index,
-        align: node.align
-    }, children);
-};
-
-Renderer.prototype.strong = function(h, node, index, children) {
-    return h('strong', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.emphasis = function(h, node, index, children) {
-    return h('em', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.break = function(h, node, index, children) {
-    return h('br', {
-        key: index
-    });
-};
-
-Renderer.prototype.delete = function(h, node, index, children) {
-    return h('del', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.link = function(h, node, index, children) {
-    return h('a', {
-        key: index,
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.linkReference = function(h, node, index, children) {
-    return h('a', {
-        key: index,
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.definition = function(h, node, index, children) {
-    return h('div', {
-            key: index,
-            style: {
-                height: 0,
-                visibility: 'hidden'
-            }
-        },
-        h('a', {
-            key: 0,
-            href: node.url,
-            'data-identifier': node.identifier
-        }, [
-            '['+node.identifier+']: ',
-            node.url
-        ])
-    );
-};
-
-Renderer.prototype.image = function(h, node, index, children) {
-    return h('img', {
-        key: index,
-        src: node.url,
-        alt: node.alt,
-        title: node.title
-    });
-};
-
-Renderer.prototype.text = function(h, node, index, children) {
-    return h('span', {
-        key: index
-    }, node.value);
-};
-
-module.exports = Renderer;
-
-
-/***/ }),
-/* 95 */
-/***/ (function(module, exports) {
-
-
-
-/***/ }),
-/* 96 */
-/***/ (function(module, exports) {
-
-/**
- * virtual-dom Renderer
- */
-
-function Renderer(options) {
-    this.options = options || {};
-    this.h = options.h;
-}
-
-Renderer.prototype.root = function(h, node, index, children) {
-    return h('div', {
-        key: index,
-        className: this.options.rootClassName || 'markdown-body'
-    }, children);
-};
-
-Renderer.prototype.inlineCode = function(h, node, index, children) {
-    return h('code', {
-        key: index,
-    }, node.value);
-};
-
-Renderer.prototype.math = function(h, node, index, children) {
-    return h('p', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.renderedValue
-        }
-    });
-};
-
-Renderer.prototype.inlineMath = function(h, node, index, children) {
-    return h('span', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.renderedValue
-        }
-    });
-};
-
-Renderer.prototype.code = function(h, node, index, children) {
-    return h('pre', {
-        key: index
-    }, h('code', {
-        className: node.lang?'language-'+node.lang:''
-    }, node.value));
-};
-
-Renderer.prototype.blockquote = function(h, node, index, children) {
-    return h('blockquote', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.html = function(h, node, index, children) {
-    return h('div', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.value
-        }
-    });
-};
-
-Renderer.prototype.heading = function(h, node, index, children) {
-    return h('h'+node.depth, {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.thematicBreak = function(h, node, index, children) {
-    return h('hr', {
-        key: index
-    });
-};
-
-Renderer.prototype.list = function(h, node, index, children) {
-    return h(node.ordered?'ol':'ul', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.listItem = function(h, node, index, children) {
-    return h('li', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.checkbox = function(h, node, index, children) {
-    return h('input', {
-        key: index,
-        type: 'checkbox',
-        checked: node.checked,
-        readOnly: true
-    });
-};
-
-Renderer.prototype.paragraph = function(h, node, index, children) {
-    return h('p', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.table = function(h, node, index, children) {
-    return h('table', {
-            key: index
-        },
-        h('tbody',{key:0}, children)
-    );
-};
-
-Renderer.prototype.tableRow = function(h, node, index, children) {
-    return h('tr', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.tableCell = function(h, node, index, children) {
-    return h('td', {
-        key: index,
-        align: node.align
-    }, children);
-};
-
-Renderer.prototype.strong = function(h, node, index, children) {
-    return h('strong', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.emphasis = function(h, node, index, children) {
-    return h('em', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.break = function(h, node, index, children) {
-    return h('br', {
-        key: index
-    });
-};
-
-Renderer.prototype.delete = function(h, node, index, children) {
-    return h('del', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.link = function(h, node, index, children) {
-    return h('a', {
-        key: index,
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.linkReference = function(h, node, index, children) {
-    return h('a', {
-        key: index,
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.definition = function(h, node, index, children) {
-    return h('div', {
-            key: index,
-            style: {
-                height: 0,
-                visibility: 'hidden'
-            }
-        },
-        h('a', {
-            key: 0,
-            href: node.url,
-            'data-identifier': node.identifier
-        }, [
-            '['+node.identifier+']: ',
-            node.url
-        ])
-    );
-};
-
-Renderer.prototype.image = function(h, node, index, children) {
-    return h('img', {
-        key: index,
-        src: node.url,
-        alt: node.alt,
-        title: node.title
-    });
-};
-
-Renderer.prototype.text = function(h, node, index, children) {
-    return h('span', {
-        key: index
-    }, node.value);
-};
-
-module.exports = Renderer;
-
-
-/***/ }),
-/* 97 */
-/***/ (function(module, exports) {
-
-module.exports = "# 欢迎使用马克飞象\n\n\n----------\n\n----------\n\n\n@(示例笔记本)[马克飞象|帮助|Markdown]\n\n**马克飞象**是一款专为印象笔记（Evernote）打造的Markdown编辑器，通过精心的设计与技术实现，配合印象笔记强大的存储和同步功能，带来前所未有的书写体验。特点概述：\n\n- **功能丰富** ：支持高亮代码块、*LaTeX* 公式、流程图，本地图片以及附件上传，甚至截图粘贴，工作学习好帮手；\n- **得心应手** ：简洁高效的编辑器，提供[桌面客户端][1]以及[离线Chrome App][2]，支持移动端 Web；\n- **深度整合** ：支持选择笔记本和添加标签，支持从印象笔记跳转编辑，轻松管理。\n\n-------------------\n\n[TOC]\n\n## Markdown简介\n\n> Markdown 是一种轻量级标记语言，它允许人们使用易读易写的纯文本格式编写文档，然后转换成格式丰富的HTML页面。    —— [维基百科](https://zh.wikipedia.org/wiki/Markdown)\n\n正如您在阅读的这份文档，它使用简单的符号标识不同的标题，将某些文字标记为**粗体**或者*斜体*，创建一个[链接](http://www.example.com)或一个脚注[^demo]。下面列举了几个高级功能，更多语法请按`Cmd + /`查看帮助。\n\n### 代码块\n``` python\n@requires_authorization\ndef somefunc(param1='', param2=0):\n    '''A docstring'''\n    if param1 > param2: # interesting\n        print 'Greater'\n    return (param2 - param1 + 1) or None\nclass SomeClass:\n    pass\n>>> message = '''interpreter\n... prompt'''\n```\n### LaTeX 公式\n\n可以创建行内公式，例如 $\\Gamma(n) = (n-1)!\\quad\\forall n\\in\\mathbb N$。或者块级公式：\n\n$$\tx = \\dfrac{-b \\pm \\sqrt{b^2 - 4ac}}{2a} $$\n\n$$\n% \\f is defined as f(#1) using the macro\n\\f{x} = \\int_{-\\infty}^\\infty\n    \\hat \\f\\xi\\,e^{2 \\pi i \\xi x}\n    \\,d\\xi\n$$\n\n\n### 表格\n| Item      |    Value | Qty  |\n| :-------- | --------:| :--: |\n| Computer  | 1600 USD |  5   |\n| Phone     |   12 USD |  12  |\n| Pipe      |    1 USD | 234  |\n\n### 流程图\n```flow\nst=>start: Start\ne=>end\nop=>operation: My Operation\ncond=>condition: Yes or No?\n\nst->op->cond\ncond(yes)->e\ncond(no)->op\n```\n\n以及时序图:\n\n```sequence\nAlice->Bob: Hello Bob, how are you?\nNote right of Bob: Bob thinks\nBob-->Alice: I am good thanks!\n```\n\n> **提示：**想了解更多，请查看**流程图**[语法][3]以及**时序图**[语法][4]。\n\n### 复选框\n\n使用 `- [ ]` 和 `- [x]` 语法可以创建复选框，实现 todo-list 等功能。例如：\n\n- [x] 已完成事项\n- [ ] 待办事项1\n- [ ] 待办事项2\n\n> **注意：**目前支持尚不完全，在印象笔记中勾选复选框是无效、不能同步的，所以必须在**马克飞象**中修改 Markdown 原文才可生效。下个版本将会全面支持。\n\n\n## 印象笔记相关\n\n### 笔记本和标签\n**马克飞象**增加了`@(笔记本)[标签A|标签B]`语法, 以选择笔记本和添加标签。 **绑定账号后**， 输入`(`自动会出现笔记本列表，请从中选择。\n\n### 笔记标题\n**马克飞象**会自动使用文档内出现的第一个标题作为笔记标题。例如本文，就是第一行的 `欢迎使用马克飞象`。\n\n### 快捷编辑\n保存在印象笔记中的笔记，右上角会有一个红色的编辑按钮，点击后会回到**马克飞象**中打开并编辑该笔记。\n>**注意：**目前用户在印象笔记中单方面做的任何修改，马克飞象是无法自动感知和更新的。所以请务必回到马克飞象编辑。\n\n### 数据同步\n**马克飞象**通过**将Markdown原文以隐藏内容保存在笔记中**的精妙设计，实现了对Markdown的存储和再次编辑。既解决了其他产品只是单向导出HTML的单薄，又规避了服务端存储Markdown带来的隐私安全问题。这样，服务端仅作为对印象笔记 API调用和数据转换之用。\n\n >**隐私声明：用户所有的笔记数据，均保存在印象笔记中。马克飞象不存储用户的任何笔记数据。**\n\n### 离线存储\n**马克飞象**使用浏览器离线存储将内容实时保存在本地，不必担心网络断掉或浏览器崩溃。为了节省空间和避免冲突，已同步至印象笔记并且不再修改的笔记将删除部分本地缓存，不过依然可以随时通过`文档管理`打开。\n\n> **注意：**虽然浏览器存储大部分时候都比较可靠，但印象笔记作为专业云存储，更值得信赖。以防万一，**请务必经常及时同步到印象笔记**。\n\n## 编辑器相关\n### 设置\n右侧系统菜单（快捷键`Cmd + M`）的`设置`中，提供了界面字体、字号、自定义CSS、vim/emacs 键盘模式等高级选项。\n\n### 快捷键\n\n帮助    `Cmd + /`\n同步文档    `Cmd + S`\n创建文档    `Cmd + Opt + N`\n最大化编辑器    `Cmd + Enter`\n预览文档 `Cmd + Opt + Enter`\n文档管理    `Cmd + O`\n系统菜单    `Cmd + M`\n\n加粗    `Cmd + B`\n插入图片    `Cmd + G`\n插入链接    `Cmd + L`\n提升标题    `Cmd + H`\n\n## 关于收费\n\n**马克飞象**为新用户提供 10 天的试用期，试用期过后需要[续费](maxiang.info/vip.html)才能继续使用。未购买或者未及时续费，将不能同步新的笔记。之前保存过的笔记依然可以编辑。\n\n\n## 反馈与建议\n- 微博：[@马克飞象](http://weibo.com/u/2788354117)，[@GGock](http://weibo.com/ggock \"开发者个人账号\")\n- 邮箱：<hustgock@gmail.com>\n\n---------\n感谢阅读这份帮助文档。请点击右上角，绑定印象笔记账号，开启全新的记录与分享体验吧。\n\n\n\n\n[^demo]: 这是一个示例脚注。请查阅 [MultiMarkdown 文档](https://github.com/fletcher/MultiMarkdown/wiki/MultiMarkdown-Syntax-Guide#footnotes) 关于脚注的说明。 **限制：** 印象笔记的笔记内容使用 [ENML][5] 格式，基于 HTML，但是不支持某些标签和属性，例如id，这就导致`脚注`和`TOC`无法正常点击。\n\n\n  [1]: http://maxiang.info/client_zh\n  [2]: https://chrome.google.com/webstore/detail/kidnkfckhbdkfgbicccmdggmpgogehop\n  [3]: http://adrai.github.io/flowchart.js/\n  [4]: http://bramp.github.io/js-sequence-diagrams/\n  [5]: https://dev.yinxiang.com/doc/articles/enml.php\n\n"
-
-/***/ }),
-/* 98 */
 /***/ (function(module, exports) {
 
 /**
@@ -9236,6 +8218,209 @@ Renderer.prototype.code = function(h, node, children) {};
 
 module.exports = Renderer;
 
+
+/***/ }),
+/* 92 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(93)
+
+/***/ }),
+/* 93 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/**
+ * react Renderer
+ *
+ * extend mdast
+{
+    "type": "heading",
+    "depth": 1 <= number <= 6,
+    "tagName": "a",
+    "properties": {
+        "href": "http://alpha.com",
+        "id": "bravo",
+        "className": ["bravo"],
+        "download": true
+    },
+    "children": []
+}
+ */
+
+var extend = __webpack_require__(2);
+
+function props(node, defaultProps) {
+    var dataProps = extend({}, node.properties);
+    return extend({}, dataProps, defaultProps);
+}
+
+module.exports = {
+
+    root: function(h, node, children) {
+        return h(node.tagName||'div', props(node), children);
+    },
+
+    blockquote: function(h, node, children) {
+        return h('blockquote', props(node), children);
+    },
+
+    heading: function(h, node, children) {
+        return h('h'+node.depth, props(node), children);
+    },
+
+    thematicBreak : function(h, node) {
+        return h('hr', props(node));
+    },
+
+    list : function(h, node, children) {
+        return h(node.ordered?'ol':'ul', props(node), children);
+    },
+
+    listItem : function(h, node, children) {
+        return h('li', props(node), children);
+    },
+
+    checkbox : function(h, node) {
+        return h('input', props(node, {
+            type: 'checkbox',
+            checked: node.checked,
+            readOnly: true
+        }));
+    },
+
+    paragraph : function(h, node, children) {
+        return h(node.tagName||'p', props(node), children);
+    },
+
+    table : function(h, node, children) {
+        return h('table', props(node), h('tbody',{key:0}, children));
+    },
+
+    tableRow : function(h, node, children) {
+        return h('tr', props(node), children);
+    },
+
+    tableCell : function(h, node, children) {
+        return h('td', props(node, {align: node.align}), children);
+    },
+
+    strong : function(h, node, children) {
+        return h('strong', props(node), children);
+    },
+
+    emphasis : function(h, node, children) {
+        return h('em', props(node), children);
+    },
+
+    break : function(h, node) {
+        return h('br', props(node));
+    },
+
+    delete : function(h, node, children) {
+        return h('del', props(node), children);
+    },
+
+    link : function(h, node, children) {
+        return h('a', props(node, {
+            target: '_blank',
+            href: node.url,
+            title: node.title
+        }), children);
+    },
+
+    linkReference : function(h, node, children) {
+        return h('a', props(node, {
+            href: node.url,
+            title: node.title
+        }), children);
+    },
+
+    definition : function(h, node, children) {
+        // return null;
+        // return h('div', props(node, {
+        //         style: {
+        //             height: 0,
+        //             visibility: 'hidden'
+        //         }
+        //     }),
+        //     h('a', {
+        //         key: 0,
+        //         href: node.url,
+        //         'data-identifier': node.identifier
+        //     }, [
+        //         '['+node.identifier+']: ',
+        //         node.url
+        //     ])
+        // );
+    },
+
+    image : function(h, node) {
+        return h('img', props(node, {
+            src: node.url,
+            alt: node.alt,
+            title: node.title
+        }));
+    },
+
+    text : function(h, node) {
+        return h('span', props(node), node.value);
+    },
+
+    inlineCode : function(h, node, children) {
+        return h('code', props(node), node.value);
+    },
+
+    code : function(h, node, children) {
+        return h('pre', props(node), h('code', {
+            className: node.lang?'language-'+node.lang:null
+        }, node.value));
+    },
+
+    yaml : function(h, node, children) {
+        return h('pre', props(node), h('code', {
+            className: 'language-yaml'
+        }, node.value));
+    },
+
+    math : function(h, node, children) {
+        return h('p', props(node, {
+            dangerouslySetInnerHTML: {
+                __html: node.value
+            }
+        }));
+    },
+
+    inlineMath : function(h, node, children) {
+        return h('span', props(node, {
+            dangerouslySetInnerHTML: {
+                __html: node.value
+            }
+        }));
+    },
+
+    html : function(h, node, children) {
+        return h('div', props(node, {
+            dangerouslySetInnerHTML: {
+                __html: node.value
+            }
+        }));
+    },
+
+    footnote : function(h, node, children) {
+
+    },
+
+    footnoteReference : function(h, node, children) {
+
+    }
+};
+
+
+/***/ }),
+/* 94 */
+/***/ (function(module, exports) {
+
+module.exports = "# 欢迎使用马克飞象\n\n\n----------\n\n----------\n\n\n@(示例笔记本)[马克飞象|帮助|Markdown]\n\n**马克飞象**是一款专为印象笔记（Evernote）打造的Markdown编辑器，通过精心的设计与技术实现，配合印象笔记强大的存储和同步功能，带来前所未有的书写体验。特点概述：\n\n- **功能丰富** ：支持高亮代码块、*LaTeX* 公式、流程图，本地图片以及附件上传，甚至截图粘贴，工作学习好帮手；\n- **得心应手** ：简洁高效的编辑器，提供[桌面客户端][1]以及[离线Chrome App][2]，支持移动端 Web；\n- **深度整合** ：支持选择笔记本和添加标签，支持从印象笔记跳转编辑，轻松管理。\n\n-------------------\n\n[TOC]\n\n## Markdown简介\n\n> Markdown 是一种轻量级标记语言，它允许人们使用易读易写的纯文本格式编写文档，然后转换成格式丰富的HTML页面。    —— [维基百科](https://zh.wikipedia.org/wiki/Markdown)\n\n正如您在阅读的这份文档，它使用简单的符号标识不同的标题，将某些文字标记为**粗体**或者*斜体*，创建一个[链接](http://www.example.com)或一个脚注[^demo]。下面列举了几个高级功能，更多语法请按`Cmd + /`查看帮助。\n\n### 代码块\n``` python\n@requires_authorization\ndef somefunc(param1='', param2=0):\n    '''A docstring'''\n    if param1 > param2: # interesting\n        print 'Greater'\n    return (param2 - param1 + 1) or None\nclass SomeClass:\n    pass\n>>> message = '''interpreter\n... prompt'''\n```\n### LaTeX 公式\n\n可以创建行内公式，例如 $\\Gamma(n) = (n-1)!\\quad\\forall n\\in\\mathbb N$。或者块级公式：\n\n$$\tx = \\dfrac{-b \\pm \\sqrt{b^2 - 4ac}}{2a} $$\n\n$$\n% \\f is defined as f(#1) using the macro\n\\f{x} = \\int_{-\\infty}^\\infty\n    \\hat \\f\\xi\\,e^{2 \\pi i \\xi x}\n    \\,d\\xi\n$$\n\n\n### 表格\n| Item      |    Value | Qty  |\n| :-------- | --------:| :--: |\n| Computer  | 1600 USD |  5   |\n| Phone     |   12 USD |  12  |\n| Pipe      |    1 USD | 234  |\n\n### 流程图\n```flow\nst=>start: Start\ne=>end\nop=>operation: My Operation\ncond=>condition: Yes or No?\n\nst->op->cond\ncond(yes)->e\ncond(no)->op\n```\n\n以及时序图:\n\n```sequence\nAlice->Bob: Hello Bob, how are you?\nNote right of Bob: Bob thinks\nBob-->Alice: I am good thanks!\n```\n\n> **提示：**想了解更多，请查看**流程图**[语法][3]以及**时序图**[语法][4]。\n\n### 复选框\n\n使用 `- [ ]` 和 `- [x]` 语法可以创建复选框，实现 todo-list 等功能。例如：\n\n- [x] 已完成事项\n- [ ] 待办事项1\n- [ ] 待办事项2\n\n> **注意：**目前支持尚不完全，在印象笔记中勾选复选框是无效、不能同步的，所以必须在**马克飞象**中修改 Markdown 原文才可生效。下个版本将会全面支持。\n\n\n## 印象笔记相关\n\n### 笔记本和标签\n**马克飞象**增加了`@(笔记本)[标签A|标签B]`语法, 以选择笔记本和添加标签。 **绑定账号后**， 输入`(`自动会出现笔记本列表，请从中选择。\n\n### 笔记标题\n**马克飞象**会自动使用文档内出现的第一个标题作为笔记标题。例如本文，就是第一行的 `欢迎使用马克飞象`。\n\n### 快捷编辑\n保存在印象笔记中的笔记，右上角会有一个红色的编辑按钮，点击后会回到**马克飞象**中打开并编辑该笔记。\n>**注意：**目前用户在印象笔记中单方面做的任何修改，马克飞象是无法自动感知和更新的。所以请务必回到马克飞象编辑。\n\n### 数据同步\n**马克飞象**通过**将Markdown原文以隐藏内容保存在笔记中**的精妙设计，实现了对Markdown的存储和再次编辑。既解决了其他产品只是单向导出HTML的单薄，又规避了服务端存储Markdown带来的隐私安全问题。这样，服务端仅作为对印象笔记 API调用和数据转换之用。\n\n >**隐私声明：用户所有的笔记数据，均保存在印象笔记中。马克飞象不存储用户的任何笔记数据。**\n\n### 离线存储\n**马克飞象**使用浏览器离线存储将内容实时保存在本地，不必担心网络断掉或浏览器崩溃。为了节省空间和避免冲突，已同步至印象笔记并且不再修改的笔记将删除部分本地缓存，不过依然可以随时通过`文档管理`打开。\n\n> **注意：**虽然浏览器存储大部分时候都比较可靠，但印象笔记作为专业云存储，更值得信赖。以防万一，**请务必经常及时同步到印象笔记**。\n\n## 编辑器相关\n### 设置\n右侧系统菜单（快捷键`Cmd + M`）的`设置`中，提供了界面字体、字号、自定义CSS、vim/emacs 键盘模式等高级选项。\n\n### 快捷键\n\n帮助    `Cmd + /`\n同步文档    `Cmd + S`\n创建文档    `Cmd + Opt + N`\n最大化编辑器    `Cmd + Enter`\n预览文档 `Cmd + Opt + Enter`\n文档管理    `Cmd + O`\n系统菜单    `Cmd + M`\n\n加粗    `Cmd + B`\n插入图片    `Cmd + G`\n插入链接    `Cmd + L`\n提升标题    `Cmd + H`\n\n## 关于收费\n\n**马克飞象**为新用户提供 10 天的试用期，试用期过后需要[续费](maxiang.info/vip.html)才能继续使用。未购买或者未及时续费，将不能同步新的笔记。之前保存过的笔记依然可以编辑。\n\n\n## 反馈与建议\n- 微博：[@马克飞象](http://weibo.com/u/2788354117)，[@GGock](http://weibo.com/ggock \"开发者个人账号\")\n- 邮箱：<hustgock@gmail.com>\n\n---------\n感谢阅读这份帮助文档。请点击右上角，绑定印象笔记账号，开启全新的记录与分享体验吧。\n\n\n\n\n[^demo]: 这是一个示例脚注。请查阅 [MultiMarkdown 文档](https://github.com/fletcher/MultiMarkdown/wiki/MultiMarkdown-Syntax-Guide#footnotes) 关于脚注的说明。 **限制：** 印象笔记的笔记内容使用 [ENML][5] 格式，基于 HTML，但是不支持某些标签和属性，例如id，这就导致`脚注`和`TOC`无法正常点击。\n\n\n  [1]: http://maxiang.info/client_zh\n  [2]: https://chrome.google.com/webstore/detail/kidnkfckhbdkfgbicccmdggmpgogehop\n  [3]: http://adrai.github.io/flowchart.js/\n  [4]: http://bramp.github.io/js-sequence-diagrams/\n  [5]: https://dev.yinxiang.com/doc/articles/enml.php\n\n"
 
 /***/ })
 /******/ ]);

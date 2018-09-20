@@ -1,10 +1,10 @@
 {
   "name": "remark-render",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Compile markdown to Virtual DOM with remark.",
   "scripts": {
     "dist": "webpack -c webpack.config.js",
-    "dev": "webpack -w --config ./examples/webpack.config.js --example morphdom",
+    "dev": "webpack -w --config ./examples/webpack.config.js --example react",
     "test": "mocha test/**/*.js"
   },
   "repository": {
@@ -40,5 +40,9 @@
     "webpack": "^4.17.2",
     "webpack-cli": "^3.1.0",
     "webpack-merge": "^4.1.4"
+  },
+  "dependencies": {
+    "remark-react-renderer": "^0.0.1",
+    "extend": "^3.0.2"
   }
 }

@@ -1,34 +1,12 @@
-const extend = require('extend');
+var extend = require('extend');
 
 function extendProps(node, props) {
-    if(!node.props){
-        node.props = {};
-    }
-    extend(node.props, props);
-}
-
-function getRenderer(mode) {
-    switch (mode){
-        case 'react' :
-            return require('./renderers/react-renderer');
-        case 'vue' :
-            return require('./renderers/vue-renderer');
-        case 'hyperscript' :
-            return require('./renderers/hyperscript-renderer');
-        case 'preact' :
-            return require('./renderers/preact-renderer');
-        case 'snabbdom' :
-            return require('./renderers/snabbdom-renderer');
-        case 'virtual-dom' :
-            return require('./renderers/virtual-dom-renderer');
-    }
-    return null;
+    if(!node.properties){ node.properties = {}; }
+    extend(node.properties, props);
 }
 
 function Parser(options) {
-    var Renderer = options.Renderer?options.Renderer:getRenderer(options.mode);
     this.options = options;
-    this.renderer = new Renderer(options);
     this.h = options.h;
 }
 
@@ -38,7 +16,8 @@ Parser.prototype.parseNodes = function(nodes) {
     for(var i=0;i<nodes.length;i++){
         var node = nodes[i];
         extendProps(node, {key: i});
-        vnodes.push(this.parseNode(node));
+        var tempNode = this.parseNode(node);
+        tempNode && vnodes.push(tempNode);
     }
     return vnodes;
 };
@@ -47,16 +26,16 @@ Parser.prototype.parseNode = function(node) {
     if(!node) return null;
     var children = this.parseNodes(node.children);
     var h = this.h;
-    return this.renderer[node.type].apply(this.renderer, [h, node, children]);
+    return this.renderer[node.type].apply(null, [h, node, children]);
 };
 
-Parser.prototype.parse = function(root, _h) {
+Parser.prototype.parse = function(root) {
     try {
-        _h && (this.h = _h);
         extendProps(root, {
             key: 0,
             className: this.options.rootClassName || 'markdown-body'
         });
+        this.options.rootTagName && (root.tagName = this.options.rootTagName);
         return this.parseNode(root);
     }
     catch (e) {

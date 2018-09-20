@@ -60,12 +60,13 @@ contain multiple modes and optionally settings as well.
 var unified = require('unified')
 var parse = require('remark-parse')
 var render = require('remark-render')
-  
+var renderer = require('remark-hyperscript-renderer');
+
 var h = require('hyperscript');
 unified()
   .use(parse)
   .use(render, {
-     mode: 'hyperscript',
+     renderer: renderer,
      h: h,
      rootClassName: 'markdown-body'
   })
@@ -85,14 +86,14 @@ unified()
 var unified = require('unified')
 var parse = require('remark-parse')
 var render = require('remark-render')
-  
+var renderer = require('remark-react-renderer');
 var React = require('react');
 var h = React.createElement;
 
 var processor = unified()
     .use(parse)
     .use(render, {
-        mode: 'react',
+        renderer: renderer,
         h: h
     });
  
@@ -111,13 +112,13 @@ ReactDOM.render(
 var unified = require('unified')
 var parse = require('remark-parse')
 var render = require('remark-render')
-  
+var renderer = require('remark-vue-renderer');
 var Vue = require('vue');
  
 var processor = unified()
     .use(parse)
     .use(render, {
-        mode: 'vue'
+        renderer: renderer
     });
  
 const app = new Vue({
@@ -136,13 +137,12 @@ const app = new Vue({
 var unified = require('unified')
 var parse = require('remark-parse')
 var render = require('remark-render')
-  
+var renderer = require('remark-hyperscript-renderer'); 
 var h = require('hyperscript');
-var Renderer = require('remark-render/src/renderers/hyperscript-renderer');
 
 renderer.text = function(h, node, children) {
     return h('span', {
-        key: node.props.key,
+        key: node.properties.key,
         style: {'font-size': '60px'}
     }, node.value);
 };
@@ -151,7 +151,7 @@ unified()
   .use(parse)
   .use(render, {
      h: h,
-     Renderer: Renderer
+     renderer: renderer
   })
   .process('# h1  \n## h2', function(err, file) {
     if (err) throw err
@@ -189,31 +189,27 @@ function createElements(children) {
     return doms;
 }
 
-
-function Renderer(options) {
-    this.options = options || {};
+var renderer = {
+    root: function(h, node, children) {
+        return h('div', node.props, children);
+    },
+    text: function(h, node, children) {
+        return document.createTextNode(node.value);
+    },
+    blockquote: function(h, node, children) {
+        return h('blockquote', node.props, children);
+    },
+    heading: function(h, node, children) {
+        return h('h'+node.depth, node.props, children);
+    }
+    ...
 }
 
-Renderer.prototype.root = function(h, node, children) {
-    return h('div', node.props, children);
-};
-
-Renderer.prototype.text = function(h, node, children) {
-    return document.createTextNode(node.value);
-};
-
-Renderer.prototype.blockquote = function(h, node, children) {
-    return h('blockquote', node.props, children);
-};
-
-Renderer.prototype.heading = function(h, node, children) {
-    return h('h'+node.depth, node.props, children);
-};
 
 var processor = unified()
     .use(parse, {})
     .use(render, {
-        Renderer: Renderer,
+        renderer: renderer,
         h: createElement
     });
 

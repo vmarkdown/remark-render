@@ -1,15 +1,16 @@
 const unified = require('unified');
 const parse = require('remark-parse');
 const render = require('../../src/index');
-
+const renderer = require('remark-react-renderer');
 const h = React.createElement;
 
 let processor = unified()
     .use(parse, {})
     .use(render, {
-        mode: 'react',
+        renderer: renderer,
         h: h,
-        rootClassName: 'markdown-body'
+        rootClassName: 'markdown-body',
+        rootTagName: 'main'
     });
 
 const file = processor.processSync(require('../md/maxiang.md'));

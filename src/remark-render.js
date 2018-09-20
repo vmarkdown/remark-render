@@ -2,17 +2,16 @@ var Parser = require('./parser');
 
 module.exports = function plugin(options) {
 
-    var mode = this.data('mode') || options.mode;
-    options.mode = mode;
-
-    var parser = new Parser(options);
-
     var self = this;
 
-    self.data('renderer', parser.renderer);
+    var renderer = this.data('renderer') || options.renderer;
+
+    var parser = new Parser(options);
+    parser.renderer = renderer;
 
     this.Compiler = function compiler(node) {
         var h = self.data('h');
-        return parser.parse(node, h);
+        h && (parser.h = h);
+        return parser.parse(node);
     }
 };
