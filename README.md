@@ -20,16 +20,30 @@ npm install remark-render
 
 Say we have the following file, `example.js`:
 
+
 ```
+var renderer = require('remark-preact-renderer');
+
 unified().use(render, {
-  h: h, // create element function
-  rootClassName: 'markdown-body' // vdom root element class name,
-  rootTagName: 'main' // vdom root element tag type. default is div
+  renderer: renderer,
+  h: h,
+  rootClassName: 'markdown-body',
+  rootTagName: 'main'
 })
 
 => <main class="markdown-body"></main>
 
 ```
+
+#### options
+|  | remark |
+| :------| ------: |
+| renderer |  framework renderer |
+| h | create element function |
+| rootClassName | vdom root element class name |
+| rootTagName | vdom root element tag type. default is div |
+
+
 
 ```javascript 
 var unified = require('unified')
@@ -82,6 +96,10 @@ contain multiple modes and optionally settings as well.
 
 ###### HyperScript
 
+```bash
+npm install remark-render remark-hyperscript-renderer
+```
+
 ```javascript 
 var unified = require('unified')
 var parse = require('remark-parse')
@@ -108,6 +126,10 @@ unified()
 
 ###### React
 
+```bash
+npm install remark-react-renderer
+```
+
 ```javascript 
 var unified = require('unified')
 var parse = require('remark-parse')
@@ -133,6 +155,10 @@ ReactDOM.render(
 ```
 
 ###### Vue
+
+```bash
+npm install remark-vue-renderer
+```
 
 ```javascript 
 var unified = require('unified')
