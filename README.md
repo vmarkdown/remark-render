@@ -20,6 +20,16 @@ npm install remark-render
 
 Say we have the following file, `example.js`:
 
+```
+unified().use(render, {
+  h: h, // create element function
+  rootClassName: 'markdown-body' // vdom root element class name,
+  rootTagName: 'main' // vdom root element tag type. default is div
+})
+
+=> <main class="markdown-body"></main>
+
+```
 
 ```javascript 
 var unified = require('unified')
@@ -30,9 +40,9 @@ var h = require('hyperscript');
 unified()
   .use(parse)
   .use(render, {
-     mode: 'hyperscript', // supoort hyperscript react vue preact snabbdom virtual-dom
      h: h, // create element function
-     rootClassName: 'markdown-body' // vdom root element class name
+     rootClassName: 'markdown-body' // vdom root element class name,
+     rootTagName: 'main'
   })
   .process('# h1  \n## h2', function(err, file) {
     if (err) throw err
