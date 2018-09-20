@@ -58,7 +58,7 @@ unified()
 
 
 
-## Example
+## Examples
 
 Presets provide a potentially sharable way to render.  They can
 contain multiple modes and optionally settings as well.
