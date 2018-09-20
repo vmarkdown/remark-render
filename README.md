@@ -42,12 +42,28 @@ unified()
 ```
 
 
-## Preset
+
+## Renderers
+
+|  | renderers |
+| :------| ------: |
+| React | [remark-preact-renderer](https://github.com/vmarkdown/remark-preact-renderer) |
+| Preact | [remark-react-renderer](https://github.com/vmarkdown/remark-react-renderer) |
+| Vue | remark-vue-renderer |
+| HyperScript | remark-hyperscript-renderer |
+| snabbdom | remark-snabbdom-renderer |
+| virtual-dom | remark-virtual-dom-renderer |
+| morphdom | morphdom |
+
+
+
+
+## Example
 
 Presets provide a potentially sharable way to render.  They can
 contain multiple modes and optionally settings as well.
 
-#### Example
+##### html
 
 
 ```html
