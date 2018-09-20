@@ -20,13 +20,13 @@ const config = {
 module.exports = [
     merge(config, {
         entry: {
-            'remark-render': './src/remark-render.js'
+            'remark-render': './src/index'
         }
     }),
     merge(config, {
         mode: 'production',
         entry: {
-            'remark-render.min': './src/remark-render.js'
+            'remark-render.min': './src/index'
         }
     })
 ];
