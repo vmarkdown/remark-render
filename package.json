@@ -35,12 +35,13 @@
     "mocha": "^5.2.0",
     "react": "^16.5.1",
     "remark-parse": "^5.0.0",
+    "remark-preact-renderer": "^0.0.1",
+    "remark-react-renderer": "^0.0.1",
     "text-loader": "^0.0.1",
     "unified": "^7.0.0",
     "webpack": "^4.17.2",
     "webpack-cli": "^3.1.0",
-    "webpack-merge": "^4.1.4",
-    "remark-react-renderer": "^0.0.1"
+    "webpack-merge": "^4.1.4"
   },
   "dependencies": {
     "extend": "^3.0.2"
