@@ -306,10 +306,10 @@ The rendered output looks like this:
         var htmlRenderTime = document.getElementById('html-render-time');
 
         function render() {
-            var startTime = new Date().getTime();
             var md = template.replace('%%datatime%%', new Date).replace('will not be', 'will be');
             var text = marked(md);
             var html = compile_expressions(text);
+            var startTime = new Date().getTime();
             document.getElementById('html-preview').innerHTML = html;
             var endTime = new Date().getTime();
             htmlRenderTime.innerText = endTime-startTime;

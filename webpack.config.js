@@ -17,16 +17,18 @@ const config = {
     ]
 };
 
+const index = path.resolve(__dirname, 'index');
+
 module.exports = [
     merge(config, {
         entry: {
-            'remark-render': './src/index'
+            'remark-render': index
         }
     }),
     merge(config, {
         mode: 'production',
         entry: {
-            'remark-render.min': './src/index'
+            'remark-render.min': index
         }
     })
 ];
