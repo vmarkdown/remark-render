@@ -19,3 +19,5 @@ preact.render(
     vdom,
     document.getElementById('preview')
 );
+
+console.log(processor.parse(require('../md/maxiang.md')))
