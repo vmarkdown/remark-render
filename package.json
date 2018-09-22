@@ -1,6 +1,6 @@
 {
   "name": "remark-render",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Compile markdown to Virtual DOM with remark.",
   "scripts": {
     "dist": "webpack -c webpack.config.js",
@@ -18,7 +18,7 @@
     "vue",
     "react"
   ],
-  "main": "src/index.js",
+  "main": "index.js",
   "files": [
     "src",
     "dist/*.js"
@@ -44,6 +44,7 @@
     "webpack-merge": "^4.1.4"
   },
   "dependencies": {
-    "extend": "^3.0.2"
+    "extend": "^3.0.2",
+    "unherit": "^1.1.1"
   }
 }

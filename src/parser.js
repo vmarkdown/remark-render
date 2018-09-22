@@ -10,11 +10,12 @@ function Parser(options) {
     this.h = options.h;
 }
 
-Parser.prototype.parseNodes = function(nodes) {
+Parser.prototype.parseNodes = function(nodes, parent) {
     if(!nodes || nodes.length === 0) return [];
     var vnodes = [];
     for(var i=0;i<nodes.length;i++){
         var node = nodes[i];
+        node.parent = parent;
         extendProps(node, {key: i});
         var tempNode = this.parseNode(node);
         tempNode && vnodes.push(tempNode);
@@ -22,11 +23,11 @@ Parser.prototype.parseNodes = function(nodes) {
     return vnodes;
 };
 
-Parser.prototype.parseNode = function(node) {
+Parser.prototype.parseNode = function(node, parent) {
     if(!node) return null;
-    var children = this.parseNodes(node.children);
+    var children = this.parseNodes(node.children, node);
     var h = this.h;
-    return this.renderer[node.type].apply(null, [h, node, children]);
+    return this.options.renderer[node.type].apply(null, [h, node, children, parent]);
 };
 
 Parser.prototype.parse = function(root) {

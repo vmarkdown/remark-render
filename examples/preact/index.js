@@ -1,13 +1,14 @@
 const unified = require('unified');
 const parse = require('remark-parse');
-const render = require('../../src/index');
+const render = require('../../index');
 const renderer = require('remark-preact-renderer');
+
 const processor = unified()
     .use(parse, {})
     .use(render, {
         renderer: renderer,
         h: preact.h,
-        rootClassName: 'markdown',
+        rootClassName: 'markdown-body',
         rootTagName: 'main'
     });
 
