@@ -1,17 +1,3 @@
-var extend = require('extend');
-
-function createKey(node, index) {
-    if(node.value){
-        return node.value;
-    }
-    return index;
-}
-
-function extendProps(node, props) {
-    if(!node.properties){ node.properties = {}; }
-    extend(node.properties, props);
-}
-
 function Parser(options) {
     this.options = options;
     this.h = options.h;
@@ -23,7 +9,6 @@ Parser.prototype.parseNodes = function(nodes, parent) {
     for(var i=0;i<nodes.length;i++){
         var node = nodes[i];
         node.parent = parent;
-        extendProps(node, {key: createKey(node, i)});
         var tempNode = this.parseNode(node);
         tempNode && vnodes.push(tempNode);
     }
@@ -39,10 +24,10 @@ Parser.prototype.parseNode = function(node, parent) {
 
 Parser.prototype.parse = function(root) {
     try {
-        extendProps(root, {
+        root.properties = {
             key: 0,
             className: this.options.rootClassName || 'markdown-body'
-        });
+        };
         this.options.rootTagName && (root.tagName = this.options.rootTagName);
         return this.parseNode(root);
     }

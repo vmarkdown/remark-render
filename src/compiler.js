@@ -1,9 +1,13 @@
 'use strict';
 
 var xtend = require('xtend');
+var createKey = require('./create-key');
 var Parser = require('./parser');
 
 function Compiler(root, file) {
+
+    createKey(root);
+
     this.root = root;
     this.file = file;
 

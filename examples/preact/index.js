@@ -12,12 +12,39 @@ const processor = unified()
         rootTagName: 'main'
     });
 
-const file = processor.processSync(require('../md/maxiang.md'));
-const vdom = file.contents;
+// const file = processor.processSync(require('../md/maxiang.md'));
+// const vdom = file.contents;
+//
+// preact.render(
+//     vdom,
+//     document.getElementById('preview')
+// );
 
-preact.render(
-    vdom,
-    document.getElementById('preview')
-);
+(function () {
+    // var p = processor.parse(require('../md/maxiang.md'));
+    // console.log(JSON.stringify(p));
+    // console.log(processor.runSync(p));
 
-console.log(processor.parse(require('../md/maxiang.md')))
+
+    let md = require('../md/maxiang.md');
+
+
+    const file = processor.processSync(md);
+    const vdom = file.contents;
+    console.log(vdom);
+
+})();
+
+
+(function () {
+    // var p = processor.parse(require('../md/maxiang.md'));
+    // console.log(p);
+    // console.log(processor.runSync(p));
+
+    let md = require('../md/maxiang.md');
+    md = '###### h6  '+'\n'+md;
+    const file = processor.processSync(md);
+    const vdom = file.contents;
+    console.log(vdom);
+
+})();

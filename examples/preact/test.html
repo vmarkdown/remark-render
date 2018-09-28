@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>preact</title>
+
+
+
+</head>
+<body>
+
+<div id="preview"></div>
+
+
+<script>
+    function hash(str) {
+        var hash = 5381,
+            i    = str.length;
+        while(i) {
+            hash = (hash * 33) ^ str.charCodeAt(--i);
+        }
+        return hash >>> 0;
+    }
+</script>
+
+
+<script>
+
+
+    console.log(hash('abdfwqretgwertwert'));
+    console.log(hash('abdfwqretgwertwert2'));
+    console.log(hash('abdfwqretgwertwert3'));
+
+</script>
+</body>
+</html>
