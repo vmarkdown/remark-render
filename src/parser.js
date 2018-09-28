@@ -1,5 +1,12 @@
 var extend = require('extend');
 
+function createKey(node, index) {
+    if(node.value){
+        return node.value;
+    }
+    return index;
+}
+
 function extendProps(node, props) {
     if(!node.properties){ node.properties = {}; }
     extend(node.properties, props);
@@ -16,7 +23,7 @@ Parser.prototype.parseNodes = function(nodes, parent) {
     for(var i=0;i<nodes.length;i++){
         var node = nodes[i];
         node.parent = parent;
-        extendProps(node, {key: i});
+        extendProps(node, {key: createKey(node, i)});
         var tempNode = this.parseNode(node);
         tempNode && vnodes.push(tempNode);
     }
