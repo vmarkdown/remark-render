@@ -35,7 +35,7 @@
     "mocha": "^5.2.0",
     "react": "^16.5.1",
     "remark-parse": "^5.0.0",
-    "remark-preact-renderer": "^0.0.1",
+    "remark-preact-renderer": "^0.0.6",
     "remark-react-renderer": "^0.0.1",
     "text-loader": "^0.0.1",
     "unified": "^7.0.0",
