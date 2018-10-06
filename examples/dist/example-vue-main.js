@@ -100,17 +100,25 @@ return /******/ (function(modules) { // webpackBootstrap
 
 const unified = __webpack_require__(1);
 const parse = __webpack_require__(16);
-const render = __webpack_require__(88);
+const render = __webpack_require__(89);
+const renderer = __webpack_require__(95);
+
+let md = __webpack_require__(88);
+
+// setTimeout(function () {
+//     md = md.replace('Markdown 语法说明','Markdown 语法说明=====');
+//     app.$forceUpdate();
+// }, 3000);
 
 const processor = unified()
     .use(parse, {})
     .use(render, {
-        mode: 'vue'
-    });
+        renderer: renderer
+    }).freeze();
 
 const app = new Vue({
     render(h) {
-        const file = processor.data('h', h).processSync(__webpack_require__(97));
+        const file = processor().data('h', h).processSync(md);
         return file.contents;
     }
 });
@@ -8044,1111 +8052,471 @@ function text(eat, value, silent) {
 
 /***/ }),
 /* 88 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-var plugin = __webpack_require__(89);
-
-module.exports = plugin;
-
-
+module.exports = "**NOTE:** This is Simplelified  Chinese Edition Document of Markdown Syntax. If you are seeking for English Edition Document. Please refer to [Markdown: Syntax][eng-doc].\n\n[eng-doc]:http://daringfireball.net/projects/markdown/syntax\n\n**声明：** 这份文档派生(fork)于[繁体中文版](http://markdown.tw/)，在此基础上进行了繁体转简体工作，并进行了适当的润色。此文档用 Markdown 语法编写，你可以到这里[查看它的源文件][src1]。「繁体中文版的原始文件可以[查看这里][src] 。」--By @[riku][t]\n\n**注：** 本项目托管于 [GitHub][]上，请通过\"派生\"和\"合并请求\"来帮忙改进本项目。\n\n  [src1]: http://gitcafe.com/riku/Markdown-Syntax-CN/blob/master/syntax.md\n  [src]: https://github.com/othree/markdown-syntax-zhtw/blob/master/syntax.md\n  [t]: http://twitter.com/riku\n  [g]: http://gitcafe.com/riku/Markdown-Syntax-CN\n  [Github]: https://github.com/riku/Markdown-Syntax-CN\n  [GitCafe]: http://gitcafe.com/riku/Markdown-Syntax-CN/\n\nMarkdown 语法说明 (简体中文版) / ([点击查看快速入门](./basic.html))\n================\n\n*   [概述](#overview)\n    *   [宗旨](#philosophy)\n    *   [兼容 HTML](#html)\n    *   [特殊字符自动转换](#autoescape)\n*   [区块元素](#block)\n    *   [段落和换行](#p)\n    *   [标题](#header)\n    *   [区块引用](#blockquote)\n    *   [列表](#list)\n    *   [代码区块](#precode)\n    *   [分隔线](#hr)\n*   [区段元素](#span)\n    *   [链接](#link)\n    *   [强调](#em)\n    *   [代码](#code)\n    *   [图片](#img)\n*   [其它](#misc)\n    *   [反斜杠](#backslash)\n    *   [自动链接](#autolink)\n*   [感谢](#acknowledgement)\n*\t[Markdown 免费编辑器](#editor)\n\n* * *\n\n<h2 id=\"overview\">概述</h2>\n\n<h3 id=\"philosophy\">宗旨</h3>\n\nMarkdown 的目标是实现「易读易写」。\n\n可读性，无论如何，都是最重要的。一份使用 Markdown 格式撰写的文件应该可以直接以纯文本发布，并且看起来不会像是由许多标签或是格式指令所构成。Markdown 语法受到一些既有 text-to-HTML 格式的影响，包括 [Setext] [1]、[atx] [2]、[Textile] [3]、[reStructuredText] [4]、[Grutatext] [5] 和 [EtText] [6]，而最大灵感来源其实是纯文本电子邮件的格式。\n\n  [1]: http://docutils.sourceforge.net/mirror/setext.html\n  [2]: http://www.aaronsw.com/2002/atx/\n  [3]: http://textism.com/tools/textile/\n  [4]: http://docutils.sourceforge.net/rst.html\n  [5]: http://www.triptico.com/software/grutatxt.html\n  [6]: http://ettext.taint.org/doc/\n\n总之， Markdown 的语法全由一些符号所组成，这些符号经过精挑细选，其作用一目了然。比如：在文字两旁加上星号，看起来就像\\*强调\\*。Markdown 的列表看起来，嗯，就是列表。Markdown 的区块引用看起来就真的像是引用一段文字，就像你曾在电子邮件中见过的那样。\n\n<h3 id=\"html\">兼容 HTML</h3>\n\nMarkdown 语法的目标是：成为一种适用于网络的*书写*语言。\n\nMarkdown 不是想要取代 HTML，甚至也没有要和它相近，它的语法种类很少，只对应 HTML 标记的一小部分。Markdown 的构想*不是*要使得 HTML 文档更容易书写。在我看来， HTML 已经很容易写了。Markdown 的理念是，能让文档更容易读、写和随意改。HTML 是一种*发布*的格式，Markdown 是一种*书写*的格式。就这样，Markdown 的格式语法只涵盖纯文本可以涵盖的范围。\n\n不在 Markdown 涵盖范围之内的标签，都可以直接在文档里面用 HTML 撰写。不需要额外标注这是 HTML 或是 Markdown；只要直接加标签就可以了。\n\n要制约的只有一些 HTML 区块元素――比如 `<div>`、`<table>`、`<pre>`、`<p>` 等标签，必须在前后加上空行与其它内容区隔开，还要求它们的开始标签与结尾标签不能用制表符或空格来缩进。Markdown 的生成器有足够智能，不会在 HTML 区块标签外加上不必要的 `<p>` 标签。\n\n例子如下，在 Markdown 文件里加上一段 HTML 表格：\n\n    这是一个普通段落。\n\n    <table>\n        <tr>\n            <td>Foo</td>\n        </tr>\n    </table>\n\n    这是另一个普通段落。\n\n请注意，在 HTML 区块标签间的 Markdown 格式语法将不会被处理。比如，你在 HTML 区块内使用 Markdown 样式的`*强调*`会没有效果。\n\nHTML 的区段（行内）标签如 `<span>`、`<cite>`、`<del>` 可以在 Markdown 的段落、列表或是标题里随意使用。依照个人习惯，甚至可以不用 Markdown 格式，而直接采用 HTML 标签来格式化。举例说明：如果比较喜欢 HTML 的 `<a>` 或 `<img>` 标签，可以直接使用这些标签，而不用 Markdown 提供的链接或是图像标签语法。\n\n和处在 HTML 区块标签间不同，Markdown 语法在 HTML 区段标签间是有效的。\n\n<h3 id=\"autoescape\">特殊字符自动转换</h3>\n\n在 HTML 文件中，有两个字符需要特殊处理： `<` 和 `&` 。 `<` 符号用于起始标签，`&` 符号则用于标记 HTML 实体，如果你只是想要显示这些字符的原型，你必须要使用实体的形式，像是 `&lt;` 和 `&amp;`。\n\n`&` 字符尤其让网络文档编写者受折磨，如果你要打「`AT&T`」 ，你必须要写成「`AT&amp;T`」。而网址中的 `&` 字符也要转换。比如你要链接到：\n\n    http://images.google.com/images?num=30&q=larry+bird\n\n你必须要把网址转换写为：\n\n    http://images.google.com/images?num=30&amp;q=larry+bird\n\n才能放到链接标签的 `href` 属性里。不用说也知道这很容易忽略，这也可能是 HTML 标准检验所检查到的错误中，数量最多的。\n\nMarkdown 让你可以自然地书写字符，需要转换的由它来处理好了。如果你使用的 `&` 字符是 HTML 字符实体的一部分，它会保留原状，否则它会被转换成 `&amp`;。\n\n所以你如果要在文档中插入一个版权符号 `©`，你可以这样写：\n\n    &copy;\n\nMarkdown 会保留它不动。而若你写：\n\n    AT&T\n\nMarkdown 就会将它转为：\n\n    AT&amp;T\n\n类似的状况也会发生在 `<` 符号上，因为 Markdown 允许 [兼容 HTML](#html) ，如果你是把 `<` 符号作为 HTML 标签的定界符使用，那 Markdown 也不会对它做任何转换，但是如果你写：\n\n    4 < 5\n\nMarkdown 将会把它转换为：\n\n    4 &lt; 5\n\n不过需要注意的是，code 范围内，不论是行内还是区块， `<` 和 `&` 两个符号都*一定*会被转换成 HTML 实体，这项特性让你可以很容易地用 Markdown 写 HTML code （和 HTML 相对而言， HTML 语法中，你要把所有的 `<` 和 `&` 都转换为 HTML 实体，才能在 HTML 文件里面写出 HTML code。）\n\n* * *\n\n<h2 id=\"block\">区块元素</h2>\n\n\n<h3 id=\"p\">段落和换行</h3>\n\n一个 Markdown 段落是由一个或多个连续的文本行组成，它的前后要有一个以上的空行（空行的定义是显示上看起来像是空的，便会被视为空行。比方说，若某一行只包含空格和制表符，则该行也会被视为空行）。普通段落不该用空格或制表符来缩进。\n\n「由一个或多个连续的文本行组成」这句话其实暗示了 Markdown 允许段落内的强迫换行（插入换行符），这个特性和其他大部分的 text-to-HTML 格式不一样（包括 Movable Type 的「Convert Line Breaks」选项），其它的格式会把每个换行符都转成 `<br />` 标签。\n\n如果你*确实*想要依赖 Markdown 来插入 `<br />` 标签的话，在插入处先按入两个以上的空格然后回车。\n\n的确，需要多费点事（多加空格）来产生 `<br />` ，但是简单地「每个换行都转换为 `<br />`」的方法在 Markdown 中并不适合， Markdown 中 email 式的 [区块引用][bq] 和多段落的 [列表][l] 在使用换行来排版的时候，不但更好用，还更方便阅读。\n\n  [bq]: #blockquote\n  [l]:  #list\n\n<h3 id=\"header\">标题</h3>\n\nMarkdown 支持两种标题的语法，类 [Setext] [1] 和类 [atx] [2] 形式。\n\n类 Setext 形式是用底线的形式，利用 `=` （最高阶标题）和 `-` （第二阶标题），例如：\n\n    This is an H1\n    =============\n\n    This is an H2\n    -------------\n\n任何数量的 `=` 和 `-` 都可以有效果。\n\n类 Atx 形式则是在行首插入 1 到 6 个 `#` ，对应到标题 1 到 6 阶，例如：\n\n    # 这是 H1\n\n    ## 这是 H2\n\n    ###### 这是 H6\n\n你可以选择性地「闭合」类 atx 样式的标题，这纯粹只是美观用的，若是觉得这样看起来比较舒适，你就可以在行尾加上 `#`，而行尾的 `#` 数量也不用和开头一样（行首的井字符数量决定标题的阶数）：\n\n    # 这是 H1 #\n\n    ## 这是 H2 ##\n\n    ### 这是 H3 ######\n\n\n<h3 id=\"blockquote\">区块引用 Blockquotes</h3>\n\nMarkdown 标记区块引用是使用类似 email 中用 `>` 的引用方式。如果你还熟悉在 email 信件中的引言部分，你就知道怎么在 Markdown 文件中建立一个区块引用，那会看起来像是你自己先断好行，然后在每行的最前面加上 `>` ：\n\n    > This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet,\n    > consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.\n    > Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.\n    > \n    > Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse\n    > id sem consectetuer libero luctus adipiscing.\n\nMarkdown 也允许你偷懒只在整个段落的第一行最前面加上 `>` ：\n\n    > This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet,\n    consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.\n    Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.\n\n    > Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse\n    id sem consectetuer libero luctus adipiscing.\n\n区块引用可以嵌套（例如：引用内的引用），只要根据层次加上不同数量的 `>` ：\n\n    > This is the first level of quoting.\n    >\n    > > This is nested blockquote.\n    >\n    > Back to the first level.\n\n引用的区块内也可以使用其他的 Markdown 语法，包括标题、列表、代码区块等：\n\n\t> ## 这是一个标题。\n\t> \n\t> 1.   这是第一行列表项。\n\t> 2.   这是第二行列表项。\n\t> \n\t> 给出一些例子代码：\n\t> \n\t>     return shell_exec(\"echo $input | $markdown_script\");\n\n任何像样的文本编辑器都能轻松地建立 email 型的引用。例如在 BBEdit 中，你可以选取文字后然后从选单中选择*增加引用阶层*。\n\n<h3 id=\"list\">列表</h3>\n\nMarkdown 支持有序列表和无序列表。\n\n无序列表使用星号、加号或是减号作为列表标记：\n\n    *   Red\n    *   Green\n    *   Blue\n\n等同于：\n\n    +   Red\n    +   Green\n    +   Blue\n\n也等同于：\n\n    -   Red\n    -   Green\n    -   Blue\n\n有序列表则使用数字接着一个英文句点：\n\n    1.  Bird\n    2.  McHale\n    3.  Parish\n\n很重要的一点是，你在列表标记上使用的数字并不会影响输出的 HTML 结果，上面的列表所产生的 HTML 标记为：\n\n    <ol>\n    <li>Bird</li>\n    <li>McHale</li>\n    <li>Parish</li>\n    </ol>\n\n如果你的列表标记写成：\n\n    1.  Bird\n    1.  McHale\n    1.  Parish\n\n或甚至是：\n\n    3. Bird\n    1. McHale\n    8. Parish\n\n你都会得到完全相同的 HTML 输出。重点在于，你可以让 Markdown 文件的列表数字和输出的结果相同，或是你懒一点，你可以完全不用在意数字的正确性。\n\n如果你使用懒惰的写法，建议第一个项目最好还是从 1. 开始，因为 Markdown 未来可能会支持有序列表的 start 属性。\n\n列表项目标记通常是放在最左边，但是其实也可以缩进，最多 3 个空格，项目标记后面则一定要接着至少一个空格或制表符。\n\n要让列表看起来更漂亮，你可以把内容用固定的缩进整理好：\n\n    *   Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\n        Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi,\n        viverra nec, fringilla in, laoreet vitae, risus.\n    *   Donec sit amet nisl. Aliquam semper ipsum sit amet velit.\n        Suspendisse id sem consectetuer libero luctus adipiscing.\n\n但是如果你懒，那也行：\n\n    *   Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\n    Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi,\n    viverra nec, fringilla in, laoreet vitae, risus.\n    *   Donec sit amet nisl. Aliquam semper ipsum sit amet velit.\n    Suspendisse id sem consectetuer libero luctus adipiscing.\n\n如果列表项目间用空行分开，在输出 HTML 时 Markdown 就会将项目内容用 `<p>` \n标签包起来，举例来说：\n\n    *   Bird\n    *   Magic\n\n会被转换为：\n\n    <ul>\n    <li>Bird</li>\n    <li>Magic</li>\n    </ul>\n\n但是这个：\n\n    *   Bird\n\n    *   Magic\n\n会被转换为：\n\n    <ul>\n    <li><p>Bird</p></li>\n    <li><p>Magic</p></li>\n    </ul>\n\n列表项目可以包含多个段落，每个项目下的段落都必须缩进 4 个空格或是 1 个制表符：\n\n    1.  This is a list item with two paragraphs. Lorem ipsum dolor\n        sit amet, consectetuer adipiscing elit. Aliquam hendrerit\n        mi posuere lectus.\n\n        Vestibulum enim wisi, viverra nec, fringilla in, laoreet\n        vitae, risus. Donec sit amet nisl. Aliquam semper ipsum\n        sit amet velit.\n\n    2.  Suspendisse id sem consectetuer libero luctus adipiscing.\n\n如果你每行都有缩进，看起来会看好很多，当然，再次地，如果你很懒惰，Markdown 也允许：\n\n    *   This is a list item with two paragraphs.\n\n        This is the second paragraph in the list item. You're\n    only required to indent the first line. Lorem ipsum dolor\n    sit amet, consectetuer adipiscing elit.\n\n    *   Another item in the same list.\n\n如果要在列表项目内放进引用，那 `>` 就需要缩进：\n\n    *   A list item with a blockquote:\n\n        > This is a blockquote\n        > inside a list item.\n\n如果要放代码区块的话，该区块就需要缩进*两次*，也就是 8 个空格或是 2 个制表符：\n\n    *   一列表项包含一个列表区块：\n\n            <代码写在这>\n\n\n当然，项目列表很可能会不小心产生，像是下面这样的写法：\n\n    1986. What a great season.\n\n换句话说，也就是在行首出现*数字-句点-空白*，要避免这样的状况，你可以在句点前面加上反斜杠。\n\n    1986\\. What a great season.\n\n<h3 id=\"precode\">代码区块</h3>\n\n和程序相关的写作或是标签语言原始码通常会有已经排版好的代码区块，通常这些区块我们并不希望它以一般段落文件的方式去排版，而是照原来的样子显示，Markdown 会用 `<pre>` 和 `<code>` 标签来把代码区块包起来。\n\n要在 Markdown 中建立代码区块很简单，只要简单地缩进 4 个空格或是 1 个制表符就可以，例如，下面的输入：\n\n    这是一个普通段落：\n\n        这是一个代码区块。\n\nMarkdown 会转换成：\n\n    <p>这是一个普通段落：</p>\n\n    <pre><code>这是一个代码区块。\n    </code></pre>\n\n这个每行一阶的缩进（4 个空格或是 1 个制表符），都会被移除，例如：\n\n    Here is an example of AppleScript:\n\n        tell application \"Foo\"\n            beep\n        end tell\n\n会被转换为：\n\n    <p>Here is an example of AppleScript:</p>\n\n    <pre><code>tell application \"Foo\"\n        beep\n    end tell\n    </code></pre>\n\n一个代码区块会一直持续到没有缩进的那一行（或是文件结尾）。\n\n在代码区块里面， `&` 、 `<` 和 `>` 会自动转成 HTML 实体，这样的方式让你非常容易使用 Markdown 插入范例用的 HTML 原始码，只需要复制贴上，再加上缩进就可以了，剩下的 Markdown 都会帮你处理，例如：\n\n        <div class=\"footer\">\n            &copy; 2004 Foo Corporation\n        </div>\n\n会被转换为：\n\n    <pre><code>&lt;div class=\"footer\"&gt;\n        &amp;copy; 2004 Foo Corporation\n    &lt;/div&gt;\n    </code></pre>\n\n代码区块中，一般的 Markdown 语法不会被转换，像是星号便只是星号，这表示你可以很容易地以 Markdown 语法撰写 Markdown 语法相关的文件。\n\n<h3 id=\"hr\">分隔线</h3>\n\n你可以在一行中用三个以上的星号、减号、底线来建立一个分隔线，行内不能有其他东西。你也可以在星号或是减号中间插入空格。下面每种写法都可以建立分隔线：\n\n    * * *\n\n    ***\n\n    *****\n\n    - - -\n\n    ---------------------------------------\n\n\n* * *\n\n<h2 id=\"span\">区段元素</h2>\n\n<h3 id=\"link\">链接</h3>\n\nMarkdown 支持两种形式的链接语法： *行内式*和*参考式*两种形式。\n\n不管是哪一种，链接文字都是用 [方括号] 来标记。\n\n要建立一个*行内式*的链接，只要在方块括号后面紧接着圆括号并插入网址链接即可，如果你还想要加上链接的 title 文字，只要在网址后面，用双引号把 title 文字包起来即可，例如：\n\n    This is [an example](http://example.com/ \"Title\") inline link.\n\n    [This link](http://example.net/) has no title attribute.\n\n会产生：\n\n    <p>This is <a href=\"http://example.com/\" title=\"Title\">\n    an example</a> inline link.</p>\n\n    <p><a href=\"http://example.net/\">This link</a> has no\n    title attribute.</p>\n\n如果你是要链接到同样主机的资源，你可以使用相对路径：\n\n    See my [About](/about/) page for details.   \n\n*参考式*的链接是在链接文字的括号后面再接上另一个方括号，而在第二个方括号里面要填入用以辨识链接的标记：\n\n    This is [an example][id] reference-style link.\n\n你也可以选择性地在两个方括号中间加上一个空格：\n\n    This is [an example] [id] reference-style link.\n\n接着，在文件的任意处，你可以把这个标记的链接内容定义出来：\n\n    [id]: http://example.com/  \"Optional Title Here\"\n\n链接内容定义的形式为：\n\n*   方括号（前面可以选择性地加上至多三个空格来缩进），里面输入链接文字\n*   接着一个冒号\n*   接着一个以上的空格或制表符\n*   接着链接的网址\n*   选择性地接着 title 内容，可以用单引号、双引号或是括弧包着\n\n下面这三种链接的定义都是相同：\n\n\t[foo]: http://example.com/  \"Optional Title Here\"\n\t[foo]: http://example.com/  'Optional Title Here'\n\t[foo]: http://example.com/  (Optional Title Here)\n\n**请注意：**有一个已知的问题是 Markdown.pl 1.0.1 会忽略单引号包起来的链接 title。\n\n链接网址也可以用尖括号包起来：\n\n    [id]: <http://example.com/>  \"Optional Title Here\"\n\n你也可以把 title 属性放到下一行，也可以加一些缩进，若网址太长的话，这样会比较好看：\n\n    [id]: http://example.com/longish/path/to/resource/here\n        \"Optional Title Here\"\n\n网址定义只有在产生链接的时候用到，并不会直接出现在文件之中。\n\n链接辨别标签可以有字母、数字、空白和标点符号，但是并*不*区分大小写，因此下面两个链接是一样的：\n\n\t[link text][a]\n\t[link text][A]\n\n*隐式链接标记*功能让你可以省略指定链接标记，这种情形下，链接标记会视为等同于链接文字，要用隐式链接标记只要在链接文字后面加上一个空的方括号，如果你要让 \"Google\" 链接到 google.com，你可以简化成：\n\n\t[Google][]\n\n然后定义链接内容：\n\n\t[Google]: http://google.com/\n\n由于链接文字可能包含空白，所以这种简化型的标记内也许包含多个单词：\n\n\tVisit [Daring Fireball][] for more information.\n\n然后接着定义链接：\n\n\t[Daring Fireball]: http://daringfireball.net/\n\n链接的定义可以放在文件中的任何一个地方，我比较偏好直接放在链接出现段落的后面，你也可以把它放在文件最后面，就像是注解一样。\n\n下面是一个参考式链接的范例：\n\n    I get 10 times more traffic from [Google] [1] than from\n    [Yahoo] [2] or [MSN] [3].\n\n      [1]: http://google.com/        \"Google\"\n      [2]: http://search.yahoo.com/  \"Yahoo Search\"\n      [3]: http://search.msn.com/    \"MSN Search\"\n\n如果改成用链接名称的方式写：\n\n    I get 10 times more traffic from [Google][] than from\n    [Yahoo][] or [MSN][].\n\n      [google]: http://google.com/        \"Google\"\n      [yahoo]:  http://search.yahoo.com/  \"Yahoo Search\"\n      [msn]:    http://search.msn.com/    \"MSN Search\"\n\n上面两种写法都会产生下面的 HTML。\n\n    <p>I get 10 times more traffic from <a href=\"http://google.com/\"\n    title=\"Google\">Google</a> than from\n    <a href=\"http://search.yahoo.com/\" title=\"Yahoo Search\">Yahoo</a>\n    or <a href=\"http://search.msn.com/\" title=\"MSN Search\">MSN</a>.</p>\n\n下面是用行内式写的同样一段内容的 Markdown 文件，提供作为比较之用：\n\n    I get 10 times more traffic from [Google](http://google.com/ \"Google\")\n    than from [Yahoo](http://search.yahoo.com/ \"Yahoo Search\") or\n    [MSN](http://search.msn.com/ \"MSN Search\").\n\n参考式的链接其实重点不在于它比较好写，而是它比较好读，比较一下上面的范例，使用参考式的文章本身只有 81 个字符，但是用行内形式的却会增加到 176 个字元，如果是用纯 HTML 格式来写，会有 234 个字元，在 HTML 格式中，标签比文本还要多。\n\n使用 Markdown 的参考式链接，可以让文件更像是浏览器最后产生的结果，让你可以把一些标记相关的元数据移到段落文字之外，你就可以增加链接而不让文章的阅读感觉被打断。\n\n<h3 id=\"em\">强调</h3>\n\nMarkdown 使用星号（`*`）和底线（`_`）作为标记强调字词的符号，被 `*` 或 `_` 包围的字词会被转成用 `<em>` 标签包围，用两个 `*` 或 `_` 包起来的话，则会被转成 `<strong>`，例如：\n\n    *single asterisks*\n\n    _single underscores_\n\n    **double asterisks**\n\n    __double underscores__\n\n会转成：\n\n    <em>single asterisks</em>\n\n    <em>single underscores</em>\n\n    <strong>double asterisks</strong>\n\n    <strong>double underscores</strong>\n\n你可以随便用你喜欢的样式，唯一的限制是，你用什么符号开启标签，就要用什么符号结束。\n\n强调也可以直接插在文字中间：\n\n    un*frigging*believable\n\n但是**如果你的 `*` 和 `_` 两边都有空白的话，它们就只会被当成普通的符号**。\n\n如果要在文字前后直接插入普通的星号或底线，你可以用反斜线：\n\n    \\*this text is surrounded by literal asterisks\\*\n\n<h3 id=\"code\">代码</h3>\n\n如果要标记一小段行内代码，你可以用反引号把它包起来（`` ` ``），例如：\n\n    Use the `printf()` function.\n\n会产生：\n\n    <p>Use the <code>printf()</code> function.</p>\n\n如果要在代码区段内插入反引号，你可以用多个反引号来开启和结束代码区段：\n\n    ``There is a literal backtick (`) here.``\n\n这段语法会产生：\n\n    <p><code>There is a literal backtick (`) here.</code></p>\n\n代码区段的起始和结束端都可以放入一个空白，起始端后面一个，结束端前面一个，这样你就可以在区段的一开始就插入反引号：\n\n\tA single backtick in a code span: `` ` ``\n\t\n\tA backtick-delimited string in a code span: `` `foo` ``\n\n会产生：\n\n\t<p>A single backtick in a code span: <code>`</code></p>\n\t\n\t<p>A backtick-delimited string in a code span: <code>`foo`</code></p>\n\n在代码区段内，`&` 和尖括号**都**会被自动地转成 HTML 实体，这使得插入 HTML 原始码变得很容易，Markdown 会把下面这段：\n\n    Please don't use any `<blink>` tags.\n\n转为：\n\n    <p>Please don't use any <code>&lt;blink&gt;</code> tags.</p>\n\n你也可以这样写：\n\n    `&#8212;` is the decimal-encoded equivalent of `&mdash;`.\n\n以产生：\n\n    <p><code>&amp;#8212;</code> is the decimal-encoded\n    equivalent of <code>&amp;mdash;</code>.</p>\n\n\n\n<h3 id=\"img\">图片</h3>\n\n很明显地，要在纯文字应用中设计一个「自然」的语法来插入图片是有一定难度的。\n\nMarkdown 使用一种和链接很相似的语法来标记图片，同样也允许两种样式： *行内式*和*参考式*。\n\n行内式的图片语法看起来像是：\n\n    ![Alt text](/path/to/img.jpg)\n\n    ![Alt text](/path/to/img.jpg \"Optional title\")\n\n详细叙述如下：\n\n*   一个惊叹号 `!`\n*   接着一个方括号，里面放上图片的替代文字\n*   接着一个普通括号，里面放上图片的网址，最后还可以用引号包住并加上\n    选择性的 'title' 文字。\n\n参考式的图片语法则长得像这样：\n\n    ![Alt text][id]\n\n「id」是图片参考的名称，图片参考的定义方式则和连结参考一样：\n\n    [id]: url/to/image  \"Optional title attribute\"\n\n到目前为止， Markdown 还没有办法指定图片的宽高，如果你需要的话，你可以使用普通的 `<img>` 标签。\n\n* * *\n\n<h2 id=\"misc\">其它</h2>\n\n<h3 id=\"autolink\">自动链接</h3>\n\nMarkdown 支持以比较简短的自动链接形式来处理网址和电子邮件信箱，只要是用尖括号包起来， Markdown 就会自动把它转成链接。一般网址的链接文字就和链接地址一样，例如：\n\n    <http://example.com/>\n\nMarkdown 会转为：\n\n    <a href=\"http://example.com/\">http://example.com/</a>\n\n邮址的自动链接也很类似，只是 Markdown 会先做一个编码转换的过程，把文字字符转成 16 进位码的 HTML 实体，这样的格式可以糊弄一些不好的邮址收集机器人，例如：\n\n    <address@example.com>\n\nMarkdown 会转成：\n\n    <a href=\"&#x6D;&#x61;i&#x6C;&#x74;&#x6F;:&#x61;&#x64;&#x64;&#x72;&#x65;\n    &#115;&#115;&#64;&#101;&#120;&#x61;&#109;&#x70;&#x6C;e&#x2E;&#99;&#111;\n    &#109;\">&#x61;&#x64;&#x64;&#x72;&#x65;&#115;&#115;&#64;&#101;&#120;&#x61;\n    &#109;&#x70;&#x6C;e&#x2E;&#99;&#111;&#109;</a>\n\n在浏览器里面，这段字串（其实是 `<a href=\"mailto:address@example.com\">address@example.com</a>`）会变成一个可以点击的「address@example.com」链接。\n\n（这种作法虽然可以糊弄不少的机器人，但并不能全部挡下来，不过总比什么都不做好些。不管怎样，公开你的信箱终究会引来广告信件的。）\n\n<h3 id=\"backslash\">反斜杠</h3>\n\nMarkdown 可以利用反斜杠来插入一些在语法中有其它意义的符号，例如：如果你想要用星号加在文字旁边的方式来做出强调效果（但不用 `<em>` 标签），你可以在星号的前面加上反斜杠：\n\n    \\*literal asterisks\\*\n\nMarkdown 支持以下这些符号前面加上反斜杠来帮助插入普通的符号：\n\n    \\   反斜线\n    `   反引号\n    *   星号\n    _   底线\n    {}  花括号\n    []  方括号\n    ()  括弧\n    #   井字号\n    +   加号\n    -   减号\n    .   英文句点\n    !   惊叹号\n\n<h2 id=\"acknowledgement\">感谢</h2>\n\n感谢 [leafy7382][] 协助翻译，[hlb][]、[Randylien][] 帮忙润稿，[ethantw][] 的[汉字标准格式・CSS Reset][]， [WM][] 回报文字错误。\n\n[leafy7382]:https://twitter.com/#!/leafy7382\n[hlb]:http://iamhlb.com/\n[Randylien]:http://twitter.com/randylien\n[ethantw]:https://twitter.com/#!/ethantw\n[汉字标准格式・CSS Reset]:http://ethantw.net/projects/han/\n[WM]:http://kidwm.net/\n\n感谢 [fenprace][]，[addv][]。\n\n[fenprace]:https://github.com/fenprace\n[addv]:https://github.com/addv\n\n"
 
 /***/ }),
 /* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Parser = __webpack_require__(90);
+var plugin = __webpack_require__(90);
+module.exports = plugin;
 
-module.exports = function plugin(options) {
-    var parser = new Parser(options);
 
-    var self = this;
-
-    this.Compiler = function compiler(node) {
-        // console.log(self.data('h'))
-        var h = self.data('h');
-        return parser.parse(node, h);
-    }
-};
 
 /***/ }),
 /* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
-function getRenderer(mode) {
-    switch (mode){
-        case 'react' :
-            return __webpack_require__(91);
-        case 'vue' :
-            return __webpack_require__(92);
-        case 'hyperscript' :
-            return __webpack_require__(93);
-        case 'preact' :
-            return __webpack_require__(94);
-        case 'snabbdom' :
-            return __webpack_require__(95);
-        case 'virtual-dom' :
-            return __webpack_require__(96);
-    }
-    return null;
-}
+var unherit = __webpack_require__(17);
+var xtend = __webpack_require__(18);
+var Compiler = __webpack_require__(91);
 
-function Parser(options) {
-    var Renderer = options.Renderer?options.Renderer:getRenderer(options.mode);
-    this.options = options;
-    this.renderer = new Renderer(options);
-}
+module.exports = function plugin(options) {
+    var Local = unherit(Compiler);
+    Local.prototype.options = xtend(Local.prototype.options, this.data('settings'), options);
 
-Parser.prototype.parseNodes = function(nodes) {
-    if(!nodes || nodes.length === 0) return [];
+    var h = this.data('h');
+    h && (Local.prototype.options.h = h);
 
-    var vnodes = [];
-    for(var i=0;i<nodes.length;i++){
-        var node = nodes[i];
-        vnodes.push(this.parseNode(node, i));
-    }
-    return vnodes;
+    this.Compiler = Local;
 };
-
-Parser.prototype.parseNode = function(node, index) {
-    if(!node) return null;
-
-    var children = this.parseNodes(node.children);
-    return this.renderer[node.type].apply(this.renderer, [node, children, index]);
-};
-
-Parser.prototype.parse = function(node, _h) {
-    _h && (this.renderer.h = _h);
-    try {
-        return this.parseNode(node,  0);
-    }
-    catch (e) {
-        console.error(e);
-    }
-    var h = _h || this.options.h || this.renderer.h || this.renderer.options.h;
-    return h?h('div', {}, 'error'):null;
-};
-
-module.exports = Parser;
 
 /***/ }),
 /* 91 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-/**
- * react Renderer
- */
+"use strict";
 
-function Renderer(options) {
-    this.options = options || {};
-    this.h = options.h;
+
+var xtend = __webpack_require__(18);
+var createKey = __webpack_require__(92);
+var Parser = __webpack_require__(93);
+
+function Compiler(root, file) {
+
+    if(this.options.key) {
+        createKey(root);
+    }
+
+    this.root = root;
+    this.file = file;
+
+    this.options = xtend(this.options);
+    if(this.options.renderer){
+        this.visitors = this.options.renderer;
+    }
+
+    this.parser = new Parser(this.options);
 }
 
-Renderer.prototype.root = function(node, children, index) { var h = this.h; 
-    return h('div', {
-        key: index,
-        className: this.options.rootClassName || 'markdown-body'
-    }, children);
+Compiler.prototype.compile = function() {
+    return this.parser.parse(this.root);
 };
 
-Renderer.prototype.blockquote = function(node, children, index) { var h = this.h; 
-    return h('blockquote', {
-        key: index
-    }, children);
-};
+Compiler.prototype.visitors = __webpack_require__(94);
 
-Renderer.prototype.heading = function(node, children, index) { var h = this.h; 
-    return h('h'+node.depth, {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.thematicBreak = function(node, children, index) { var h = this.h; 
-    return h('hr', {
-        key: index
-    });
-};
-
-Renderer.prototype.list = function(node, children, index) { var h = this.h; 
-    return h(node.ordered?'ol':'ul', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.listItem = function(node, children, index) { var h = this.h; 
-    return h('li', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.checkbox = function(node, children, index) { var h = this.h; 
-    return h('input', {
-        key: index,
-        type: 'checkbox',
-        checked: node.checked,
-        readOnly: true
-    });
-};
-
-Renderer.prototype.paragraph = function(node, children, index) { var h = this.h; 
-    return h('p', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.table = function(node, children, index) { var h = this.h; 
-    return h('table', {
-            key: index
-        },
-        h('tbody',{key:0}, children)
-    );
-};
-
-Renderer.prototype.tableRow = function(node, children, index) { var h = this.h; 
-    return h('tr', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.tableCell = function(node, children, index) { var h = this.h; 
-    return h('td', {
-        key: index,
-        align: node.align
-    }, children);
-};
-
-Renderer.prototype.strong = function(node, children, index) { var h = this.h; 
-    return h('strong', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.emphasis = function(node, children, index) { var h = this.h; 
-    return h('em', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.break = function(node, children, index) { var h = this.h; 
-    return h('br', {
-        key: index
-    });
-};
-
-Renderer.prototype.delete = function(node, children, index) { var h = this.h; 
-    return h('del', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.link = function(node, children, index) { var h = this.h; 
-    return h('a', {
-        key: index,
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.linkReference = function(node, children, index) { var h = this.h; 
-    return h('a', {
-        key: index,
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.definition = function(node, children, index) { var h = this.h; 
-    return h('div', {
-            key: index,
-            style: {
-                height: 0,
-                visibility: 'hidden'
-            }
-        },
-        h('a', {
-            key: 0,
-            href: node.url,
-            'data-identifier': node.identifier
-        }, [
-            '['+node.identifier+']: ',
-            node.url
-        ])
-    );
-};
-
-Renderer.prototype.image = function(node, children, index) { var h = this.h; 
-    return h('img', {
-        key: index,
-        src: node.url,
-        alt: node.alt,
-        title: node.title
-    });
-};
-
-Renderer.prototype.text = function(node, children, index) { var h = this.h; 
-    return h('span', {
-        key: index
-    }, node.value);
-};
-
-Renderer.prototype.inlineCode = function(node, children, index) { var h = this.h;
-    return h('code', {
-        key: index,
-    }, node.value);
-};
-
-
-Renderer.prototype.code = function(node, children, index) { var h = this.h;
-    return h('pre', {
-        key: index
-    }, h('code', {
-        className: node.lang?'language-'+node.lang:''
-    }, node.value));
-};
-
-Renderer.prototype.math = function(node, children, index) { var h = this.h;
-    return h('p', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.value
-        }
-    });
-};
-
-Renderer.prototype.inlineMath = function(node, children, index) { var h = this.h;
-    return h('span', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.value
-        }
-    });
-};
-
-Renderer.prototype.html = function(node, children, index) { var h = this.h;
-    return h('div', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.value
-        }
-    });
-};
-
-module.exports = Renderer;
+module.exports = Compiler;
 
 
 /***/ }),
 /* 92 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-/**
- * vue Renderer
- */
+var extend = __webpack_require__(2);
 
-function Renderer(options) {
-    this.options = options || {};
+function extendProps(node, props) {
+    if(!node.properties){ node.properties = {}; }
+    extend(node.properties, props);
 }
 
-Renderer.prototype.root = function(node, children, index) { var h = this.h; 
-    return h('div', {
-        key: index,
-        'class': [this.options.rootClassName || 'markdown-body']
-    }, children);
-};
+function hash(str) {
+    var hash = 5381, i = str.length;
+    while(i) {
+        hash = (hash * 33) ^ str.charCodeAt(--i);
+    }
+    return hash >>> 0;
+}
 
-Renderer.prototype.inlineCode = function(node, children, index) { var h = this.h; 
-    return h('code', {
-        key: index,
-    }, node.value);
-};
+function createKeyByNodes(nodes) {
+    if(!nodes || nodes.length===0){
+        return
+    }
+    for(var i=0;i<nodes.length;i++) {
+        var node = nodes[i];
+        createKeyByNode(node);
+    }
+}
 
-Renderer.prototype.code = function(node, children, index) { var h = this.h; 
-    return h('pre', {
-        key: index
-    }, [
-        h('code', {
-            'class': [node.lang?'language-'+node.lang:'']
-        }, node.value)
-    ]);
-};
+function createKeyByNode(node) {
+    extendProps(node);
+    createKeyByNodes(node.children);
+    if(node.value) {
+        node.properties.key = hash(node.value);
+    }
+    else if(node.children) {
+        var key = node.children.map(function (item) {
+            return item.properties.key;
+        }).join('-');
+        node.properties.key = hash(key);
+    }
+    else {
+        var position = node.position;
+        node.properties.key = hash(position.start.line + '-' +position.end.line);
+    }
+}
 
-Renderer.prototype.blockquote = function(node, children, index) { var h = this.h; 
-    return h('blockquote', {
-        key: index
-    }, children);
-};
+function createKey(node) {
+    createKeyByNodes(node.children);
+    createKeyByNode(node);
+}
 
-
-
-Renderer.prototype.heading = function(node, children, index) { var h = this.h; 
-    return h('h'+node.depth, {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.thematicBreak = function(node, children, index) { var h = this.h; 
-    return h('hr', {
-        key: index
-    });
-};
-
-Renderer.prototype.list = function(node, children, index) { var h = this.h; 
-    return h(node.ordered?'ol':'ul', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.listItem = function(node, children, index) { var h = this.h; 
-    return h('li', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.checkbox = function(node, children, index) { var h = this.h; 
-    return h('input', {
-        key: index,
-        attrs: {
-            type: 'checkbox',
-            checked: node.checked,
-            disabled: true
-        }
-    });
-};
-
-Renderer.prototype.paragraph = function(node, children, index) { var h = this.h; 
-    return h('p', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.table = function(node, children, index) { var h = this.h; 
-    return h('table', {
-            key: index
-        },
-        [h('tbody',{key:0}, children)]
-    );
-};
-
-Renderer.prototype.tableRow = function(node, children, index) { var h = this.h; 
-    return h('tr', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.tableCell = function(node, children, index) { var h = this.h; 
-    return h('td', {
-        key: index,
-        align: node.align
-    }, children);
-};
-
-Renderer.prototype.strong = function(node, children, index) { var h = this.h; 
-    return h('strong', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.emphasis = function(node, children, index) { var h = this.h; 
-    return h('em', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.break = function(node, children, index) { var h = this.h; 
-    return h('br', {
-        key: index
-    });
-};
-
-Renderer.prototype.delete = function(node, children, index) { var h = this.h; 
-    return h('del', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.link = function(node, children, index) { var h = this.h; 
-    return h('a', {
-        key: index,
-        attrs:{
-            target: '_blank',
-            href: node.url,
-            title: node.title
-        }
-    }, children);
-};
-
-Renderer.prototype.linkReference = function(node, children, index) { var h = this.h; 
-    return h('a', {
-        key: index,
-        attrs:{
-            target: '_blank',
-            href: node.url,
-            title: node.title
-        }
-    }, children);
-};
-
-Renderer.prototype.definition = function(node, children, index) { var h = this.h; 
-    return h('div', {
-            key: index,
-            style: {
-                // height: 0,
-                // visibility: 'hidden'
-                'word-break': 'break-all'
-            }
-        },[
-            h('a', {
-                key: 0,
-                attrs: {
-                    target: '_blank',
-                    href: node.url,
-                    'data-identifier': node.identifier
-                }
-            }, [
-                '['+node.identifier+']: ',
-                node.url
-            ])
-        ]
-    );
-};
-
-Renderer.prototype.image = function(node, children, index) { var h = this.h; 
-    return h('img', {
-        key: index,
-        attrs: {
-            src: node.url,
-            alt: node.alt,
-            title: node.title
-        }
-    });
-};
-
-Renderer.prototype.text = function(node, children, index) { var h = this.h; 
-    return h('span', {
-        key: index
-    }, node.value);
-};
-
-
-Renderer.prototype.math = function(node, children, index) { var h = this.h;
-    return h('p', {
-        key: index,
-        domProps: {
-            "innerHTML": node.value
-        }
-    });
-};
-
-Renderer.prototype.inlineMath = function(node, children, index) { var h = this.h;
-    return h('span', {
-        key: index,
-        domProps: {
-            "innerHTML": node.value
-        }
-    });
-};
-
-Renderer.prototype.html = function(node, children, index) { var h = this.h;
-    return h('div', {
-        key: index,
-        domProps: {
-            "innerHTML": node.value
-        }
-    });
-};
-
-module.exports = Renderer;
+module.exports = createKey;
 
 
 /***/ }),
 /* 93 */
 /***/ (function(module, exports) {
 
-/**
- * hyperscript Renderer
- */
-
-function Renderer(options) {
-    this.options = options || {};
+function Parser(options) {
+    this.options = options;
     this.h = options.h;
 }
 
-Renderer.prototype.root = function(node, children) { var h = this.h;
-    var rootClassName = this.options.rootClassName || 'markdown-body';
-    return h('div' , {
-        className: rootClassName
-    }, children);
+Parser.prototype.parseNodes = function(nodes, parent) {
+    if(!nodes || nodes.length === 0) return [];
+    var vnodes = [];
+    for(var i=0;i<nodes.length;i++){
+        var node = nodes[i];
+        node.parent = parent;
+        var tempNode = this.parseNode(node);
+        tempNode && vnodes.push(tempNode);
+    }
+    return vnodes;
 };
 
-Renderer.prototype.text = function(node, children) { var h = this.h;
-    return h('span', {
-    }, node.value);
+Parser.prototype.parseNode = function(node, parent) {
+    if(!node) return null;
+    var children = this.parseNodes(node.children, node);
+    var h = this.h;
+    return this.options.renderer[node.type].apply(null, [h, node, children, parent, this.options]);
 };
 
-Renderer.prototype.inlineCode = function(node, children) { var h = this.h;
-    return h('code', {
-    }, node.value);
+Parser.prototype.parse = function(root) {
+    try {
+        /*
+        root.properties = {
+            key: 0,
+            className: this.options.rootClassName || 'markdown-body'
+        };
+        this.options.rootTagName && (root.tagName = this.options.rootTagName);
+        */
+        return this.parseNode(root);
+    }
+    catch (e) {
+        console.error(e);
+        return this.h?this.h('div', {}, 'error'):null;
+    }
 };
 
-Renderer.prototype.code = function(node, children) { var h = this.h;
-    return h('pre', {
-    }, h('code', {
-        className: node.lang?'language-'+node.lang:''
-    }, node.value));
-};
-
-Renderer.prototype.blockquote = function(node, children) { var h = this.h;
-    return h('blockquote', {
-    }, children);
-};
-
-Renderer.prototype.heading = function(node, children) { var h = this.h;
-    return h('h'+node.depth, {
-    }, children);
-};
-
-Renderer.prototype.thematicBreak = function(node, children) { var h = this.h;
-    return h('hr', {
-    });
-};
-
-Renderer.prototype.list = function(node, children) { var h = this.h;
-    return h(node.ordered?'ol':'ul', {
-    }, children);
-};
-
-Renderer.prototype.listItem = function(node, children) { var h = this.h;
-    return h('li', {
-    }, children);
-};
-
-Renderer.prototype.checkbox = function(node, children) { var h = this.h;
-    return h('input', {
-        type: 'checkbox',
-        checked: node.checked,
-        readOnly: true
-    });
-};
-
-Renderer.prototype.paragraph = function(node, children) { var h = this.h;
-    return h('p', {
-    }, children);
-};
-
-Renderer.prototype.table = function(node, children) { var h = this.h;
-    return h('table', {},
-        h('tbody',{key:0}, children)
-    );
-};
-
-Renderer.prototype.tableRow = function(node, children) { var h = this.h;
-    return h('tr', {}, children);
-};
-
-Renderer.prototype.tableCell = function(node, children) { var h = this.h;
-    return h('td', {
-        align: node.align
-    }, children);
-};
-
-Renderer.prototype.strong = function(node, children) { var h = this.h;
-    return h('strong', {
-    }, children);
-};
-
-Renderer.prototype.emphasis = function(node, children) { var h = this.h;
-    return h('em', {
-    }, children);
-};
-
-Renderer.prototype.break = function(node, children) { var h = this.h;
-    return h('br', {
-    });
-};
-
-Renderer.prototype.delete = function(node, children) { var h = this.h;
-    return h('del', {
-    }, children);
-};
-
-Renderer.prototype.link = function(node, children) { var h = this.h;
-    return h('a', {
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.linkReference = function(node, children) { var h = this.h;
-    return h('a', {
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.definition = function(node, children) { var h = this.h;
-    return h('div', {
-            style: {
-                height: '0',
-                visibility: 'hidden'
-            }
-        },
-        h('a', {
-            href: node.url,
-            'data-identifier': node.identifier
-        }, [
-            '['+node.identifier+']: ',
-            node.url
-        ])
-    );
-};
-
-Renderer.prototype.image = function(node, children) { var h = this.h;
-    return h('img', {
-        src: node.url,
-        alt: node.alt,
-        title: node.title
-    });
-};
-
-Renderer.prototype.math = function(node, children) { var h = this.h;
-    return h('p', {
-        innerHTML : node.value
-    });
-};
-
-Renderer.prototype.inlineMath = function(node, children) { var h = this.h;
-    return h('span', {
-        innerHTML : node.value
-    });
-};
-
-Renderer.prototype.html = function(node, children) { var h = this.h;
-    return h('div', {
-        innerHTML : node.value
-    });
-};
-
-module.exports = Renderer;
-
-
+module.exports = Parser;
 
 /***/ }),
 /* 94 */
 /***/ (function(module, exports) {
 
 /**
- * preact Renderer
+ * Renderer interface
  */
 
-function Renderer(options) {
-    this.options = options || {};
-    this.h = options.h;
-}
+module.exports = {
 
-Renderer.prototype.root = function(h, node, index, children) {
-    return h('div', {
-        key: index,
-        className: this.options.rootClassName || 'markdown-body'
-    }, children);
+    /**
+     * root element (根元素)
+     * @param {*} h create element function (构建元素节点函数)
+     * @param {*} node  current node  (当前根元素节点)
+ *              node.key is node index if node in array for key. default is 0 (如果当前节点在数组中，返回当前节点在数组中的序列，这是为了构建数组key)
+     * @param {*} children node create element children (当前节点的子节点)
+     */
+    root : function(h, node, children, options) {},
+
+    text : function(h, node, children, options) {},
+
+    inlineCode : function(h, node, children, options) {},
+
+    blockquote : function(h, node, children, options) {},
+
+    heading : function(h, node, children, options) {},
+
+    thematicBreak : function(h, node, children, options) {},
+
+    list : function(h, node, children, options) {},
+
+    listItem : function(h, node, children, options) {},
+
+    checkbox : function(h, node, children, options) {},
+
+    paragraph : function(h, node, children, options) {},
+
+    table : function(h, node, children, options) {},
+
+    tableRow : function(h, node, children, options) {},
+
+    tableCell : function(h, node, children, options) {},
+
+    strong : function(h, node, children, options) {},
+
+    emphasis : function(h, node, children, options) {},
+
+    break : function(h, node, children, options) {},
+
+    delete : function(h, node, children, options) {},
+
+    link : function(h, node, children, options) {},
+
+    linkReference : function(h, node, children, options) {},
+
+    definition : function(h, node, children, options) {},
+
+    image : function(h, node, children, options) {},
+
+    imageReference : function(h, node, children, options) {},
+
+    math : function(h, node, children, options) {},
+
+    inlineMath : function(h, node, children, options) {},
+
+    html : function(h, node, children, options) {},
+
+    code : function(h, node, children, options) {},
 };
-
-Renderer.prototype.inlineCode = function(h, node, index, children) {
-    return h('code', {
-        key: index,
-    }, node.value);
-};
-
-Renderer.prototype.math = function(h, node, index, children) {
-    return h('p', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.renderedValue
-        }
-    });
-};
-
-Renderer.prototype.inlineMath = function(h, node, index, children) {
-    return h('span', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.renderedValue
-        }
-    });
-};
-
-Renderer.prototype.code = function(h, node, index, children) {
-    return h('pre', {
-        key: index
-    }, h('code', {
-        className: node.lang?'language-'+node.lang:''
-    }, node.value));
-};
-
-Renderer.prototype.blockquote = function(h, node, index, children) {
-    return h('blockquote', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.html = function(h, node, index, children) {
-    return h('div', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.value
-        }
-    });
-};
-
-Renderer.prototype.heading = function(h, node, index, children) {
-    return h('h'+node.depth, {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.thematicBreak = function(h, node, index, children) {
-    return h('hr', {
-        key: index
-    });
-};
-
-Renderer.prototype.list = function(h, node, index, children) {
-    return h(node.ordered?'ol':'ul', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.listItem = function(h, node, index, children) {
-    return h('li', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.checkbox = function(h, node, index, children) {
-    return h('input', {
-        key: index,
-        type: 'checkbox',
-        checked: node.checked,
-        readOnly: true
-    });
-};
-
-Renderer.prototype.paragraph = function(h, node, index, children) {
-    return h('p', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.table = function(h, node, index, children) {
-    return h('table', {
-            key: index
-        },
-        h('tbody',{key:0}, children)
-    );
-};
-
-Renderer.prototype.tableRow = function(h, node, index, children) {
-    return h('tr', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.tableCell = function(h, node, index, children) {
-    return h('td', {
-        key: index,
-        align: node.align
-    }, children);
-};
-
-Renderer.prototype.strong = function(h, node, index, children) {
-    return h('strong', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.emphasis = function(h, node, index, children) {
-    return h('em', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.break = function(h, node, index, children) {
-    return h('br', {
-        key: index
-    });
-};
-
-Renderer.prototype.delete = function(h, node, index, children) {
-    return h('del', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.link = function(h, node, index, children) {
-    return h('a', {
-        key: index,
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.linkReference = function(h, node, index, children) {
-    return h('a', {
-        key: index,
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.definition = function(h, node, index, children) {
-    return h('div', {
-            key: index,
-            style: {
-                height: 0,
-                visibility: 'hidden'
-            }
-        },
-        h('a', {
-            key: 0,
-            href: node.url,
-            'data-identifier': node.identifier
-        }, [
-            '['+node.identifier+']: ',
-            node.url
-        ])
-    );
-};
-
-Renderer.prototype.image = function(h, node, index, children) {
-    return h('img', {
-        key: index,
-        src: node.url,
-        alt: node.alt,
-        title: node.title
-    });
-};
-
-Renderer.prototype.text = function(h, node, index, children) {
-    return h('span', {
-        key: index
-    }, node.value);
-};
-
-module.exports = Renderer;
-
 
 /***/ }),
 /* 95 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-
+module.exports = __webpack_require__(96)
 
 /***/ }),
 /* 96 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 /**
- * virtual-dom Renderer
+ * react Renderer
+ *
+ * extend mdast
+{
+    "type": "heading",
+    "depth": 1 <= number <= 6,
+    "tagName": "a",
+    "parent": parent,
+    "properties": {
+        "href": "http://alpha.com",
+        "id": "bravo",
+        "className": ["bravo"],
+        "download": true
+    },
+    "children": []
+}
  */
 
-function Renderer(options) {
-    this.options = options || {};
-    this.h = options.h;
+var extend = __webpack_require__(2);
+
+function props(node, defaultProps) {
+    var dataProps = extend({}, node.properties);
+    return extend({}, dataProps, defaultProps);
 }
 
-Renderer.prototype.root = function(h, node, index, children) {
-    return h('div', {
-        key: index,
-        className: this.options.rootClassName || 'markdown-body'
-    }, children);
-};
+module.exports = {
 
-Renderer.prototype.inlineCode = function(h, node, index, children) {
-    return h('code', {
-        key: index,
-    }, node.value);
-};
+    root: function(h, node, children) {
+        return h(node.tagName||'div', props(node), children);
+    },
 
-Renderer.prototype.math = function(h, node, index, children) {
-    return h('p', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.renderedValue
-        }
-    });
-};
+    blockquote: function(h, node, children) {
+        return h('blockquote', props(node), children);
+    },
 
-Renderer.prototype.inlineMath = function(h, node, index, children) {
-    return h('span', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.renderedValue
-        }
-    });
-};
+    heading: function(h, node, children) {
+        return h('h'+node.depth, props(node), children);
+    },
 
-Renderer.prototype.code = function(h, node, index, children) {
-    return h('pre', {
-        key: index
-    }, h('code', {
-        className: node.lang?'language-'+node.lang:''
-    }, node.value));
-};
+    thematicBreak : function(h, node) {
+        return h('hr', props(node));
+    },
 
-Renderer.prototype.blockquote = function(h, node, index, children) {
-    return h('blockquote', {
-        key: index
-    }, children);
-};
+    list : function(h, node, children) {
+        return h(node.ordered?'ol':'ul', props(node), children);
+    },
 
-Renderer.prototype.html = function(h, node, index, children) {
-    return h('div', {
-        key: index,
-        dangerouslySetInnerHTML: {
-            __html: node.value
-        }
-    });
-};
-
-Renderer.prototype.heading = function(h, node, index, children) {
-    return h('h'+node.depth, {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.thematicBreak = function(h, node, index, children) {
-    return h('hr', {
-        key: index
-    });
-};
-
-Renderer.prototype.list = function(h, node, index, children) {
-    return h(node.ordered?'ol':'ul', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.listItem = function(h, node, index, children) {
-    return h('li', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.checkbox = function(h, node, index, children) {
-    return h('input', {
-        key: index,
-        type: 'checkbox',
-        checked: node.checked,
-        readOnly: true
-    });
-};
-
-Renderer.prototype.paragraph = function(h, node, index, children) {
-    return h('p', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.table = function(h, node, index, children) {
-    return h('table', {
-            key: index
-        },
-        h('tbody',{key:0}, children)
-    );
-};
-
-Renderer.prototype.tableRow = function(h, node, index, children) {
-    return h('tr', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.tableCell = function(h, node, index, children) {
-    return h('td', {
-        key: index,
-        align: node.align
-    }, children);
-};
-
-Renderer.prototype.strong = function(h, node, index, children) {
-    return h('strong', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.emphasis = function(h, node, index, children) {
-    return h('em', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.break = function(h, node, index, children) {
-    return h('br', {
-        key: index
-    });
-};
-
-Renderer.prototype.delete = function(h, node, index, children) {
-    return h('del', {
-        key: index
-    }, children);
-};
-
-Renderer.prototype.link = function(h, node, index, children) {
-    return h('a', {
-        key: index,
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.linkReference = function(h, node, index, children) {
-    return h('a', {
-        key: index,
-        href: node.url,
-        title: node.title
-    }, children);
-};
-
-Renderer.prototype.definition = function(h, node, index, children) {
-    return h('div', {
-            key: index,
-            style: {
-                height: 0,
-                visibility: 'hidden'
+    listItem : function(h, node, children) {
+        if(node.hasOwnProperty('checked') && node.checked !== null) {
+            if(children && children.length>0 && children[0].children) {
+                children[0].children.unshift(
+                    h('input', {
+                        type: 'checkbox',
+                        className: ['list-item-checkbox'],
+                        checked: node.checked,
+                        readonly: true,
+                        disabled: true,
+                    })
+                );
             }
-        },
-        h('a', {
-            key: 0,
+        }
+        return h('li', props(node), children);
+    },
+
+    checkbox : function(h, node) {
+        return h('input', props(node, {
+            type: 'checkbox',
+            checked: node.checked,
+            readOnly: true
+        }));
+    },
+
+    paragraph : function(h, node, children) {
+        return h(node.tagName||'p', props(node), children);
+    },
+
+    table : function(h, node, children) {
+        return h('table', props(node), h('tbody',{key:0}, children));
+    },
+
+    tableRow : function(h, node, children) {
+        return h('tr', props(node), children);
+    },
+
+    tableCell : function(h, node, children) {
+        return h('td', props(node, {align: node.align}), children);
+    },
+
+    strong : function(h, node, children) {
+        return h('strong', props(node), children);
+    },
+
+    emphasis : function(h, node, children) {
+        return h('em', props(node), children);
+    },
+
+    break : function(h, node) {
+        return h('br', props(node));
+    },
+
+    delete : function(h, node, children) {
+        return h('del', props(node), children);
+    },
+
+    link : function(h, node, children) {
+        return h('a', props(node, {
+            // target: '_blank',
             href: node.url,
-            'data-identifier': node.identifier
-        }, [
-            '['+node.identifier+']: ',
-            node.url
-        ])
-    );
+            title: node.title
+        }), children);
+    },
+
+    linkReference : function(h, node, children) {
+        return h('a', props(node, {
+            href: node.url,
+            title: node.title
+        }), children);
+    },
+
+    definition : function(h, node, children) {
+        // return null;
+        // return h('div', props(node, {
+        //         style: {
+        //             height: 0,
+        //             visibility: 'hidden'
+        //         }
+        //     }),
+        //     h('a', {
+        //         key: 0,
+        //         href: node.url,
+        //         'data-identifier': node.identifier
+        //     }, [
+        //         '['+node.identifier+']: ',
+        //         node.url
+        //     ])
+        // );
+    },
+
+    image : function(h, node) {
+        return h('img', props(node, {
+            src: node.url,
+            alt: node.alt,
+            title: node.title
+        }));
+    },
+
+    imageReference: function(h, node, children) {
+
+    },
+
+    text : function(h, node) {
+        return h('span', props(node), node.value);
+    },
+
+    inlineCode : function(h, node, children) {
+        return h('code', props(node), node.value);
+    },
+
+    code : function(h, node, children) {
+        return h('pre', props(node), h('code', {
+            className: node.lang?'language-'+node.lang:null
+        }, node.value));
+    },
+
+    yaml : function(h, node, children) {
+        return h('pre', props(node), h('code', {
+            className: 'language-yaml'
+        }, node.value));
+    },
+
+    math : function(h, node, children) {
+        return h('p', props(node, {
+            dangerouslySetInnerHTML: {
+                __html: node.value
+            }
+        }));
+    },
+
+    inlineMath : function(h, node, children) {
+        return h('span', props(node, {
+            dangerouslySetInnerHTML: {
+                __html: node.value
+            }
+        }));
+    },
+
+    html : function(h, node, children) {
+        return h('div', props(node, {
+            dangerouslySetInnerHTML: {
+                __html: node.value
+            }
+        }));
+    },
+
+    footnote : function(h, node, children) {
+        return h('span', props(node), children);
+    },
+
+    footnoteReference : function(h, node, children) {
+        return h('a', props(node, {
+            id: node.ref,
+            className: 'footnote-reference',
+            href: '#'+node.def
+        }), node.value);
+    },
+
+    footnoteDefinition : function(h, node, children) {
+        return h('div', props(node, {
+            id: node.def,
+            className: 'footnote-definition'
+        }), children);
+    },
 };
 
-Renderer.prototype.image = function(h, node, index, children) {
-    return h('img', {
-        key: index,
-        src: node.url,
-        alt: node.alt,
-        title: node.title
-    });
-};
-
-Renderer.prototype.text = function(h, node, index, children) {
-    return h('span', {
-        key: index
-    }, node.value);
-};
-
-module.exports = Renderer;
-
-
-/***/ }),
-/* 97 */
-/***/ (function(module, exports) {
-
-module.exports = "**NOTE:** This is Simplelified  Chinese Edition Document of Markdown Syntax. If you are seeking for English Edition Document. Please refer to [Markdown: Syntax][eng-doc].\n\n[eng-doc]:http://daringfireball.net/projects/markdown/syntax\n\n**声明：** 这份文档派生(fork)于[繁体中文版](http://markdown.tw/)，在此基础上进行了繁体转简体工作，并进行了适当的润色。此文档用 Markdown 语法编写，你可以到这里[查看它的源文件][src1]。「繁体中文版的原始文件可以[查看这里][src] 。」--By @[riku][t]\n\n**注：** 本项目托管于 [GitHub][]上，请通过\"派生\"和\"合并请求\"来帮忙改进本项目。\n\n  [src1]: http://gitcafe.com/riku/Markdown-Syntax-CN/blob/master/syntax.md\n  [src]: https://github.com/othree/markdown-syntax-zhtw/blob/master/syntax.md\n  [t]: http://twitter.com/riku\n  [g]: http://gitcafe.com/riku/Markdown-Syntax-CN\n  [Github]: https://github.com/riku/Markdown-Syntax-CN\n  [GitCafe]: http://gitcafe.com/riku/Markdown-Syntax-CN/\n\nMarkdown 语法说明 (简体中文版) / ([点击查看快速入门](./basic.html))\n================\n\n*   [概述](#overview)\n    *   [宗旨](#philosophy)\n    *   [兼容 HTML](#html)\n    *   [特殊字符自动转换](#autoescape)\n*   [区块元素](#block)\n    *   [段落和换行](#p)\n    *   [标题](#header)\n    *   [区块引用](#blockquote)\n    *   [列表](#list)\n    *   [代码区块](#precode)\n    *   [分隔线](#hr)\n*   [区段元素](#span)\n    *   [链接](#link)\n    *   [强调](#em)\n    *   [代码](#code)\n    *   [图片](#img)\n*   [其它](#misc)\n    *   [反斜杠](#backslash)\n    *   [自动链接](#autolink)\n*   [感谢](#acknowledgement)\n*\t[Markdown 免费编辑器](#editor)\n\n* * *\n\n<h2 id=\"overview\">概述</h2>\n\n<h3 id=\"philosophy\">宗旨</h3>\n\nMarkdown 的目标是实现「易读易写」。\n\n可读性，无论如何，都是最重要的。一份使用 Markdown 格式撰写的文件应该可以直接以纯文本发布，并且看起来不会像是由许多标签或是格式指令所构成。Markdown 语法受到一些既有 text-to-HTML 格式的影响，包括 [Setext] [1]、[atx] [2]、[Textile] [3]、[reStructuredText] [4]、[Grutatext] [5] 和 [EtText] [6]，而最大灵感来源其实是纯文本电子邮件的格式。\n\n  [1]: http://docutils.sourceforge.net/mirror/setext.html\n  [2]: http://www.aaronsw.com/2002/atx/\n  [3]: http://textism.com/tools/textile/\n  [4]: http://docutils.sourceforge.net/rst.html\n  [5]: http://www.triptico.com/software/grutatxt.html\n  [6]: http://ettext.taint.org/doc/\n\n总之， Markdown 的语法全由一些符号所组成，这些符号经过精挑细选，其作用一目了然。比如：在文字两旁加上星号，看起来就像\\*强调\\*。Markdown 的列表看起来，嗯，就是列表。Markdown 的区块引用看起来就真的像是引用一段文字，就像你曾在电子邮件中见过的那样。\n\n<h3 id=\"html\">兼容 HTML</h3>\n\nMarkdown 语法的目标是：成为一种适用于网络的*书写*语言。\n\nMarkdown 不是想要取代 HTML，甚至也没有要和它相近，它的语法种类很少，只对应 HTML 标记的一小部分。Markdown 的构想*不是*要使得 HTML 文档更容易书写。在我看来， HTML 已经很容易写了。Markdown 的理念是，能让文档更容易读、写和随意改。HTML 是一种*发布*的格式，Markdown 是一种*书写*的格式。就这样，Markdown 的格式语法只涵盖纯文本可以涵盖的范围。\n\n不在 Markdown 涵盖范围之内的标签，都可以直接在文档里面用 HTML 撰写。不需要额外标注这是 HTML 或是 Markdown；只要直接加标签就可以了。\n\n要制约的只有一些 HTML 区块元素――比如 `<div>`、`<table>`、`<pre>`、`<p>` 等标签，必须在前后加上空行与其它内容区隔开，还要求它们的开始标签与结尾标签不能用制表符或空格来缩进。Markdown 的生成器有足够智能，不会在 HTML 区块标签外加上不必要的 `<p>` 标签。\n\n例子如下，在 Markdown 文件里加上一段 HTML 表格：\n\n    这是一个普通段落。\n\n    <table>\n        <tr>\n            <td>Foo</td>\n        </tr>\n    </table>\n\n    这是另一个普通段落。\n\n请注意，在 HTML 区块标签间的 Markdown 格式语法将不会被处理。比如，你在 HTML 区块内使用 Markdown 样式的`*强调*`会没有效果。\n\nHTML 的区段（行内）标签如 `<span>`、`<cite>`、`<del>` 可以在 Markdown 的段落、列表或是标题里随意使用。依照个人习惯，甚至可以不用 Markdown 格式，而直接采用 HTML 标签来格式化。举例说明：如果比较喜欢 HTML 的 `<a>` 或 `<img>` 标签，可以直接使用这些标签，而不用 Markdown 提供的链接或是图像标签语法。\n\n和处在 HTML 区块标签间不同，Markdown 语法在 HTML 区段标签间是有效的。\n\n<h3 id=\"autoescape\">特殊字符自动转换</h3>\n\n在 HTML 文件中，有两个字符需要特殊处理： `<` 和 `&` 。 `<` 符号用于起始标签，`&` 符号则用于标记 HTML 实体，如果你只是想要显示这些字符的原型，你必须要使用实体的形式，像是 `&lt;` 和 `&amp;`。\n\n`&` 字符尤其让网络文档编写者受折磨，如果你要打「`AT&T`」 ，你必须要写成「`AT&amp;T`」。而网址中的 `&` 字符也要转换。比如你要链接到：\n\n    http://images.google.com/images?num=30&q=larry+bird\n\n你必须要把网址转换写为：\n\n    http://images.google.com/images?num=30&amp;q=larry+bird\n\n才能放到链接标签的 `href` 属性里。不用说也知道这很容易忽略，这也可能是 HTML 标准检验所检查到的错误中，数量最多的。\n\nMarkdown 让你可以自然地书写字符，需要转换的由它来处理好了。如果你使用的 `&` 字符是 HTML 字符实体的一部分，它会保留原状，否则它会被转换成 `&amp`;。\n\n所以你如果要在文档中插入一个版权符号 `©`，你可以这样写：\n\n    &copy;\n\nMarkdown 会保留它不动。而若你写：\n\n    AT&T\n\nMarkdown 就会将它转为：\n\n    AT&amp;T\n\n类似的状况也会发生在 `<` 符号上，因为 Markdown 允许 [兼容 HTML](#html) ，如果你是把 `<` 符号作为 HTML 标签的定界符使用，那 Markdown 也不会对它做任何转换，但是如果你写：\n\n    4 < 5\n\nMarkdown 将会把它转换为：\n\n    4 &lt; 5\n\n不过需要注意的是，code 范围内，不论是行内还是区块， `<` 和 `&` 两个符号都*一定*会被转换成 HTML 实体，这项特性让你可以很容易地用 Markdown 写 HTML code （和 HTML 相对而言， HTML 语法中，你要把所有的 `<` 和 `&` 都转换为 HTML 实体，才能在 HTML 文件里面写出 HTML code。）\n\n* * *\n\n<h2 id=\"block\">区块元素</h2>\n\n\n<h3 id=\"p\">段落和换行</h3>\n\n一个 Markdown 段落是由一个或多个连续的文本行组成，它的前后要有一个以上的空行（空行的定义是显示上看起来像是空的，便会被视为空行。比方说，若某一行只包含空格和制表符，则该行也会被视为空行）。普通段落不该用空格或制表符来缩进。\n\n「由一个或多个连续的文本行组成」这句话其实暗示了 Markdown 允许段落内的强迫换行（插入换行符），这个特性和其他大部分的 text-to-HTML 格式不一样（包括 Movable Type 的「Convert Line Breaks」选项），其它的格式会把每个换行符都转成 `<br />` 标签。\n\n如果你*确实*想要依赖 Markdown 来插入 `<br />` 标签的话，在插入处先按入两个以上的空格然后回车。\n\n的确，需要多费点事（多加空格）来产生 `<br />` ，但是简单地「每个换行都转换为 `<br />`」的方法在 Markdown 中并不适合， Markdown 中 email 式的 [区块引用][bq] 和多段落的 [列表][l] 在使用换行来排版的时候，不但更好用，还更方便阅读。\n\n  [bq]: #blockquote\n  [l]:  #list\n\n<h3 id=\"header\">标题</h3>\n\nMarkdown 支持两种标题的语法，类 [Setext] [1] 和类 [atx] [2] 形式。\n\n类 Setext 形式是用底线的形式，利用 `=` （最高阶标题）和 `-` （第二阶标题），例如：\n\n    This is an H1\n    =============\n\n    This is an H2\n    -------------\n\n任何数量的 `=` 和 `-` 都可以有效果。\n\n类 Atx 形式则是在行首插入 1 到 6 个 `#` ，对应到标题 1 到 6 阶，例如：\n\n    # 这是 H1\n\n    ## 这是 H2\n\n    ###### 这是 H6\n\n你可以选择性地「闭合」类 atx 样式的标题，这纯粹只是美观用的，若是觉得这样看起来比较舒适，你就可以在行尾加上 `#`，而行尾的 `#` 数量也不用和开头一样（行首的井字符数量决定标题的阶数）：\n\n    # 这是 H1 #\n\n    ## 这是 H2 ##\n\n    ### 这是 H3 ######\n\n\n<h3 id=\"blockquote\">区块引用 Blockquotes</h3>\n\nMarkdown 标记区块引用是使用类似 email 中用 `>` 的引用方式。如果你还熟悉在 email 信件中的引言部分，你就知道怎么在 Markdown 文件中建立一个区块引用，那会看起来像是你自己先断好行，然后在每行的最前面加上 `>` ：\n\n    > This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet,\n    > consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.\n    > Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.\n    > \n    > Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse\n    > id sem consectetuer libero luctus adipiscing.\n\nMarkdown 也允许你偷懒只在整个段落的第一行最前面加上 `>` ：\n\n    > This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet,\n    consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.\n    Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.\n\n    > Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse\n    id sem consectetuer libero luctus adipiscing.\n\n区块引用可以嵌套（例如：引用内的引用），只要根据层次加上不同数量的 `>` ：\n\n    > This is the first level of quoting.\n    >\n    > > This is nested blockquote.\n    >\n    > Back to the first level.\n\n引用的区块内也可以使用其他的 Markdown 语法，包括标题、列表、代码区块等：\n\n\t> ## 这是一个标题。\n\t> \n\t> 1.   这是第一行列表项。\n\t> 2.   这是第二行列表项。\n\t> \n\t> 给出一些例子代码：\n\t> \n\t>     return shell_exec(\"echo $input | $markdown_script\");\n\n任何像样的文本编辑器都能轻松地建立 email 型的引用。例如在 BBEdit 中，你可以选取文字后然后从选单中选择*增加引用阶层*。\n\n<h3 id=\"list\">列表</h3>\n\nMarkdown 支持有序列表和无序列表。\n\n无序列表使用星号、加号或是减号作为列表标记：\n\n    *   Red\n    *   Green\n    *   Blue\n\n等同于：\n\n    +   Red\n    +   Green\n    +   Blue\n\n也等同于：\n\n    -   Red\n    -   Green\n    -   Blue\n\n有序列表则使用数字接着一个英文句点：\n\n    1.  Bird\n    2.  McHale\n    3.  Parish\n\n很重要的一点是，你在列表标记上使用的数字并不会影响输出的 HTML 结果，上面的列表所产生的 HTML 标记为：\n\n    <ol>\n    <li>Bird</li>\n    <li>McHale</li>\n    <li>Parish</li>\n    </ol>\n\n如果你的列表标记写成：\n\n    1.  Bird\n    1.  McHale\n    1.  Parish\n\n或甚至是：\n\n    3. Bird\n    1. McHale\n    8. Parish\n\n你都会得到完全相同的 HTML 输出。重点在于，你可以让 Markdown 文件的列表数字和输出的结果相同，或是你懒一点，你可以完全不用在意数字的正确性。\n\n如果你使用懒惰的写法，建议第一个项目最好还是从 1. 开始，因为 Markdown 未来可能会支持有序列表的 start 属性。\n\n列表项目标记通常是放在最左边，但是其实也可以缩进，最多 3 个空格，项目标记后面则一定要接着至少一个空格或制表符。\n\n要让列表看起来更漂亮，你可以把内容用固定的缩进整理好：\n\n    *   Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\n        Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi,\n        viverra nec, fringilla in, laoreet vitae, risus.\n    *   Donec sit amet nisl. Aliquam semper ipsum sit amet velit.\n        Suspendisse id sem consectetuer libero luctus adipiscing.\n\n但是如果你懒，那也行：\n\n    *   Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\n    Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi,\n    viverra nec, fringilla in, laoreet vitae, risus.\n    *   Donec sit amet nisl. Aliquam semper ipsum sit amet velit.\n    Suspendisse id sem consectetuer libero luctus adipiscing.\n\n如果列表项目间用空行分开，在输出 HTML 时 Markdown 就会将项目内容用 `<p>` \n标签包起来，举例来说：\n\n    *   Bird\n    *   Magic\n\n会被转换为：\n\n    <ul>\n    <li>Bird</li>\n    <li>Magic</li>\n    </ul>\n\n但是这个：\n\n    *   Bird\n\n    *   Magic\n\n会被转换为：\n\n    <ul>\n    <li><p>Bird</p></li>\n    <li><p>Magic</p></li>\n    </ul>\n\n列表项目可以包含多个段落，每个项目下的段落都必须缩进 4 个空格或是 1 个制表符：\n\n    1.  This is a list item with two paragraphs. Lorem ipsum dolor\n        sit amet, consectetuer adipiscing elit. Aliquam hendrerit\n        mi posuere lectus.\n\n        Vestibulum enim wisi, viverra nec, fringilla in, laoreet\n        vitae, risus. Donec sit amet nisl. Aliquam semper ipsum\n        sit amet velit.\n\n    2.  Suspendisse id sem consectetuer libero luctus adipiscing.\n\n如果你每行都有缩进，看起来会看好很多，当然，再次地，如果你很懒惰，Markdown 也允许：\n\n    *   This is a list item with two paragraphs.\n\n        This is the second paragraph in the list item. You're\n    only required to indent the first line. Lorem ipsum dolor\n    sit amet, consectetuer adipiscing elit.\n\n    *   Another item in the same list.\n\n如果要在列表项目内放进引用，那 `>` 就需要缩进：\n\n    *   A list item with a blockquote:\n\n        > This is a blockquote\n        > inside a list item.\n\n如果要放代码区块的话，该区块就需要缩进*两次*，也就是 8 个空格或是 2 个制表符：\n\n    *   一列表项包含一个列表区块：\n\n            <代码写在这>\n\n\n当然，项目列表很可能会不小心产生，像是下面这样的写法：\n\n    1986. What a great season.\n\n换句话说，也就是在行首出现*数字-句点-空白*，要避免这样的状况，你可以在句点前面加上反斜杠。\n\n    1986\\. What a great season.\n\n<h3 id=\"precode\">代码区块</h3>\n\n和程序相关的写作或是标签语言原始码通常会有已经排版好的代码区块，通常这些区块我们并不希望它以一般段落文件的方式去排版，而是照原来的样子显示，Markdown 会用 `<pre>` 和 `<code>` 标签来把代码区块包起来。\n\n要在 Markdown 中建立代码区块很简单，只要简单地缩进 4 个空格或是 1 个制表符就可以，例如，下面的输入：\n\n    这是一个普通段落：\n\n        这是一个代码区块。\n\nMarkdown 会转换成：\n\n    <p>这是一个普通段落：</p>\n\n    <pre><code>这是一个代码区块。\n    </code></pre>\n\n这个每行一阶的缩进（4 个空格或是 1 个制表符），都会被移除，例如：\n\n    Here is an example of AppleScript:\n\n        tell application \"Foo\"\n            beep\n        end tell\n\n会被转换为：\n\n    <p>Here is an example of AppleScript:</p>\n\n    <pre><code>tell application \"Foo\"\n        beep\n    end tell\n    </code></pre>\n\n一个代码区块会一直持续到没有缩进的那一行（或是文件结尾）。\n\n在代码区块里面， `&` 、 `<` 和 `>` 会自动转成 HTML 实体，这样的方式让你非常容易使用 Markdown 插入范例用的 HTML 原始码，只需要复制贴上，再加上缩进就可以了，剩下的 Markdown 都会帮你处理，例如：\n\n        <div class=\"footer\">\n            &copy; 2004 Foo Corporation\n        </div>\n\n会被转换为：\n\n    <pre><code>&lt;div class=\"footer\"&gt;\n        &amp;copy; 2004 Foo Corporation\n    &lt;/div&gt;\n    </code></pre>\n\n代码区块中，一般的 Markdown 语法不会被转换，像是星号便只是星号，这表示你可以很容易地以 Markdown 语法撰写 Markdown 语法相关的文件。\n\n<h3 id=\"hr\">分隔线</h3>\n\n你可以在一行中用三个以上的星号、减号、底线来建立一个分隔线，行内不能有其他东西。你也可以在星号或是减号中间插入空格。下面每种写法都可以建立分隔线：\n\n    * * *\n\n    ***\n\n    *****\n\n    - - -\n\n    ---------------------------------------\n\n\n* * *\n\n<h2 id=\"span\">区段元素</h2>\n\n<h3 id=\"link\">链接</h3>\n\nMarkdown 支持两种形式的链接语法： *行内式*和*参考式*两种形式。\n\n不管是哪一种，链接文字都是用 [方括号] 来标记。\n\n要建立一个*行内式*的链接，只要在方块括号后面紧接着圆括号并插入网址链接即可，如果你还想要加上链接的 title 文字，只要在网址后面，用双引号把 title 文字包起来即可，例如：\n\n    This is [an example](http://example.com/ \"Title\") inline link.\n\n    [This link](http://example.net/) has no title attribute.\n\n会产生：\n\n    <p>This is <a href=\"http://example.com/\" title=\"Title\">\n    an example</a> inline link.</p>\n\n    <p><a href=\"http://example.net/\">This link</a> has no\n    title attribute.</p>\n\n如果你是要链接到同样主机的资源，你可以使用相对路径：\n\n    See my [About](/about/) page for details.   \n\n*参考式*的链接是在链接文字的括号后面再接上另一个方括号，而在第二个方括号里面要填入用以辨识链接的标记：\n\n    This is [an example][id] reference-style link.\n\n你也可以选择性地在两个方括号中间加上一个空格：\n\n    This is [an example] [id] reference-style link.\n\n接着，在文件的任意处，你可以把这个标记的链接内容定义出来：\n\n    [id]: http://example.com/  \"Optional Title Here\"\n\n链接内容定义的形式为：\n\n*   方括号（前面可以选择性地加上至多三个空格来缩进），里面输入链接文字\n*   接着一个冒号\n*   接着一个以上的空格或制表符\n*   接着链接的网址\n*   选择性地接着 title 内容，可以用单引号、双引号或是括弧包着\n\n下面这三种链接的定义都是相同：\n\n\t[foo]: http://example.com/  \"Optional Title Here\"\n\t[foo]: http://example.com/  'Optional Title Here'\n\t[foo]: http://example.com/  (Optional Title Here)\n\n**请注意：**有一个已知的问题是 Markdown.pl 1.0.1 会忽略单引号包起来的链接 title。\n\n链接网址也可以用尖括号包起来：\n\n    [id]: <http://example.com/>  \"Optional Title Here\"\n\n你也可以把 title 属性放到下一行，也可以加一些缩进，若网址太长的话，这样会比较好看：\n\n    [id]: http://example.com/longish/path/to/resource/here\n        \"Optional Title Here\"\n\n网址定义只有在产生链接的时候用到，并不会直接出现在文件之中。\n\n链接辨别标签可以有字母、数字、空白和标点符号，但是并*不*区分大小写，因此下面两个链接是一样的：\n\n\t[link text][a]\n\t[link text][A]\n\n*隐式链接标记*功能让你可以省略指定链接标记，这种情形下，链接标记会视为等同于链接文字，要用隐式链接标记只要在链接文字后面加上一个空的方括号，如果你要让 \"Google\" 链接到 google.com，你可以简化成：\n\n\t[Google][]\n\n然后定义链接内容：\n\n\t[Google]: http://google.com/\n\n由于链接文字可能包含空白，所以这种简化型的标记内也许包含多个单词：\n\n\tVisit [Daring Fireball][] for more information.\n\n然后接着定义链接：\n\n\t[Daring Fireball]: http://daringfireball.net/\n\n链接的定义可以放在文件中的任何一个地方，我比较偏好直接放在链接出现段落的后面，你也可以把它放在文件最后面，就像是注解一样。\n\n下面是一个参考式链接的范例：\n\n    I get 10 times more traffic from [Google] [1] than from\n    [Yahoo] [2] or [MSN] [3].\n\n      [1]: http://google.com/        \"Google\"\n      [2]: http://search.yahoo.com/  \"Yahoo Search\"\n      [3]: http://search.msn.com/    \"MSN Search\"\n\n如果改成用链接名称的方式写：\n\n    I get 10 times more traffic from [Google][] than from\n    [Yahoo][] or [MSN][].\n\n      [google]: http://google.com/        \"Google\"\n      [yahoo]:  http://search.yahoo.com/  \"Yahoo Search\"\n      [msn]:    http://search.msn.com/    \"MSN Search\"\n\n上面两种写法都会产生下面的 HTML。\n\n    <p>I get 10 times more traffic from <a href=\"http://google.com/\"\n    title=\"Google\">Google</a> than from\n    <a href=\"http://search.yahoo.com/\" title=\"Yahoo Search\">Yahoo</a>\n    or <a href=\"http://search.msn.com/\" title=\"MSN Search\">MSN</a>.</p>\n\n下面是用行内式写的同样一段内容的 Markdown 文件，提供作为比较之用：\n\n    I get 10 times more traffic from [Google](http://google.com/ \"Google\")\n    than from [Yahoo](http://search.yahoo.com/ \"Yahoo Search\") or\n    [MSN](http://search.msn.com/ \"MSN Search\").\n\n参考式的链接其实重点不在于它比较好写，而是它比较好读，比较一下上面的范例，使用参考式的文章本身只有 81 个字符，但是用行内形式的却会增加到 176 个字元，如果是用纯 HTML 格式来写，会有 234 个字元，在 HTML 格式中，标签比文本还要多。\n\n使用 Markdown 的参考式链接，可以让文件更像是浏览器最后产生的结果，让你可以把一些标记相关的元数据移到段落文字之外，你就可以增加链接而不让文章的阅读感觉被打断。\n\n<h3 id=\"em\">强调</h3>\n\nMarkdown 使用星号（`*`）和底线（`_`）作为标记强调字词的符号，被 `*` 或 `_` 包围的字词会被转成用 `<em>` 标签包围，用两个 `*` 或 `_` 包起来的话，则会被转成 `<strong>`，例如：\n\n    *single asterisks*\n\n    _single underscores_\n\n    **double asterisks**\n\n    __double underscores__\n\n会转成：\n\n    <em>single asterisks</em>\n\n    <em>single underscores</em>\n\n    <strong>double asterisks</strong>\n\n    <strong>double underscores</strong>\n\n你可以随便用你喜欢的样式，唯一的限制是，你用什么符号开启标签，就要用什么符号结束。\n\n强调也可以直接插在文字中间：\n\n    un*frigging*believable\n\n但是**如果你的 `*` 和 `_` 两边都有空白的话，它们就只会被当成普通的符号**。\n\n如果要在文字前后直接插入普通的星号或底线，你可以用反斜线：\n\n    \\*this text is surrounded by literal asterisks\\*\n\n<h3 id=\"code\">代码</h3>\n\n如果要标记一小段行内代码，你可以用反引号把它包起来（`` ` ``），例如：\n\n    Use the `printf()` function.\n\n会产生：\n\n    <p>Use the <code>printf()</code> function.</p>\n\n如果要在代码区段内插入反引号，你可以用多个反引号来开启和结束代码区段：\n\n    ``There is a literal backtick (`) here.``\n\n这段语法会产生：\n\n    <p><code>There is a literal backtick (`) here.</code></p>\n\n代码区段的起始和结束端都可以放入一个空白，起始端后面一个，结束端前面一个，这样你就可以在区段的一开始就插入反引号：\n\n\tA single backtick in a code span: `` ` ``\n\t\n\tA backtick-delimited string in a code span: `` `foo` ``\n\n会产生：\n\n\t<p>A single backtick in a code span: <code>`</code></p>\n\t\n\t<p>A backtick-delimited string in a code span: <code>`foo`</code></p>\n\n在代码区段内，`&` 和尖括号**都**会被自动地转成 HTML 实体，这使得插入 HTML 原始码变得很容易，Markdown 会把下面这段：\n\n    Please don't use any `<blink>` tags.\n\n转为：\n\n    <p>Please don't use any <code>&lt;blink&gt;</code> tags.</p>\n\n你也可以这样写：\n\n    `&#8212;` is the decimal-encoded equivalent of `&mdash;`.\n\n以产生：\n\n    <p><code>&amp;#8212;</code> is the decimal-encoded\n    equivalent of <code>&amp;mdash;</code>.</p>\n\n\n\n<h3 id=\"img\">图片</h3>\n\n很明显地，要在纯文字应用中设计一个「自然」的语法来插入图片是有一定难度的。\n\nMarkdown 使用一种和链接很相似的语法来标记图片，同样也允许两种样式： *行内式*和*参考式*。\n\n行内式的图片语法看起来像是：\n\n    ![Alt text](/path/to/img.jpg)\n\n    ![Alt text](/path/to/img.jpg \"Optional title\")\n\n详细叙述如下：\n\n*   一个惊叹号 `!`\n*   接着一个方括号，里面放上图片的替代文字\n*   接着一个普通括号，里面放上图片的网址，最后还可以用引号包住并加上\n    选择性的 'title' 文字。\n\n参考式的图片语法则长得像这样：\n\n    ![Alt text][id]\n\n「id」是图片参考的名称，图片参考的定义方式则和连结参考一样：\n\n    [id]: url/to/image  \"Optional title attribute\"\n\n到目前为止， Markdown 还没有办法指定图片的宽高，如果你需要的话，你可以使用普通的 `<img>` 标签。\n\n* * *\n\n<h2 id=\"misc\">其它</h2>\n\n<h3 id=\"autolink\">自动链接</h3>\n\nMarkdown 支持以比较简短的自动链接形式来处理网址和电子邮件信箱，只要是用尖括号包起来， Markdown 就会自动把它转成链接。一般网址的链接文字就和链接地址一样，例如：\n\n    <http://example.com/>\n\nMarkdown 会转为：\n\n    <a href=\"http://example.com/\">http://example.com/</a>\n\n邮址的自动链接也很类似，只是 Markdown 会先做一个编码转换的过程，把文字字符转成 16 进位码的 HTML 实体，这样的格式可以糊弄一些不好的邮址收集机器人，例如：\n\n    <address@example.com>\n\nMarkdown 会转成：\n\n    <a href=\"&#x6D;&#x61;i&#x6C;&#x74;&#x6F;:&#x61;&#x64;&#x64;&#x72;&#x65;\n    &#115;&#115;&#64;&#101;&#120;&#x61;&#109;&#x70;&#x6C;e&#x2E;&#99;&#111;\n    &#109;\">&#x61;&#x64;&#x64;&#x72;&#x65;&#115;&#115;&#64;&#101;&#120;&#x61;\n    &#109;&#x70;&#x6C;e&#x2E;&#99;&#111;&#109;</a>\n\n在浏览器里面，这段字串（其实是 `<a href=\"mailto:address@example.com\">address@example.com</a>`）会变成一个可以点击的「address@example.com」链接。\n\n（这种作法虽然可以糊弄不少的机器人，但并不能全部挡下来，不过总比什么都不做好些。不管怎样，公开你的信箱终究会引来广告信件的。）\n\n<h3 id=\"backslash\">反斜杠</h3>\n\nMarkdown 可以利用反斜杠来插入一些在语法中有其它意义的符号，例如：如果你想要用星号加在文字旁边的方式来做出强调效果（但不用 `<em>` 标签），你可以在星号的前面加上反斜杠：\n\n    \\*literal asterisks\\*\n\nMarkdown 支持以下这些符号前面加上反斜杠来帮助插入普通的符号：\n\n    \\   反斜线\n    `   反引号\n    *   星号\n    _   底线\n    {}  花括号\n    []  方括号\n    ()  括弧\n    #   井字号\n    +   加号\n    -   减号\n    .   英文句点\n    !   惊叹号\n\n<h2 id=\"acknowledgement\">感谢</h2>\n\n感谢 [leafy7382][] 协助翻译，[hlb][]、[Randylien][] 帮忙润稿，[ethantw][] 的[汉字标准格式・CSS Reset][]， [WM][] 回报文字错误。\n\n[leafy7382]:https://twitter.com/#!/leafy7382\n[hlb]:http://iamhlb.com/\n[Randylien]:http://twitter.com/randylien\n[ethantw]:https://twitter.com/#!/ethantw\n[汉字标准格式・CSS Reset]:http://ethantw.net/projects/han/\n[WM]:http://kidwm.net/\n\n感谢 [fenprace][]，[addv][]。\n\n[fenprace]:https://github.com/fenprace\n[addv]:https://github.com/addv\n\n"
 
 /***/ })
 /******/ ]);

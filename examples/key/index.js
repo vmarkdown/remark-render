@@ -6,6 +6,7 @@ const renderer = require('remark-preact-renderer');
 const processor = unified()
     .use(parse, {})
     .use(render, {
+        key: false,
         renderer: renderer,
         h: preact.h,
         rootClassName: 'markdown-body',

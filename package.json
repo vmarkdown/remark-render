@@ -1,10 +1,10 @@
 {
   "name": "remark-render",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Compile markdown to Virtual DOM with remark.",
   "scripts": {
     "dist": "webpack -c webpack.config.js",
-    "dev": "webpack -w --config ./examples/webpack.config.js --example key",
+    "dev": "webpack -w --config ./examples/webpack.config.js --example vue",
     "test": "mocha test/**/*.js"
   },
   "repository": {
@@ -37,6 +37,7 @@
     "remark-parse": "^5.0.0",
     "remark-preact-renderer": "^0.0.6",
     "remark-react-renderer": "^0.0.1",
+    "remark-vue-renderer": "^0.0.1",
     "text-loader": "^0.0.1",
     "unified": "^7.0.0",
     "webpack": "^4.17.2",

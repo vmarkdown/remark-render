@@ -73,7 +73,7 @@ unified()
 | :------| ------: |
 | React | [remark-preact-renderer](https://github.com/vmarkdown/remark-preact-renderer) |
 | Preact | [remark-react-renderer](https://github.com/vmarkdown/remark-react-renderer) |
-| Vue | remark-vue-renderer |
+| Vue | [remark-vue-renderer](https://github.com/vmarkdown/remark-vue-renderer) |
 | HyperScript | remark-hyperscript-renderer |
 | snabbdom | remark-snabbdom-renderer |
 | virtual-dom | remark-virtual-dom-renderer |
@@ -170,12 +170,12 @@ var processor = unified()
     .use(parse)
     .use(render, {
         renderer: renderer
-    });
+    }).freeze();
  
 const app = new Vue({
     el: '#preview',
     render(h) {
-        var file = processor.data('h', h).processSync('# h1');
+        var file = processor().data('h', h).processSync('# h1');
         return file.contents;
     }
 }); 

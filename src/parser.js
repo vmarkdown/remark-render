@@ -19,16 +19,18 @@ Parser.prototype.parseNode = function(node, parent) {
     if(!node) return null;
     var children = this.parseNodes(node.children, node);
     var h = this.h;
-    return this.options.renderer[node.type].apply(null, [h, node, children, parent]);
+    return this.options.renderer[node.type].apply(null, [h, node, children, parent, this.options]);
 };
 
 Parser.prototype.parse = function(root) {
     try {
+        /*
         root.properties = {
             key: 0,
             className: this.options.rootClassName || 'markdown-body'
         };
         this.options.rootTagName && (root.tagName = this.options.rootTagName);
+        */
         return this.parseNode(root);
     }
     catch (e) {

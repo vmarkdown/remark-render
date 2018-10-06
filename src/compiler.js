@@ -6,7 +6,9 @@ var Parser = require('./parser');
 
 function Compiler(root, file) {
 
-    createKey(root);
+    if(this.options.key) {
+        createKey(root);
+    }
 
     this.root = root;
     this.file = file;
