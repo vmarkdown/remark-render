@@ -5,7 +5,8 @@
   "scripts": {
     "dist": "webpack -c webpack.config.js",
     "dev": "webpack -w --config ./examples/webpack.config.js --example vue",
-    "test": "mocha test/**/*.js"
+    "test": "mocha test/**/*.js",
+    "pub": "npm publish ."
   },
   "repository": {
     "type": "git",
