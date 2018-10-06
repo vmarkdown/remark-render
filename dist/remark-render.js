@@ -107,78 +107,220 @@ module.exports = plugin;
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Parser = __webpack_require__(2);
+var unherit = __webpack_require__(2);
+var xtend = __webpack_require__(3);
+var Compiler = __webpack_require__(5);
 
 module.exports = function plugin(options) {
+    var Local = unherit(Compiler);
+    Local.prototype.options = xtend(Local.prototype.options, this.data('settings'), options);
 
-    var self = this;
+    var h = this.data('h');
+    h && (Local.prototype.options.h = h);
 
-    var renderer = this.data('renderer') || options.renderer;
-
-    var parser = new Parser(options);
-    parser.renderer = renderer;
-
-    this.Compiler = function compiler(node) {
-        var h = self.data('h');
-        h && (parser.h = h);
-        return parser.parse(node);
-    }
+    this.Compiler = Local;
 };
 
 /***/ }),
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var extend = __webpack_require__(3);
+"use strict";
+
+
+var xtend = __webpack_require__(3)
+var inherits = __webpack_require__(4)
+
+module.exports = unherit
+
+/* Create a custom constructor which can be modified
+ * without affecting the original class. */
+function unherit(Super) {
+  var result
+  var key
+  var value
+
+  inherits(Of, Super)
+  inherits(From, Of)
+
+  /* Clone values. */
+  result = Of.prototype
+
+  for (key in result) {
+    value = result[key]
+
+    if (value && typeof value === 'object') {
+      result[key] = 'concat' in value ? value.concat() : xtend(value)
+    }
+  }
+
+  return Of
+
+  /* Constructor accepting a single argument,
+   * which itself is an `arguments` object. */
+  function From(parameters) {
+    return Super.apply(this, parameters)
+  }
+
+  /* Constructor accepting variadic arguments. */
+  function Of() {
+    if (!(this instanceof Of)) {
+      return new From(arguments)
+    }
+
+    return Super.apply(this, arguments)
+  }
+}
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+module.exports = extend
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function extend() {
+    var target = {}
+
+    for (var i = 0; i < arguments.length; i++) {
+        var source = arguments[i]
+
+        for (var key in source) {
+            if (hasOwnProperty.call(source, key)) {
+                target[key] = source[key]
+            }
+        }
+    }
+
+    return target
+}
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+  };
+} else {
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    var TempCtor = function () {}
+    TempCtor.prototype = superCtor.prototype
+    ctor.prototype = new TempCtor()
+    ctor.prototype.constructor = ctor
+  }
+}
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var xtend = __webpack_require__(3);
+var createKey = __webpack_require__(6);
+var Parser = __webpack_require__(8);
+
+function Compiler(root, file) {
+
+    if(this.options.key) {
+        createKey(root);
+    }
+
+    this.root = root;
+    this.file = file;
+
+    this.options = xtend(this.options);
+    if(this.options.renderer){
+        this.visitors = this.options.renderer;
+    }
+
+    this.parser = new Parser(this.options);
+}
+
+Compiler.prototype.compile = function() {
+    return this.parser.parse(this.root);
+};
+
+Compiler.prototype.visitors = __webpack_require__(9);
+
+module.exports = Compiler;
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var extend = __webpack_require__(7);
 
 function extendProps(node, props) {
     if(!node.properties){ node.properties = {}; }
     extend(node.properties, props);
 }
 
-function Parser(options) {
-    this.options = options;
-    this.h = options.h;
+function hash(str) {
+    var hash = 5381, i = str.length;
+    while(i) {
+        hash = (hash * 33) ^ str.charCodeAt(--i);
+    }
+    return hash >>> 0;
 }
 
-Parser.prototype.parseNodes = function(nodes) {
-    if(!nodes || nodes.length === 0) return [];
-    var vnodes = [];
-    for(var i=0;i<nodes.length;i++){
+function createKeyByNodes(nodes) {
+    if(!nodes || nodes.length===0){
+        return
+    }
+    for(var i=0;i<nodes.length;i++) {
         var node = nodes[i];
-        extendProps(node, {key: i});
-        var tempNode = this.parseNode(node);
-        tempNode && vnodes.push(tempNode);
+        createKeyByNode(node);
     }
-    return vnodes;
-};
+}
 
-Parser.prototype.parseNode = function(node) {
-    if(!node) return null;
-    var children = this.parseNodes(node.children);
-    var h = this.h;
-    return this.renderer[node.type].apply(null, [h, node, children]);
-};
-
-Parser.prototype.parse = function(root) {
-    try {
-        extendProps(root, {
-            key: 0,
-            className: this.options.rootClassName || 'markdown-body'
-        });
-        this.options.rootTagName && (root.tagName = this.options.rootTagName);
-        return this.parseNode(root);
+function createKeyByNode(node) {
+    extendProps(node);
+    createKeyByNodes(node.children);
+    if(node.value) {
+        node.properties.key = hash(node.value);
     }
-    catch (e) {
-        console.error(e);
-        return this.h?this.h('div', {}, 'error'):null;
+    else if(node.children) {
+        var key = node.children.map(function (item) {
+            return item.properties.key;
+        }).join('-');
+        node.properties.key = hash(key);
     }
-};
+    else {
+        var position = node.position;
+        node.properties.key = hash(position.start.line + '-' +position.end.line);
+    }
+}
 
-module.exports = Parser;
+function createKey(node) {
+    createKeyByNodes(node.children);
+    createKeyByNode(node);
+}
+
+module.exports = createKey;
+
 
 /***/ }),
-/* 3 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -300,6 +442,123 @@ module.exports = function extend() {
 	return target;
 };
 
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports) {
+
+function Parser(options) {
+    this.options = options;
+    this.h = options.h;
+}
+
+Parser.prototype.parseNodes = function(nodes, parent) {
+    if(!nodes || nodes.length === 0) return [];
+    var vnodes = [];
+    for(var i=0;i<nodes.length;i++){
+        var node = nodes[i];
+        node.parent = parent;
+        var tempNode = this.parseNode(node);
+        tempNode && vnodes.push(tempNode);
+    }
+    return vnodes;
+};
+
+Parser.prototype.parseNode = function(node, parent) {
+    if(!node) return null;
+    var children = this.parseNodes(node.children, node);
+    var h = this.h;
+    return this.options.renderer[node.type].apply(null, [h, node, children, parent, this.options]);
+};
+
+Parser.prototype.parse = function(root) {
+    try {
+        /*
+        root.properties = {
+            key: 0,
+            className: this.options.rootClassName || 'markdown-body'
+        };
+        this.options.rootTagName && (root.tagName = this.options.rootTagName);
+        */
+        return this.parseNode(root);
+    }
+    catch (e) {
+        console.error(e);
+        return this.h?this.h('div', {}, 'error'):null;
+    }
+};
+
+module.exports = Parser;
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+/**
+ * Renderer interface
+ */
+
+module.exports = {
+
+    /**
+     * root element (根元素)
+     * @param {*} h create element function (构建元素节点函数)
+     * @param {*} node  current node  (当前根元素节点)
+ *              node.key is node index if node in array for key. default is 0 (如果当前节点在数组中，返回当前节点在数组中的序列，这是为了构建数组key)
+     * @param {*} children node create element children (当前节点的子节点)
+     */
+    root : function(h, node, children, options) {},
+
+    text : function(h, node, children, options) {},
+
+    inlineCode : function(h, node, children, options) {},
+
+    blockquote : function(h, node, children, options) {},
+
+    heading : function(h, node, children, options) {},
+
+    thematicBreak : function(h, node, children, options) {},
+
+    list : function(h, node, children, options) {},
+
+    listItem : function(h, node, children, options) {},
+
+    checkbox : function(h, node, children, options) {},
+
+    paragraph : function(h, node, children, options) {},
+
+    table : function(h, node, children, options) {},
+
+    tableRow : function(h, node, children, options) {},
+
+    tableCell : function(h, node, children, options) {},
+
+    strong : function(h, node, children, options) {},
+
+    emphasis : function(h, node, children, options) {},
+
+    break : function(h, node, children, options) {},
+
+    delete : function(h, node, children, options) {},
+
+    link : function(h, node, children, options) {},
+
+    linkReference : function(h, node, children, options) {},
+
+    definition : function(h, node, children, options) {},
+
+    image : function(h, node, children, options) {},
+
+    imageReference : function(h, node, children, options) {},
+
+    math : function(h, node, children, options) {},
+
+    inlineMath : function(h, node, children, options) {},
+
+    html : function(h, node, children, options) {},
+
+    code : function(h, node, children, options) {},
+};
 
 /***/ })
 /******/ ]);
