@@ -71,8 +71,8 @@ unified()
 
 |  | renderers |
 | :------| ------: |
-| React | [remark-preact-renderer](https://github.com/vmarkdown/remark-preact-renderer) |
-| Preact | [remark-react-renderer](https://github.com/vmarkdown/remark-react-renderer) |
+| Preact | [remark-preact-renderer](https://github.com/vmarkdown/remark-preact-renderer) |
+| React | [remark-react-renderer](https://github.com/vmarkdown/remark-react-renderer) |
 | Vue | [remark-vue-renderer](https://github.com/vmarkdown/remark-vue-renderer) |
 | HyperScript | remark-hyperscript-renderer |
 | snabbdom | remark-snabbdom-renderer |
